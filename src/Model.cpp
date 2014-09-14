@@ -1,8 +1,6 @@
 #include "Starship.hpp"
 #include "Hedron.hpp"
 #include "Model.hpp"
-#include <cassert>
-#include <cstdio>
 
 void Model::Cube(double size)
 {
@@ -10,35 +8,35 @@ void Model::Cube(double size)
 
 	Begin(GL_QUADS);
 
-	Vertex(+l, +l, -l);
-	Vertex(-l, +l, -l);
-	Vertex(-l, +l, +l);
-	Vertex(+l, +l, +l);
+	Next(Vertex(+l, +l, -l));
+	Next(Vertex(-l, +l, -l));
+	Next(Vertex(-l, +l, +l));
+	Next(Vertex(+l, +l, +l));
 
-	Vertex(+l, -l, +l);
-	Vertex(-l, -l, +l);
-	Vertex(-l, -l, -l);
-	Vertex(+l, -l, -l);
+	Next(Vertex(+l, -l, +l));
+	Next(Vertex(-l, -l, +l));
+	Next(Vertex(-l, -l, -l));
+	Next(Vertex(+l, -l, -l));
  
-	Vertex(+l, +l, +l);
-	Vertex(-l, +l, +l);
-	Vertex(-l, -l, +l);
-	Vertex(+l, -l, +l);
+	Next(Vertex(+l, +l, +l));
+	Next(Vertex(-l, +l, +l));
+	Next(Vertex(-l, -l, +l));
+	Next(Vertex(+l, -l, +l));
  
-	Vertex(+l, -l, -l);
-	Vertex(-l, -l, -l);
-	Vertex(-l, +l, -l);
-	Vertex(+l, +l, -l);
+	Next(Vertex(+l, -l, -l));
+	Next(Vertex(-l, -l, -l));
+	Next(Vertex(-l, +l, -l));
+	Next(Vertex(+l, +l, -l));
  
-	Vertex(-l, +l, +l);
-	Vertex(-l, +l, -l);
-	Vertex(-l, -l, -l);
-	Vertex(-l, -l, +l);
+	Next(Vertex(-l, +l, +l));
+	Next(Vertex(-l, +l, -l));
+	Next(Vertex(-l, -l, -l));
+	Next(Vertex(-l, -l, +l));
  
-	Vertex(+l, +l, -l);
-	Vertex(+l, +l, +l);
-	Vertex(+l, -l, +l);
-	Vertex(+l, -l, -l);
+	Next(Vertex(+l, +l, -l));
+	Next(Vertex(+l, +l, +l));
+	Next(Vertex(+l, -l, +l));
+	Next(Vertex(+l, -l, -l));
 
 	End();
 }

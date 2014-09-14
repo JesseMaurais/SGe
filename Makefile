@@ -41,7 +41,7 @@ Height.o: src/Height.cpp src/Height.hpp
 Lua.o: src/Lua.cpp src/Lua.hpp
 	$(CC) $(CFLAGS) src/Lua.cpp
 
-Lux.o: src/Lux.cpp src/Lux.hpp src/Geom.cpp src/Shader.cpp
+Lux.o: src/Lux.cpp src/Lux.hpp src/Geom.hpp src/Shader.hpp
 	$(CC) $(CFLAGS) src/Lux.cpp
 
 Lwo.o: src/Lwo.cpp src/Lwo.hpp

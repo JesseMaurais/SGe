@@ -33,13 +33,6 @@ void Mesh::Swap(Mesh &M)
 	texCoords.swap(M.texCoords);
 }
 
-int Mesh::AddGroup(Segment G)
-{
-	int index = groups.size();
-	groups.push_back(G);
-	return index;
-}
-
 int Mesh::AddSurface(Surface S)
 {
 	int index = faces.size();
@@ -87,7 +80,7 @@ int Mesh::NewVertex(int a, int b, double c)
 	Vector &A = GetVertex(a);
 	Vector &B = GetVertex(b);
 
-	return AddVertex(c*A + (1 - c)*B);
+	return AddVertex(A*c + B*(1-c));
 }
 
 int Mesh::NewTexCoord(int a, int b, double c)
@@ -95,7 +88,7 @@ int Mesh::NewTexCoord(int a, int b, double c)
 	Vector &A = GetTexCoord(a);
 	Vector &B = GetTexCoord(b);
 
-	return AddTexCoord(c*A + (1 - c)*B);
+	return AddTexCoord(A*c + B*(1-c));
 }
 
 int Mesh::NewNormal(int a, int b, double c)
@@ -103,7 +96,7 @@ int Mesh::NewNormal(int a, int b, double c)
 	Vector &A = GetNormal(a);
 	Vector &B = GetNormal(b);
 
-	return AddNormal(c*A + (1 - c)*B);
+	return AddNormal(A*c + B*(1-c));
 }
 
 int Mesh::NewColor(int a, int b, double c)
@@ -111,7 +104,7 @@ int Mesh::NewColor(int a, int b, double c)
 	Vector &A = GetColor(a);
 	Vector &B = GetColor(b);
 
-	return AddColor(c*A + (1 - c)*B);
+	return AddColor(A*c + B*(1-c));
 }
 
 Vector &Mesh::GetVertex(int index)
@@ -169,7 +162,7 @@ void Mesh::GetNormals(int index, Vector *V)
 	GetNormals(faces[index].points, V);
 }
 
-void Mesh::GetColor(int index, Vector *V)
+void Mesh::GetColors(int index, Vector *V)
 {
 	GetColors(faces[index].points, V);
 }
@@ -206,13 +199,13 @@ int MeshComposer::BeginGroup(int id)
 {
 	group = id;
 	Group &G = Mesh::groups[group];
-	G.first = Mesh::faces.size();
+	G.first = 3*Mesh::faces.size();
 }
 
 int MeshComposer::EndGroup()
 {
 	Group &G = Mesh::groups[group];
-	G.count = Mesh::faces.size() - G.first;
+	G.count = 3*Mesh::faces.size() - G.first;
 	return group;
 }
 
@@ -247,6 +240,11 @@ int MeshComposer::Normal(double x, double y, double z)
 int MeshComposer::Color(double x, double y, double z)
 {
 	return Mesh::AddColor(Vector(x, y, z));
+}
+
+int MeshComposer::Next(Point P)
+{
+	return Next(Mesh::AddPoint(P));
 }
 
 int MeshComposer::Next(int index)

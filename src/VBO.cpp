@@ -1,4 +1,5 @@
 #include "VBO.hpp"
+#include <cstdio>
 
 template <class C>
  void BufferData(GLenum target, std::vector<C> &list, GLenum usage)
@@ -69,6 +70,6 @@ void VBO::BindBuffers()
 void VBO::Draw(int group)
 {
 	Group &G = Mesh::groups[group];
-	glDrawElements(GL_TRIANGLES, G.count*3, GL_UNSIGNED_INT, G.first*3);
+	glDrawElements(GL_TRIANGLES, G.count, GL_UNSIGNED_INT, (void*) G.first);
 }
 

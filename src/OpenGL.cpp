@@ -6,6 +6,7 @@ static SDL_GLContext Context;
 
 signed OpenGL_Init()
 {
+	const char *title = NULL;
 	int x = SDL_WINDOWPOS_UNDEFINED;
 	int y = SDL_WINDOWPOS_UNDEFINED;
 	int w = 800;
@@ -21,12 +22,13 @@ signed OpenGL_Init()
 	 while (lua_next(State, table))
 	 {
 		const char *key = lua_tostring(State, -2);
-		#define integer lua_tointeger(State, -1)
-		#define boolean lua_toboolean(State, -1)
+		#define tointeger lua_tointeger(State, -1)
+		#define toboolean lua_toboolean(State, -1)
+		#define tostring  lua_tostring(State, -1)
 
 		if (!SDL_strcasecmp(key, "ALPHA"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -34,7 +36,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "RED"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_RED_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_RED_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -42,7 +44,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "GREEN"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -50,7 +52,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "BLUE"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -58,7 +60,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "DEPTH"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -66,7 +68,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "STENCIL"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -74,7 +76,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "BUFFER"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -82,7 +84,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "DOUBLEBUFFER"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, boolean))
+		 if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, toboolean))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -90,7 +92,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "ACCELERATED"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, boolean))
+		 if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, toboolean))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -98,7 +100,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "MAJOR"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -106,7 +108,7 @@ signed OpenGL_Init()
 		else
 		if (!SDL_strcasecmp(key, "MINOR"))
 		{
-		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, integer))
+		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, tointeger))
 		 {
 		  SDL_perror("SDL_GL_SetAttribute");
 		 }
@@ -136,90 +138,95 @@ signed OpenGL_Init()
 		 }
 		}
 		else
+		if (!SDL_strcasecmp(key, "TITLE"))
+		{
+		 title = tostring;
+		}
+		else
 		if (!SDL_strcasecmp(key, "X"))
 		{
-		 x = integer;
+		 x = tointeger;
 		}
 		else
 		if (!SDL_strcasecmp(key, "Y"))
 		{
-		 y = integer;
+		 y = tointeger;
 		}
 		else
 		if (!SDL_strcasecmp(key, "WIDTH"))
 		{
-		 w = integer;
+		 w = tointeger;
 		}
 		else
 		if (!SDL_strcasecmp(key, "HEIGHT"))
 		{
-		 h = integer;
+		 h = tointeger;
 		}
 		else
 		if (!SDL_strcasecmp(key, "FULLSCREEN"))
 		{
-		 if (boolean) m |= SDL_WINDOW_FULLSCREEN;
+		 if (toboolean) m |= SDL_WINDOW_FULLSCREEN;
 		}
 		else
 		if (!SDL_strcasecmp(key, "DESKTOP"))
 		{
-		 if (boolean) m |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		 if (toboolean) m |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 		else
 		if (!SDL_strcasecmp(key, "SHOWN"))
 		{
-		 if (boolean) m |= SDL_WINDOW_SHOWN;
+		 if (toboolean) m |= SDL_WINDOW_SHOWN;
 		}
 		else
 		if (!SDL_strcasecmp(key, "HIDDEN"))
 		{
-		 if (boolean) m |= SDL_WINDOW_HIDDEN;
+		 if (toboolean) m |= SDL_WINDOW_HIDDEN;
 		}
 		else
 		if (!SDL_strcasecmp(key, "BORDERLESS"))
 		{
-		 if (boolean) m |= SDL_WINDOW_BORDERLESS;
+		 if (toboolean) m |= SDL_WINDOW_BORDERLESS;
 		}
 		else
 		if (!SDL_strcasecmp(key, "RESIZABLE"))
 		{
-		 if (boolean) m |= SDL_WINDOW_RESIZABLE;
+		 if (toboolean) m |= SDL_WINDOW_RESIZABLE;
 		}
 		else
 		if (!SDL_strcasecmp(key, "ALLOW_HIGHDPI"))
 		{
-		 if (boolean) m |= SDL_WINDOW_ALLOW_HIGHDPI;
+		 if (toboolean) m |= SDL_WINDOW_ALLOW_HIGHDPI;
 		}
 		else
 		if (!SDL_strcasecmp(key, "MINIMIZED"))
 		{
-		 if (boolean) m |= SDL_WINDOW_MINIMIZED;
+		 if (toboolean) m |= SDL_WINDOW_MINIMIZED;
 		}
 		else
 		if (!SDL_strcasecmp(key, "MAXIMIZED"))
 		{
-		 if (boolean) m |= SDL_WINDOW_MAXIMIZED;
+		 if (toboolean) m |= SDL_WINDOW_MAXIMIZED;
 		}
 		else
 		if (!SDL_strcasecmp(key, "INPUT_GRABBED"))
 		{
-		 if (boolean) m |= SDL_WINDOW_INPUT_GRABBED;
+		 if (toboolean) m |= SDL_WINDOW_INPUT_GRABBED;
 		}
 		else
 		if (!SDL_strcasecmp(key, "INPUT_FOCUS"))
 		{
-		 if (boolean) m |= SDL_WINDOW_INPUT_FOCUS;
+		 if (toboolean) m |= SDL_WINDOW_INPUT_FOCUS;
 		}
 		else
 		if (!SDL_strcasecmp(key, "MOUSE_FOCUS"))
 		{
-		 if (boolean) m |= SDL_WINDOW_MOUSE_FOCUS;
+		 if (toboolean) m |= SDL_WINDOW_MOUSE_FOCUS;
 		}
 		/*
 		else
 		if (!SDL_strcasecmp(key, "MOUSE_CAPTURE"))
 		{
-		 if (boolean) m |= SDL_WINDOW_MOUSE_CAPTURE;
+		 if (toboolean) m |= SDL_WINDOW_MOUSE_CAPTURE;
 		}
 		*/
 		else
@@ -232,7 +239,7 @@ signed OpenGL_Init()
 	}
 	lua_pop(State, 1);
 
-	Window = SDL_CreateWindow("SGe", x, y, w, h, m);
+	Window = SDL_CreateWindow(title, x, y, w, h, m);
 	if (!Window)
 	{
 	 SDL_perror("SDL_CreateWindow");

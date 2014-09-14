@@ -1,8 +1,7 @@
-#include <vector>
-#include <cstdlib>
-#include "OpenAL.hpp"
 #include "SDL.hpp"
 #include "Lua.hpp"
+#include "OpenAL.hpp"
+#include <vector>
 
 static ALCdevice *Device;
 static ALCcontext *Context;
@@ -10,7 +9,7 @@ static ALCcontext *Context;
 signed OpenAL_Init()
 {
 	std::vector<ALCint> attributes;
-	const char *string = getenv("AUDIODEVICE");
+	const char *string = NULL;
 
 	lua_getglobal(State, "Audio");
 	int table = lua_gettop(State);
@@ -20,36 +19,43 @@ signed OpenAL_Init()
 	 while (lua_next(State, table))
 	 {
 		const char *key = lua_tostring(State, -2);
-		const int value = lua_tointeger(State, -1);
+		#define tointeger lua_tointeger(State, -1)
+		#define toboolean lua_toboolean(State, -1)
+		#define tostring  lua_tostring(State, -1)
 
 		if (!SDL_strcasecmp(key, "SYNC"))
 		{
 		 attributes.push_back(ALC_SYNC);
-		 attributes.push_back(value);
+		 attributes.push_back(toboolean);
 		}
 		else
 		if (!SDL_strcasecmp(key, "REFRESH"))
 		{
 		 attributes.push_back(ALC_REFRESH);
-		 attributes.push_back(value);
+		 attributes.push_back(tointeger);
 		}
 		else
 		if (!SDL_strcasecmp(key, "FREQUENCY"))
 		{
 		 attributes.push_back(ALC_FREQUENCY);
-		 attributes.push_back(value);
+		 attributes.push_back(tointeger);
 		}
 		else
 		if (!SDL_strcasecmp(key, "MONO_SOURCES"))
 		{
 		 attributes.push_back(ALC_MONO_SOURCES);
-		 attributes.push_back(value);
+		 attributes.push_back(tointeger);
 		}
 		else
 		if (!SDL_strcasecmp(key, "STEREO_SOURCES"))
 		{
 		 attributes.push_back(ALC_STEREO_SOURCES);
-		 attributes.push_back(value);
+		 attributes.push_back(tointeger);
+		}
+		else
+		if (!SDL_strcasecmp(key, "DEVICE"))
+		{
+		 string = tostring;
 		}
 
 		lua_pop(State, 1);

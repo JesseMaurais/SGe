@@ -14,8 +14,8 @@ struct Geometry : virtual Model, Geom, VBO
 	dBodyID body;
 	dGeomID geom;
 
-	void Position(double x, double y, double z);
 	void Rotation(double radian, double x, double y, double z);
+	void Position(double x, double y, double z);
 	void LinearVel(double x, double y, double z);
 	void AngularVel(double x, double y, double z);
 };

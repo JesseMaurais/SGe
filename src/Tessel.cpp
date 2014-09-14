@@ -36,13 +36,13 @@ void Tessel::BeginPolygon()
 void Tessel::PolygonVertex(int point)
 {
 	Vector &V = Mesh::GetVertex(point);
-	gluTessVertex(obj, V.v, point);
+	gluTessVertex(obj, V.v, (void*) point);
 }
 
 void Tessel::PolygonVertex(Vector V)
 {
 	int index = Mesh::AddVertex(V);
-	PolyVertex(index);
+	PolygonVertex(index);
 }
 
 void Tessel::Contour()

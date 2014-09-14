@@ -88,6 +88,7 @@ struct MeshComposer : virtual Mesh
 	int Normal(double x, double y, double z);
 	int Color(double x, double y, double z);
 
+	int Next(Point P);
 	int Next(int point);
 	
  private:
