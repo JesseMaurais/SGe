@@ -9,9 +9,10 @@ struct Tessel : virtual MeshComposer
 	Tessel();
 	~Tessel();
 
-	void Vertex(int index, double *v);
-	void Vertex(Vector);
+	void Property(int name, double param);
 	void BeginPolygon();
+	void PolygonVertex(int point);
+	void PolygonVertex(Vector);
 	void Contour();
 	void EndPolygon();
 

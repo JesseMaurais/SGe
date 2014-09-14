@@ -27,13 +27,13 @@ struct Nurbs : virtual MeshComposer
 	
  private:
  
- 	static Point pivot;
 	static void error(int code);
 	static void begin(int mode, MeshComposer *self);
 	static void end(MeshComposer *self);
 	static void vertex(float *v, MeshComposer *self);
 	static void texCoord(float *v, MeshComposer *self);
 	static void normal(float *v, MeshComposer *self);
+	static void color(float *v, MeshComposer *self);
 };
 
 #endif // file

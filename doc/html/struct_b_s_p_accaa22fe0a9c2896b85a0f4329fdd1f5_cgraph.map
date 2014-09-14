@@ -1,0 +1,8 @@
+<map id="BSP::Classify" name="BSP::Classify">
+<area shape="rect" id="node3" href="$struct_mesh.html#a57d2e12e76fbca821d5d52e2bb3cddf4" title="Mesh::GetVertexes" alt="" coords="161,5,295,35"/>
+<area shape="rect" id="node7" href="$struct_plane.html#ac75eece1b98e27fb4b9274c622b9cad1" title="Plane::Classify" alt="" coords="173,59,283,88"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="345,5,465,35"/>
+<area shape="rect" id="node9" href="$struct_plane.html#ae51e3ab357f5d143c72e4abe2c8aa7ab" title="Plane::Equate" alt="" coords="353,59,457,88"/>
+<area shape="rect" id="node11" href="$struct_plane.html#a24e65e8fa86f262abd6f7b2eefddb61a" title="Plane::Dot" alt="" coords="516,59,599,88"/>
+<area shape="rect" id="node13" href="$struct_vector.html#a0de7400e816252f3a1805d282b02055e" title="Vector::Dot" alt="" coords="649,59,737,88"/>
+</map>

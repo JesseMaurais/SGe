@@ -10,12 +10,13 @@ Nurbs::Nurbs()
 	typedef _GLUfuncptr FP;
 
 	gluNurbsCallbackData(obj, this);
-	gluNurbsCallback(obj, GLU_NURBS_ERROR, FP(error));
-	gluNurbsCallback(obj, GLU_NURBS_BEGIN_DATA, FP(begin));
-	gluNurbsCallback(obj, GLU_NURBS_END_DATA, FP(end));
-	gluNurbsCallback(obj, GLU_NURBS_VERTEX_DATA, FP(vertex));
-	gluNurbsCallback(obj, GLU_NURBS_NORMAL_DATA, FP(normal));
-	gluNurbsCallback(obj, GLU_NURBS_TEXTURE_COORD_DATA, FP(texCoord));
+	gluNurbsCallback(obj, GLU_NURBS_ERROR, (FP) error);
+	gluNurbsCallback(obj, GLU_NURBS_BEGIN_DATA, (FP) begin);
+	gluNurbsCallback(obj, GLU_NURBS_END_DATA, (FP) end);
+	gluNurbsCallback(obj, GLU_NURBS_VERTEX_DATA, (FP) vertex);
+	gluNurbsCallback(obj, GLU_NURBS_NORMAL_DATA, (FP) normal);
+	gluNurbsCallback(obj, GLU_NURBS_TEXTURE_COORD_DATA, (FP) texCoord);
+	gluNurbsCallback(obj, GLU_NURBS_COLOR_DATA, (FP) color);
 }
 
 Nurbs::~Nurbs()
@@ -40,29 +41,24 @@ void Nurbs::end(MeshComposer *self)
 
 void Nurbs::vertex(float *v, MeshComposer *self)
 {
-	Vector V(v[0], v[1], v[2]);
-	int index = self->AddVertex(V);
-	pivot.vertex = index;
-	
-	index = self->AddPoint(pivot);
+	int index = self->Vertex(v[0], v[1], v[2]);
 	self->Next(index);
 }
 
 void Nurbs::texCoord(float *v, MeshComposer *self)
 {
-	Vector V(v[0], v[1], v[2]);
-	int index = self->AddTexCoord(V);
-	pivot.texCoord = index;
+	self->TexCoord(v[0], v[1], v[2]);
 }
 
 void Nurbs::normal(float *v, MeshComposer *self)
 {
-	Vector V(v[0], v[1], v[2]);
-	int index = self->AddNormal(V);
-	pivot.normal = index;
+	self->Normal(v[0], v[1], v[2]);
 }
 
-Point Nurbs::pivot;
+void Nurbs::color(float *v, MeshComposer *self)
+{
+	self->Color(v[0], v[1], v[2]);
+}
 
 void Nurbs::BeginCurve()
 {

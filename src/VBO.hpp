@@ -7,17 +7,18 @@
 struct VBO : virtual Mesh
 {
 	union {
-	 GLuint buffers[4];
+	 GLuint buffers[5];
 	 struct {
-	  GLuint element, vertex, normal, texCoord;
+	  GLuint element, vertex, texCoord, normal, color;
 	 };
 	};
-	size_t size;
 	void Enable();
 	void Disable();
 	void GenBuffers(GLenum usage);
 	void DeleteBuffers();
-	void DrawBuffers();
+	void BindBuffers();
+	void Draw(int group);
 };
 
 #endif // file
+

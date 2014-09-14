@@ -1,0 +1,6 @@
+<map id="CommonFont" name="CommonFont">
+<area shape="rect" id="node5" href="$struct_polygon_font.html" title="PolygonFont" alt="" coords="5,160,99,189"/>
+<area shape="rect" id="node9" href="$struct_texture_font.html" title="TextureFont" alt="" coords="123,160,213,189"/>
+<area shape="rect" id="node2" href="$struct_font_struct.html" title="FontStruct" alt="" coords="68,5,151,35"/>
+<area shape="rect" id="node7" href="$struct_outline_font.html" title="OutlineFont" alt="" coords="8,237,96,267"/>
+</map>

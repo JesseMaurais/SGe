@@ -1,0 +1,30 @@
+<map id="Vector::Dot" name="Vector::Dot">
+<area shape="rect" id="node3" href="$struct_plane.html#a24e65e8fa86f262abd6f7b2eefddb61a" title="Plane::Dot" alt="" coords="157,136,240,165"/>
+<area shape="rect" id="node29" href="$struct_vector.html#a3acba47366d95818a851138226701687" title="Vector::Square" alt="" coords="144,323,253,352"/>
+<area shape="rect" id="node62" href="$struct_vector.html#ad7a8580908178f8d10cb942e2784e303" title="Vector::Project" alt="" coords="672,520,781,549"/>
+<area shape="rect" id="node5" href="$struct_plane.html#a3c084030f58c423a37a7f389f4fdb99b" title="Plane::Plane" alt="" coords="317,5,413,35"/>
+<area shape="rect" id="node7" href="$struct_plane.html#ae51e3ab357f5d143c72e4abe2c8aa7ab" title="Plane::Equate" alt="" coords="313,109,417,139"/>
+<area shape="rect" id="node11" href="$struct_plane.html#a35db288312b055c6940278724c1ff016" title="Plane::Cut" alt="" coords="500,5,583,35"/>
+<area shape="rect" id="node23" href="$struct_tree.html#a59faaf70dcf6aa4238913cf05146f11f" title="Tree::Traverse" alt="" coords="488,163,595,192"/>
+<area shape="rect" id="node25" href="$struct_plane.html#a49b5c41f36441e10cc2c75e377472f43" title="Plane::Agree" alt="" coords="317,213,413,243"/>
+<area shape="rect" id="node9" href="$struct_b_s_p.html#aeae2ec0ae6b5bc7cca04a9d2ad1d1c4c" title="BSP::Split" alt="" coords="685,31,768,60"/>
+<area shape="rect" id="node14" href="$struct_plane.html#ac75eece1b98e27fb4b9274c622b9cad1" title="Plane::Classify" alt="" coords="487,109,596,139"/>
+<area shape="rect" id="node16" href="$struct_b_s_p.html#accaa22fe0a9c2896b85a0f4329fdd1f5" title="BSP::Classify" alt="" coords="675,96,779,125"/>
+<area shape="rect" id="node18" href="$struct_b_s_p.html#a6c543b453dd89561556eb07b966d0f03" title="BSP::Sort" alt="" coords="1083,97,1163,127"/>
+<area shape="rect" id="node20" href="$struct_b_s_p.html#a445eb897e3932862fa3b7513eb6e52e0" title="BSP::Select" alt="" coords="885,123,979,152"/>
+<area shape="rect" id="node31" href="$struct_vector.html#a6171e280a158f46e98e9f55262ee2ce1" title="Vector::Magnitude" alt="" coords="301,323,429,352"/>
+<area shape="rect" id="node33" href="$struct_tree.html#ae1b7cadaee4642325cab83c22d217d73" title="Tree::Perspective" alt="" coords="479,283,604,312"/>
+<area shape="rect" id="node35" href="$struct_vector.html#a45c871a46bf2b8b14e91170d46f0ebae" title="Vector::Normalize" alt="" coords="479,336,604,365"/>
+<area shape="rect" id="node37" href="$class_crayon.html#a40399a68ba8ac733f71815220cd68a86" title="Crayon::Vertex" alt="" coords="672,149,781,179"/>
+<area shape="rect" id="node39" href="$struct_matrix.html#a87470670dca1121a0d49e0e26326d097" title="Matrix::Direction" alt="" coords="668,203,785,232"/>
+<area shape="rect" id="node41" href="$struct_matrix.html#a470a93f7c8922718d2dee50094684303" title="Matrix::Tangent" alt="" coords="671,256,783,285"/>
+<area shape="rect" id="node45" href="$struct_quaternion.html#ad3da5af85791ee4ad47596482963a796" title="Quaternion::Direction" alt="" coords="655,309,799,339"/>
+<area shape="rect" id="node47" href="$struct_sphere.html#a8fcf010df13a95ed1236254fd68454fe" title="Sphere::Divide" alt="" coords="673,363,780,392"/>
+<area shape="rect" id="node49" href="$struct_sphere.html#a87c28cc3d1a8f929b86f3cd62c253909" title="Sphere::Draw" alt="" coords="881,388,983,417"/>
+<area shape="rect" id="node52" href="$struct_vector.html#a308366593140da1b40227931b885f3db" title="Vector::Right" alt="" coords="677,467,776,496"/>
+<area shape="rect" id="node43" href="$struct_mesh.html#a80c2b4f3d3860e35b8056bdc88dcf0b5" title="Mesh::GetTangentSpace" alt="" coords="849,256,1015,285"/>
+<area shape="rect" id="node54" href="$struct_mesh.html#a03c042e171ee4ee5b5d04c237b9e589b" title="Mesh::GetTriangle" alt="" coords="868,467,996,496"/>
+<area shape="rect" id="node56" href="$struct_mesh.html#aa06060ad8a1082d1c06952f8da40102e" title="Mesh::GetPlane" alt="" coords="1065,467,1180,496"/>
+<area shape="rect" id="node58" href="$struct_b_s_p.html#a24c00ff2d3632c19af1780970c094d07" title="BSP::Sort" alt="" coords="1231,467,1311,496"/>
+<area shape="rect" id="node60" href="$struct_b_s_p.html#acfd843ca8a467f9ebbb6d861dd489b09" title="BSP::Sort" alt="" coords="1361,467,1441,496"/>
+</map>

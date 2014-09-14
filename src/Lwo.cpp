@@ -25,10 +25,10 @@ void ModelLwo::AddChunk(lwo_chunk_t *chunk)
 {
 	switch (chunk->idtag)
 	{
-	 case lwo_PNTS_id:
+	case lwo_PNTS_id:
 		AddPoints(chunk->data.pnts, chunk->length);
 		break;
-	 case lwo_POLS_id:
+	case lwo_POLS_id:
 		AddPolygons(chunk->data.pols);
 		break;
 	}

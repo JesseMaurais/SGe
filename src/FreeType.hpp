@@ -17,7 +17,7 @@ struct FontStruct
 	FT_Face face;
 
 	bool Load(const char *path);
-	void Free(void);
+	void Free();
 
 	template <class Char> 
 	CharStruct Measure(const Char *string, int length=0)

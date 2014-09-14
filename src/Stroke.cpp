@@ -16,7 +16,10 @@ void Stroke::Curve(double n)
 	
 	for (double i = 1; i < n; ++i)
 	{
-	 Vertex(Equate(i/n));
+	 Vector V;
+	 double t = i/n;
+	 V = Bezier::Equate(t);
+	 Tessel::PolygonVertex(V);
 	}
 }
 
@@ -25,7 +28,7 @@ void Stroke::Move(Vector to)
 	if (!moving)
 	{
 	 moving = true;
-	 Contour();
+	 Tessel::Contour();
 	}
 	from = to;
 }
@@ -35,9 +38,9 @@ void Stroke::Line(Vector to)
 	if (moving)
 	{
 	 moving = false;
-	 Vertex(from);
+	 Tessel::PolygonVertex(from);
 	}
-	Vertex(to);
+	Tessel::PolygonVertex(to);
 	from = to;
 }
 
@@ -46,12 +49,12 @@ void Stroke::Cone(Vector X, Vector to)
 	if (moving)
 	{
 	 moving = false;
-	 Vertex(from);
+	 Tessel::PolygonVertex(from);
 	}
 	
 	double n = (to - from).Magnitude();
-	
 	Bezier::Cone(from, X, to);
+
 	Curve(n);
 	from = to;
 }
@@ -61,7 +64,7 @@ void Stroke::Cube(Vector X, Vector Y, Vector to)
 	if (moving)
 	{
 	 moving = false;
-	 Vertex(from);
+	 Tessel::PolygonVertex(from);
 	}
 	
 	double n = (to - from).Magnitude();

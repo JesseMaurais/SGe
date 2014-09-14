@@ -1,0 +1,6 @@
+<map id="Vector::Right" name="Vector::Right">
+<area shape="rect" id="node3" href="$struct_mesh.html#a03c042e171ee4ee5b5d04c237b9e589b" title="Mesh::GetTriangle" alt="" coords="153,5,281,35"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#aa06060ad8a1082d1c06952f8da40102e" title="Mesh::GetPlane" alt="" coords="332,5,447,35"/>
+<area shape="rect" id="node7" href="$struct_b_s_p.html#a24c00ff2d3632c19af1780970c094d07" title="BSP::Sort" alt="" coords="497,5,577,35"/>
+<area shape="rect" id="node9" href="$struct_b_s_p.html#acfd843ca8a467f9ebbb6d861dd489b09" title="BSP::Sort" alt="" coords="628,5,708,35"/>
+</map>

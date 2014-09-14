@@ -53,7 +53,7 @@ bool FontStruct::Load(const char *path)
 	return !error;
 }
 
-void FontStruct::Free(void)
+void FontStruct::Free()
 {
 	FT_Error error = FT_Done_Face(face);
 	if (error) FT_perror("FT_Done_Face", error);

@@ -10,11 +10,11 @@ Tessel::Tessel()
 
 	typedef _GLUfuncptr FP;
 	
-	gluTessCallback(obj, GLU_TESS_COMBINE_DATA, FP(combine));
-	gluTessCallback(obj, GLU_TESS_VERTEX_DATA, FP(next));
-	gluTessCallback(obj, GLU_TESS_BEGIN_DATA, FP(begin));
-	gluTessCallback(obj, GLU_TESS_END_DATA, FP(end));
-	gluTessCallback(obj, GLU_TESS_ERROR, FP(error));
+	gluTessCallback(obj, GLU_TESS_COMBINE_DATA, (FP) combine);
+	gluTessCallback(obj, GLU_TESS_VERTEX_DATA, (FP) next);
+	gluTessCallback(obj, GLU_TESS_BEGIN_DATA, (FP) begin);
+	gluTessCallback(obj, GLU_TESS_END_DATA, (FP) end);
+	gluTessCallback(obj, GLU_TESS_ERROR, (FP) error);
 }
 
 Tessel::~Tessel()
@@ -22,22 +22,27 @@ Tessel::~Tessel()
 	gluDeleteTess(obj);
 }
 
-void Tessel::Vertex(int index, double *v)
+void Tessel::Property(int name, double param)
 {
-	gluTessVertex(obj, v, (void*) index);
-}
-
-void Tessel::Vertex(Vector vertex)
-{
-	int index = Mesh::AddVertex(vertex);
-	Vector &V = Mesh::GetVertex(index);
-	Vertex(index, V.v);
+	gluTessProperty(obj, name, param);
 }
 
 void Tessel::BeginPolygon()
 {
 	gluTessBeginPolygon(obj, this);
 	gluTessBeginContour(obj);
+}
+
+void Tessel::PolygonVertex(int point)
+{
+	Vector &V = Mesh::GetVertex(point);
+	gluTessVertex(obj, V.v, point);
+}
+
+void Tessel::PolygonVertex(Vector V)
+{
+	int index = Mesh::AddVertex(V);
+	PolyVertex(index);
 }
 
 void Tessel::Contour()
@@ -52,15 +57,14 @@ void Tessel::EndPolygon()
 	gluTessEndPolygon(obj);
 }
 
-void Tessel::combine(double *v, void*, void*, int *index, MeshComposer *self)
-{
-	Vector V(v[0], v[1], v[2]);
-	*index = self->AddVertex(V);
-}
-
 void Tessel::error(int code)
 {
 	SDL_Log("%s: %s\n", __func__, gluErrorString(code));
+}
+
+void Tessel::combine(double *v, void*, void*, int *index, MeshComposer *self)
+{
+	*index = self->Vertex(v[0], v[1], v[2]);
 }
 
 void Tessel::begin(int mode, MeshComposer *self)

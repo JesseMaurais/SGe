@@ -1,0 +1,12 @@
+<map id="Box::Box" name="Box::Box">
+<area shape="rect" id="node3" href="$struct_mesh_composer.html#a0481f8090f9a3728f41341e77fab4e05" title="MeshComposer::BeginGroup" alt="" coords="132,5,321,35"/>
+<area shape="rect" id="node5" href="$struct_model.html#af6172f6b1d6554059c5669cfeedcb657" title="Model::Cube" alt="" coords="179,59,275,88"/>
+<area shape="rect" id="node15" href="$struct_mesh_composer.html#a6bb598e3f984a6e0c72e0d75c205696a" title="MeshComposer::EndGroup" alt="" coords="137,112,316,141"/>
+<area shape="rect" id="node17" href="$struct_v_b_o.html#a896bf81d288fe247f150f806391f09d7" title="VBO::GenBuffers" alt="" coords="165,165,288,195"/>
+<area shape="rect" id="node21" href="$struct_mesh.html#a85427cf326e76c4a9ba5f808f8827000" title="Mesh::Clear" alt="" coords="180,219,273,248"/>
+<area shape="rect" id="node7" href="$struct_mesh_composer.html#aedd087c15406a523a524fd211fa7cf41" title="MeshComposer::Begin" alt="" coords="373,5,528,35"/>
+<area shape="rect" id="node9" href="$struct_mesh_composer.html#ac8bdfd85ab8d46aefa0a8f65b884153f" title="MeshComposer::Vertex" alt="" coords="371,59,531,88"/>
+<area shape="rect" id="node13" href="$struct_mesh_composer.html#acaca9dd5fc693086a1b2e4a0e40db32e" title="MeshComposer::End" alt="" coords="379,112,523,141"/>
+<area shape="rect" id="node11" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="579,59,701,88"/>
+<area shape="rect" id="node19" href="$_v_b_o_8cpp.html#a86408e903cf0303e2f4567efefb17f8b" title="BufferData" alt="" coords="408,165,493,195"/>
+</map>

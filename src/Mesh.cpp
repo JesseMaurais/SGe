@@ -1,14 +1,43 @@
 #include "Mesh.hpp"
 #include "OpenGL.hpp"
 
-
 void Mesh::Clear()
 {
-	faces.clear();
 	points.clear();
+	faces.clear();
+	colors.clear();
 	normals.clear();
 	vertexes.clear();
 	texCoords.clear();
+}
+
+void Mesh::Copy(Mesh &M)
+{
+	groups = M.groups;
+	points = M.points;
+	faces = M.faces;
+	colors = M.colors;
+	normals = M.normals;
+	vertexes = M.vertexes;
+	texCoords = M.texCoords;
+}
+
+void Mesh::Swap(Mesh &M)
+{
+	groups.swap(M.groups);
+	points.swap(M.points);
+	faces.swap(M.faces);
+	colors.swap(M.colors);
+	normals.swap(M.normals);
+	vertexes.swap(M.vertexes);
+	texCoords.swap(M.texCoords);
+}
+
+int Mesh::AddGroup(Segment G)
+{
+	int index = groups.size();
+	groups.push_back(G);
+	return index;
 }
 
 int Mesh::AddSurface(Surface S)
@@ -32,10 +61,10 @@ int Mesh::AddVertex(Vector V)
 	return index;
 }
 
-int Mesh::AddTexCoord(Vector C)
+int Mesh::AddTexCoord(Vector T)
 {
 	int index = texCoords.size();
-	texCoords.push_back(C);
+	texCoords.push_back(T);
 	return index;
 }
 
@@ -46,30 +75,44 @@ int Mesh::AddNormal(Vector N)
 	return index;
 }
 
-int Mesh::NewVertex(int a, int b, double cut)
+int Mesh::AddColor(Vector C)
+{
+	int index = colors.size();
+	colors.push_back(C);
+	return index;
+}
+
+int Mesh::NewVertex(int a, int b, double c)
 {
 	Vector &A = GetVertex(a);
 	Vector &B = GetVertex(b);
 
-	return AddVertex(A + (B - A)*cut);
+	return AddVertex(c*A + (1 - c)*B);
 }
 
-int Mesh::NewTexCoord(int a, int b, double cut)
+int Mesh::NewTexCoord(int a, int b, double c)
 {
 	Vector &A = GetTexCoord(a);
 	Vector &B = GetTexCoord(b);
 
-	return AddTexCoord(A + (B - A)*cut);
+	return AddTexCoord(c*A + (1 - c)*B);
 }
 
-int Mesh::NewNormal(int a, int b, double cut)
+int Mesh::NewNormal(int a, int b, double c)
 {
 	Vector &A = GetNormal(a);
 	Vector &B = GetNormal(b);
 
-	return AddNormal(A*cut + B*(1-cut));
+	return AddNormal(c*A + (1 - c)*B);
 }
 
+int Mesh::NewColor(int a, int b, double c)
+{
+	Vector &A = GetColor(a);
+	Vector &B = GetColor(b);
+
+	return AddColor(c*A + (1 - c)*B);
+}
 
 Vector &Mesh::GetVertex(int index)
 {
@@ -86,6 +129,10 @@ Vector &Mesh::GetNormal(int index)
 	return normals.at(index < 0 ? points[~index].normal : index);
 }
 
+Vector &Mesh::GetColor(int index)
+{
+	return colors.at(index < 0 ? points[~index].color : index);
+}
 
 void Mesh::GetVertexes(int *indexes, Vector *V, int n)
 {
@@ -102,6 +149,10 @@ void Mesh::GetNormals(int *indexes, Vector *V, int n)
 	for (int i = 0; i < n; ++i) V[i] = GetNormal(indexes[i]);
 }
 
+void Mesh::GetColors(int *indexes, Vector *V, int n)
+{
+	for (int i = 0; i < n; ++i) V[i] = GetColor(indexes[i]);
+}
 
 void Mesh::GetVertexes(int index, Vector *V)
 {
@@ -118,6 +169,10 @@ void Mesh::GetNormals(int index, Vector *V)
 	GetNormals(faces[index].points, V);
 }
 
+void Mesh::GetColor(int index, Vector *V)
+{
+	GetColors(faces[index].points, V);
+}
 
 Plane Mesh::GetPlane(int index)
 {
@@ -137,16 +192,62 @@ Triangle Mesh::GetTriangle(int index)
 Matrix Mesh::GetTangentSpace(int index)
 {
 	Vector V [3];
-	Vector C [3];
+	Vector T [3];
 	
 	GetVertexes(index, V);
-	GetTexCoords(index, C);
+	GetTexCoords(index, T);
 
 	Matrix TBN;
-	TBN.Tangent(V, C);
+	TBN.Tangent(V, T);
 	return TBN;
 }
 
+int MeshComposer::BeginGroup(int id)
+{
+	group = id;
+	Group &G = Mesh::groups[group];
+	G.first = Mesh::faces.size();
+}
+
+int MeshComposer::EndGroup()
+{
+	Group &G = Mesh::groups[group];
+	G.count = Mesh::faces.size() - G.first;
+	return group;
+}
+
+int MeshComposer::Begin(int type)
+{
+	mode = type;
+	counter = 0;
+	return faces.size();
+}
+
+int MeshComposer::End()
+{
+	mode = Knot;
+	return faces.size();
+}
+
+int MeshComposer::Vertex(double x, double y, double z)
+{
+	return Mesh::AddVertex(Vector(x, y, z));
+}
+
+int MeshComposer::TexCoord(double x, double y, double z)
+{
+	return Mesh::AddTexCoord(Vector(x, y, z));
+}
+
+int MeshComposer::Normal(double x, double y, double z)
+{
+	return Mesh::AddNormal(Vector(x, y, z));
+}
+
+int MeshComposer::Color(double x, double y, double z)
+{
+	return Mesh::AddColor(Vector(x, y, z));
+}
 
 int MeshComposer::Next(int index)
 {
@@ -228,17 +329,4 @@ int MeshComposer::Next(int index)
 	}
 	return Knot;
 }
-
-void MeshComposer::Begin(int type)
-{
-	mode = type;
-	counter = 0;
-}
-
-void MeshComposer::End()
-{
-	mode = Knot;
-}
-
-
 

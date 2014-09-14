@@ -1,0 +1,9 @@
+<map id="Mesh::AddVertex" name="Mesh::AddVertex">
+<area shape="rect" id="node3" href="$struct_height_map.html#a7fda26160c53fb62dc7650062c146669" title="HeightMap::Load" alt="" coords="196,5,316,35"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#a74fc631d5e66e3a17e2a97005dd54072" title="Mesh::NewVertex" alt="" coords="193,59,319,88"/>
+<area shape="rect" id="node9" href="$struct_mesh_composer.html#ac8bdfd85ab8d46aefa0a8f65b884153f" title="MeshComposer::Vertex" alt="" coords="176,112,336,141"/>
+<area shape="rect" id="node15" href="$struct_tessel.html#a69dfc59105e9948f86ee4fbbe0d83197" title="Tessel::PolygonVertex" alt="" coords="179,165,333,195"/>
+<area shape="rect" id="node7" href="$struct_b_s_p.html#aeae2ec0ae6b5bc7cca04a9d2ad1d1c4c" title="BSP::Split" alt="" coords="391,59,473,88"/>
+<area shape="rect" id="node11" href="$struct_model.html#af6172f6b1d6554059c5669cfeedcb657" title="Model::Cube" alt="" coords="384,112,480,141"/>
+<area shape="rect" id="node13" href="$struct_box.html#aca78d7db44972bfa78d46b7bbc8796f6" title="Box::Box" alt="" coords="529,112,604,141"/>
+</map>

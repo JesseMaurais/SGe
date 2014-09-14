@@ -1,0 +1,18 @@
+<map id="Vector::Square" name="Vector::Square">
+<area shape="rect" id="node3" href="$struct_vector.html#a6171e280a158f46e98e9f55262ee2ce1" title="Vector::Magnitude" alt="" coords="163,165,291,195"/>
+<area shape="rect" id="node5" href="$struct_tree.html#ae1b7cadaee4642325cab83c22d217d73" title="Tree::Perspective" alt="" coords="340,139,465,168"/>
+<area shape="rect" id="node7" href="$struct_vector.html#a45c871a46bf2b8b14e91170d46f0ebae" title="Vector::Normalize" alt="" coords="340,192,465,221"/>
+<area shape="rect" id="node9" href="$class_crayon.html#a40399a68ba8ac733f71815220cd68a86" title="Crayon::Vertex" alt="" coords="533,5,643,35"/>
+<area shape="rect" id="node11" href="$struct_matrix.html#a87470670dca1121a0d49e0e26326d097" title="Matrix::Direction" alt="" coords="529,59,647,88"/>
+<area shape="rect" id="node13" href="$struct_matrix.html#a470a93f7c8922718d2dee50094684303" title="Matrix::Tangent" alt="" coords="532,112,644,141"/>
+<area shape="rect" id="node17" href="$struct_quaternion.html#ad3da5af85791ee4ad47596482963a796" title="Quaternion::Direction" alt="" coords="516,165,660,195"/>
+<area shape="rect" id="node19" href="$struct_sphere.html#a8fcf010df13a95ed1236254fd68454fe" title="Sphere::Divide" alt="" coords="535,219,641,248"/>
+<area shape="rect" id="node21" href="$struct_sphere.html#a87c28cc3d1a8f929b86f3cd62c253909" title="Sphere::Draw" alt="" coords="743,244,844,273"/>
+<area shape="rect" id="node24" href="$struct_vector.html#a308366593140da1b40227931b885f3db" title="Vector::Right" alt="" coords="539,323,637,352"/>
+<area shape="rect" id="node34" href="$struct_vector.html#ad7a8580908178f8d10cb942e2784e303" title="Vector::Project" alt="" coords="533,376,643,405"/>
+<area shape="rect" id="node15" href="$struct_mesh.html#a80c2b4f3d3860e35b8056bdc88dcf0b5" title="Mesh::GetTangentSpace" alt="" coords="711,112,876,141"/>
+<area shape="rect" id="node26" href="$struct_mesh.html#a03c042e171ee4ee5b5d04c237b9e589b" title="Mesh::GetTriangle" alt="" coords="729,323,857,352"/>
+<area shape="rect" id="node28" href="$struct_mesh.html#aa06060ad8a1082d1c06952f8da40102e" title="Mesh::GetPlane" alt="" coords="927,323,1041,352"/>
+<area shape="rect" id="node30" href="$struct_b_s_p.html#a24c00ff2d3632c19af1780970c094d07" title="BSP::Sort" alt="" coords="1092,323,1172,352"/>
+<area shape="rect" id="node32" href="$struct_b_s_p.html#acfd843ca8a467f9ebbb6d861dd489b09" title="BSP::Sort" alt="" coords="1223,323,1303,352"/>
+</map>

@@ -30,23 +30,16 @@ void Geometry::Update()
 
 	glPushMatrix();
 	glMultMatrixd(M);
-	Enable();
+	VBO::Enable();
+	VBO::BindBuffers();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glColor3d(0.5, 0.5, 0.5);
-	DrawBuffers();
+	VBO::Draw(0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glColor3d(0.8, 0.0, 0.0);
-	DrawBuffers();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-	glColor3d(0.0, 0.8, 0.0);
-	DrawBuffers();
-	Disable();
+	VBO::Draw(0);
+	VBO::Disable();
 	glPopMatrix();
-}
-
-void Geometry::Position(double x, double y, double z)
-{
-	dBodySetPosition(body, x, y, z);
 }
 
 void Geometry::Rotation(double radian, double x, double y, double z)
@@ -54,6 +47,11 @@ void Geometry::Rotation(double radian, double x, double y, double z)
 	Quaternion Q;
 	Q.Rotate(radian, x, y, z);
 	dBodySetQuaternion(body, Q.v);
+}
+
+void Geometry::Position(double x, double y, double z)
+{
+	dBodySetPosition(body, x, y, z);
 }
 
 void Geometry::LinearVel(double x, double y, double z)
@@ -70,42 +68,11 @@ Box::Box()
 {
 	double l = 1.0;
 
-	Begin(GL_QUADS);
-
-	Vertex(+l, +l, -l);
-	Vertex(-l, +l, -l);
-	Vertex(-l, +l, +l);
-	Vertex(+l, +l, +l);
-
-	Vertex(+l, -l, +l);
-	Vertex(-l, -l, +l);
-	Vertex(-l, -l, -l);
-	Vertex(+l, -l, -l);
- 
-	Vertex(+l, +l, +l);
-	Vertex(-l, +l, +l);
-	Vertex(-l, -l, +l);
-	Vertex(+l, -l, +l);
- 
-	Vertex(+l, -l, -l);
-	Vertex(-l, -l, -l);
-	Vertex(-l, +l, -l);
-	Vertex(+l, +l, -l);
- 
-	Vertex(-l, +l, +l);
-	Vertex(-l, +l, -l);
-	Vertex(-l, -l, -l);
-	Vertex(-l, -l, +l);
- 
-	Vertex(+l, +l, -l);
-	Vertex(+l, +l, +l);
-	Vertex(+l, -l, +l);
-	Vertex(+l, -l, -l);
-
-	End();
-
-	GenBuffers(GL_STATIC_DRAW);
-	Clear();
+	MeshComposer::BeginGroup(0);
+	Model::Cube(l);
+	MeshComposer::EndGroup();
+	VBO::GenBuffers(GL_STATIC_DRAW);
+	Mesh::Clear();
 
 	dMass mass;
 	mass.setBox(0.1, l, l, l);
@@ -115,5 +82,4 @@ Box::Box()
 	dGeomSetData(geom, this);
 	dGeomSetBody(geom, body);
 }
-
 

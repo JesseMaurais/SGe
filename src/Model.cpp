@@ -1,51 +1,45 @@
+#include "Starship.hpp"
+#include "Hedron.hpp"
 #include "Model.hpp"
 #include <cassert>
 #include <cstdio>
 
-void Model::Begin(int mode)
+void Model::Cube(double size)
 {
-	flag = (GL_POLYGON == mode);
-	
-	if (flag)
-	 Tessel::BeginPolygon();
-	else
-	 MeshComposer::Begin(mode);
-}
+	double l = 0.5*size;
 
-void Model::Next(int index)
-{
-	if (flag)
-	{
-	 Vector V = Mesh::GetVertex(index);
-	 Tessel::Vertex(index, V.v);
-	}
-	else
-	 MeshComposer::Next(index);
-}
+	Begin(GL_QUADS);
 
-void Model::End()
-{
-	if (flag)
-	 Tessel::EndPolygon();
-	else
-	 MeshComposer::End();
-}
+	Vertex(+l, +l, -l);
+	Vertex(-l, +l, -l);
+	Vertex(-l, +l, +l);
+	Vertex(+l, +l, +l);
 
-void Model::Vertex(double x, double y, double z)
-{
-	Vector vertex(x, y, z);
-	int index = Mesh::AddVertex(vertex);
-	MeshComposer::Next(index);
-}
+	Vertex(+l, -l, +l);
+	Vertex(-l, -l, +l);
+	Vertex(-l, -l, -l);
+	Vertex(+l, -l, -l);
+ 
+	Vertex(+l, +l, +l);
+	Vertex(-l, +l, +l);
+	Vertex(-l, -l, +l);
+	Vertex(+l, -l, +l);
+ 
+	Vertex(+l, -l, -l);
+	Vertex(-l, -l, -l);
+	Vertex(-l, +l, -l);
+	Vertex(+l, +l, -l);
+ 
+	Vertex(-l, +l, +l);
+	Vertex(-l, +l, -l);
+	Vertex(-l, -l, -l);
+	Vertex(-l, -l, +l);
+ 
+	Vertex(+l, +l, -l);
+	Vertex(+l, +l, +l);
+	Vertex(+l, -l, +l);
+	Vertex(+l, -l, -l);
 
-void Model::TexCoord(double x, double y, double z)
-{
-	Mesh::AddTexCoord(Vector(x, y, z));
+	End();
 }
-
-void Model::Normal(double x, double y, double z)
-{
-	Mesh::AddNormal(Vector(x, y, z));
-}
-
 

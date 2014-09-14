@@ -1,0 +1,19 @@
+<map id="Mesh::GetVertex" name="Mesh::GetVertex">
+<area shape="rect" id="node3" href="$struct_mesh.html#a74fc631d5e66e3a17e2a97005dd54072" title="Mesh::NewVertex" alt="" coords="191,32,316,61"/>
+<area shape="rect" id="node7" href="$struct_mesh.html#a57d2e12e76fbca821d5d52e2bb3cddf4" title="Mesh::GetVertexes" alt="" coords="187,139,320,168"/>
+<area shape="rect" id="node28" href="$struct_tessel.html#ae03acfbf1a6f72b4c7997778c7b4a317" title="Tessel::PolygonVertex" alt="" coords="176,323,331,352"/>
+<area shape="rect" id="node5" href="$struct_b_s_p.html#aeae2ec0ae6b5bc7cca04a9d2ad1d1c4c" title="BSP::Split" alt="" coords="421,5,504,35"/>
+<area shape="rect" id="node9" href="$struct_b_s_p.html#accaa22fe0a9c2896b85a0f4329fdd1f5" title="BSP::Classify" alt="" coords="411,59,515,88"/>
+<area shape="rect" id="node16" href="$struct_mesh.html#aa4f1d38e2465f8edd13be497e6c5fad0" title="Mesh::GetVertexes" alt="" coords="396,112,529,141"/>
+<area shape="rect" id="node18" href="$struct_mesh.html#a03c042e171ee4ee5b5d04c237b9e589b" title="Mesh::GetTriangle" alt="" coords="399,165,527,195"/>
+<area shape="rect" id="node26" href="$struct_mesh.html#a80c2b4f3d3860e35b8056bdc88dcf0b5" title="Mesh::GetTangentSpace" alt="" coords="380,219,545,248"/>
+<area shape="rect" id="node11" href="$struct_b_s_p.html#a6c543b453dd89561556eb07b966d0f03" title="BSP::Sort" alt="" coords="761,60,841,89"/>
+<area shape="rect" id="node13" href="$struct_b_s_p.html#a445eb897e3932862fa3b7513eb6e52e0" title="BSP::Select" alt="" coords="607,85,700,115"/>
+<area shape="rect" id="node20" href="$struct_mesh.html#aa06060ad8a1082d1c06952f8da40102e" title="Mesh::GetPlane" alt="" coords="596,165,711,195"/>
+<area shape="rect" id="node22" href="$struct_b_s_p.html#a24c00ff2d3632c19af1780970c094d07" title="BSP::Sort" alt="" coords="761,165,841,195"/>
+<area shape="rect" id="node24" href="$struct_b_s_p.html#acfd843ca8a467f9ebbb6d861dd489b09" title="BSP::Sort" alt="" coords="892,165,972,195"/>
+<area shape="rect" id="node30" href="$struct_stroke.html#ae20e93a142786cdd97503714f3123d21" title="Stroke::Curve" alt="" coords="412,323,513,352"/>
+<area shape="rect" id="node32" href="$struct_stroke.html#a122f7c60083473154d16566e055659c3" title="Stroke::Cone" alt="" coords="604,296,703,325"/>
+<area shape="rect" id="node34" href="$struct_stroke.html#abc38594adb61740f65d5ce9f5f60f62e" title="Stroke::Cube" alt="" coords="604,361,703,391"/>
+<area shape="rect" id="node36" href="$struct_stroke.html#a7b05fecd7920afe56aba40943fd363f6" title="Stroke::Line" alt="" coords="417,427,508,456"/>
+</map>

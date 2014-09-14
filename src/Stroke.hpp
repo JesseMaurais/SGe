@@ -4,12 +4,8 @@
 #include "Bezier.hpp"
 #include "Tessel.hpp"
 
-struct Stroke : Tessel, Bezier
+struct Stroke : virtual Tessel, Bezier
 {
-	double step;
-	Vector from;
-	bool moving;
-	
 	Stroke(double size=5);
 	void Point(double size);
 	void Curve(double n);
@@ -17,6 +13,12 @@ struct Stroke : Tessel, Bezier
 	void Line(Vector to);
 	void Cone(Vector X, Vector to);
 	void Cube(Vector X, Vector Y, Vector to);
+
+ protected:
+
+	double step;
+	Vector from;
+	bool moving;
 };
 
 #endif // file
