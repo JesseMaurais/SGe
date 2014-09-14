@@ -1,5 +1,0 @@
-<map id="Model::Vertex" name="Model::Vertex">
-<area shape="rect" id="node3" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="157,5,280,35"/>
-<area shape="rect" id="node5" href="$struct_model.html#a4b030c5d71038aef8dc4e63d5be3de94" title="Model::Next" alt="" coords="172,59,265,88"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="329,59,449,88"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="HeightMap::Load" name="HeightMap::Load">
-<area shape="rect" id="node3" href="$_s_d_l_8cpp.html#a6a5d6a669d2b1fa34f799a7b9fa4191d" title="LoadSurface" alt="" coords="191,5,284,35"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="176,59,299,88"/>
-<area shape="rect" id="node5" href="$_s_d_l_8cpp.html#a31c458ab100fb051cc05d2c96251116e" title="SDL_perror" alt="" coords="347,5,435,35"/>
-</map>

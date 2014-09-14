@@ -1,8 +1,0 @@
-<map id="BSP" name="BSP">
-<area shape="rect" id="node2" href="$struct_model.html" title="Model" alt="" coords="84,237,140,267"/>
-<area shape="rect" id="node4" href="$struct_nurbs.html" title="Nurbs" alt="" coords="5,160,61,189"/>
-<area shape="rect" id="node6" href="$struct_mesh_composer.html" title="MeshComposer" alt="" coords="36,83,151,112"/>
-<area shape="rect" id="node10" href="$struct_tessel.html" title="Tessel" alt="" coords="85,160,147,189"/>
-<area shape="rect" id="node8" href="$struct_mesh.html" title="Mesh" alt="" coords="113,5,167,35"/>
-<area shape="rect" id="node13" href="$struct_tree.html" title="Tree" alt="" coords="164,237,212,267"/>
-</map>

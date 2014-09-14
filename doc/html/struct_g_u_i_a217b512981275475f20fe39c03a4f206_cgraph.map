@@ -1,6 +1,0 @@
-<map id="GUI::Load" name="GUI::Load">
-<area shape="rect" id="node3" href="$_s_d_l_8cpp.html#a31c458ab100fb051cc05d2c96251116e" title="SDL_perror" alt="" coords="136,5,224,35"/>
-<area shape="rect" id="node5" href="$struct_g_u_i.html#ac63b2a4405f9b6fec04e37dfd32f5dd3" title="GUI::Done" alt="" coords="137,59,223,88"/>
-<area shape="rect" id="node7" href="$struct_g_u_i.html#ab752c5f3d0181c65ae156798f2884199" title="GUI::ChildRestack" alt="" coords="279,32,412,61"/>
-<area shape="rect" id="node9" href="$struct_g_u_i.html#a8eb2039c6162e44e7958d26a1850dd71" title="GUI::ChildUnionRect" alt="" coords="272,85,419,115"/>
-</map>

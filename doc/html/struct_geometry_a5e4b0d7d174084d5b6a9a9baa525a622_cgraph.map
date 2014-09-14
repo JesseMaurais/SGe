@@ -1,6 +1,0 @@
-<map id="Geometry::Update" name="Geometry::Update">
-<area shape="rect" id="node3" href="$struct_v_b_o.html#a2f04f3b09ecf2c6731c47f55caac2c06" title="VBO::Enable" alt="" coords="199,5,297,35"/>
-<area shape="rect" id="node5" href="$struct_v_b_o.html#aa3fc5b05a87b40c83d39a5595c719e93" title="VBO::BindBuffers" alt="" coords="185,59,311,88"/>
-<area shape="rect" id="node7" href="$struct_v_b_o.html#aab6bc27ad1ff1cf044acbff046758004" title="VBO::Draw" alt="" coords="204,112,292,141"/>
-<area shape="rect" id="node9" href="$struct_v_b_o.html#a110da0f17ea54f0124077f94973b8bfe" title="VBO::Disable" alt="" coords="197,165,299,195"/>
-</map>

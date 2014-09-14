@@ -1,7 +1,0 @@
-<map id="Vector::Right" name="Vector::Right">
-<area shape="rect" id="node3" href="$struct_vector.html#a4d8f563af105d54dee24340ddccbb636" title="Vector::Cross" alt="" coords="165,5,267,35"/>
-<area shape="rect" id="node5" href="$struct_vector.html#a45c871a46bf2b8b14e91170d46f0ebae" title="Vector::Normalize" alt="" coords="153,59,279,88"/>
-<area shape="rect" id="node7" href="$struct_vector.html#a6171e280a158f46e98e9f55262ee2ce1" title="Vector::Magnitude" alt="" coords="328,59,456,88"/>
-<area shape="rect" id="node9" href="$struct_vector.html#a3acba47366d95818a851138226701687" title="Vector::Square" alt="" coords="504,59,613,88"/>
-<area shape="rect" id="node11" href="$struct_vector.html#a0de7400e816252f3a1805d282b02055e" title="Vector::Dot" alt="" coords="663,59,751,88"/>
-</map>
