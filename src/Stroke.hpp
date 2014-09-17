@@ -1,14 +1,15 @@
 #ifndef __Stroke__
 #define __Stroke__
 
+#include "Number.hpp"
 #include "Bezier.hpp"
 #include "Tessel.hpp"
 
 struct Stroke : virtual Tessel, Bezier
 {
-	Stroke(double size=5);
-	void Point(double size);
-	void Curve(double n);
+	Stroke(Scalar detail=5);
+	void Detail(Scalar s);
+	void Curve(Scalar n);
 	void Move(Vector to);
 	void Line(Vector to);
 	void Cone(Vector X, Vector to);

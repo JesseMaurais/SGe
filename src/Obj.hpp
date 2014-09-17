@@ -12,7 +12,7 @@ struct ModelObj : virtual Model
 	int ReadVertex(char *line);
 	int ReadTexCoord(char *line);
 	int ReadNormal(char *line);
-	int ReadPoint(char *it);
+	int ReadPoint(char *item);
 	int ReadFace(char *line);
 };
 

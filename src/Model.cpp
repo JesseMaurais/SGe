@@ -2,9 +2,9 @@
 #include "Hedron.hpp"
 #include "Model.hpp"
 
-void Model::Cube(double size)
+void Model::Cube(Scalar size)
 {
-	double l = 0.5*size;
+	Scalar l = 0.5*size;
 
 	Begin(GL_QUADS);
 

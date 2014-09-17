@@ -7,7 +7,7 @@
 
 struct Model : virtual Nurbs, Tessel
 {
-	void Cube(double size);
+	void Cube(Scalar size);
 };
 
 #endif // file

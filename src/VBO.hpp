@@ -12,13 +12,13 @@ struct VBO : virtual Mesh
 	  GLuint element, vertex, texCoord, normal, color;
 	 };
 	};
-	size_t size;
-	void Enable();
-	void Disable();
 	void GenBuffers(GLenum usage);
 	void DeleteBuffers();
+	void Enable();
+	void Disable();
 	void BindBuffers();
 	void Draw(int group);
+	void Draw();
 };
 
 #endif // file

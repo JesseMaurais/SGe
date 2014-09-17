@@ -15,7 +15,7 @@ bool Model3ds::Load(const char *path)
 		}
 		lib3ds_file_free(file);
 	}
-	return file != NULL;
+	return file != nullptr;
 }
 
 void Model3ds::AddChildNodes(Lib3dsFile *file, Lib3dsNode *node)

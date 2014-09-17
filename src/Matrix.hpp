@@ -1,25 +1,26 @@
 #ifndef __Matrix__
 #define __Matrix__
 
+#include "Number.hpp"
 #include "Vector.hpp"
 
 struct Matrix
 {
 	union {
-	 double dim[4][4], v[16];
+	 Scalar dim[4][4], v[16];
 	 struct {
-	  struct { double x, y, z, w; } X, Y, Z, W;
+	  struct { Scalar x, y, z, w; } X, Y, Z, W;
 	 };
 	};
 
-	Matrix(void);
+	Matrix();
 	void Concatenate(Matrix M, Matrix N);
-	void Translate(double x, double y, double z);
-	void Scale(double x, double y, double z);
-	void Rotate(double radian, double x, double y, double z);
-	Vector Direction(void);
-	Vector Position(void);
-	void Transpose(void);
+	void Translate(Scalar x, Scalar y, Scalar z);
+	void Scale(Scalar x, Scalar y, Scalar z);
+	void Rotate(Scalar radian, Scalar x, Scalar y, Scalar z);
+	Vector Direction();
+	Vector Position();
+	void Transpose();
 	Vector Transform(Vector V);
 	void Tangent(Vector V [3], Vector C [3]);
 };

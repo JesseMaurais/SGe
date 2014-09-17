@@ -1,10 +1,10 @@
 #ifndef __Tree__
 #define __Tree__
 
-#include <vector>
-#include <queue>
 #include "Plane.hpp"
 #include "Mesh.hpp"
+#include <vector>
+#include <queue>
 
 const int Leaf = Knot;
 
@@ -25,7 +25,7 @@ struct Tree : virtual Mesh
 	std::queue<int> visit;
 	
 	bool Traverse(Vector eye, Vector at);
-	void Perspective(double fov, double aspect);
+	void Perspective(Scalar fov, Scalar aspect);
 
 	int AddNode(Branch node);
 

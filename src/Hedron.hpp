@@ -5,13 +5,13 @@
 
 namespace Icosahedron
 {
-	const double U = 0.5, V = Phi*U;
+	const Scalar U = 0.5, V = Phi*U;
 
 	const int nRects = 3;
 
 	const int nPoints = nRects*4;
 
-	static double Rects [nRects][4][3] =
+	static Scalar Rects [nRects][4][3] =
 	{
 	 { { 0,+V,+U },{ 0,-V,+U },{ 0,-V,-U },{ 0,+V,-U } }, // X
 	 { { +U,0,+V },{ +U,0,-V },{ -U,0,-V },{ -U,0,+V } }, // Y

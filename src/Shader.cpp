@@ -2,7 +2,6 @@
 #include "Lua.hpp"
 #include "Shader.hpp"
 #include "OpenGL.hpp"
-#include <cassert>
 #include <cstdio>
 #include <vector>
 

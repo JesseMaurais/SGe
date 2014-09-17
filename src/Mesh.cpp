@@ -75,7 +75,17 @@ int Mesh::AddColor(Vector C)
 	return index;
 }
 
-int Mesh::NewVertex(int a, int b, double c)
+int Mesh::NewPoint(int a, int b, Scalar c)
+{
+	Point P;
+	P.vertex = NewVertex(a, b, c);
+	P.texCoord = NewTexCoord(a, b, c);
+	P.normal = NewNormal(a, b, c);
+	P.color = NewColor(a, b, c);
+	return AddPoint(P);
+}
+
+int Mesh::NewVertex(int a, int b, Scalar c)
 {
 	Vector &A = GetVertex(a);
 	Vector &B = GetVertex(b);
@@ -83,7 +93,7 @@ int Mesh::NewVertex(int a, int b, double c)
 	return AddVertex(A*c + B*(1-c));
 }
 
-int Mesh::NewTexCoord(int a, int b, double c)
+int Mesh::NewTexCoord(int a, int b, Scalar c)
 {
 	Vector &A = GetTexCoord(a);
 	Vector &B = GetTexCoord(b);
@@ -91,7 +101,7 @@ int Mesh::NewTexCoord(int a, int b, double c)
 	return AddTexCoord(A*c + B*(1-c));
 }
 
-int Mesh::NewNormal(int a, int b, double c)
+int Mesh::NewNormal(int a, int b, Scalar c)
 {
 	Vector &A = GetNormal(a);
 	Vector &B = GetNormal(b);
@@ -99,7 +109,7 @@ int Mesh::NewNormal(int a, int b, double c)
 	return AddNormal(A*c + B*(1-c));
 }
 
-int Mesh::NewColor(int a, int b, double c)
+int Mesh::NewColor(int a, int b, Scalar c)
 {
 	Vector &A = GetColor(a);
 	Vector &B = GetColor(b);
@@ -107,24 +117,43 @@ int Mesh::NewColor(int a, int b, double c)
 	return AddColor(A*c + B*(1-c));
 }
 
+Point  &Mesh::GetPoint(int index)
+{
+	if (index < 0)
+	{
+	 return points.at(~index);
+	}
+	static Point point;
+	point.vertex = index;
+	point.texCoord = index;
+	point.normal = index;
+	point.color = index;
+	return point;
+}
+
 Vector &Mesh::GetVertex(int index)
 {
-	return vertexes.at(index < 0 ? points[~index].vertex : index);
+	return vertexes.at(index < 0 ? points.at(~index).vertex : index);
 }
 
 Vector &Mesh::GetTexCoord(int index)
 {
-	return texCoords.at(index < 0 ? points[~index].texCoord : index);
+	return texCoords.at(index < 0 ? points.at(~index).texCoord : index);
 }
 
 Vector &Mesh::GetNormal(int index)
 {
-	return normals.at(index < 0 ? points[~index].normal : index);
+	return normals.at(index < 0 ? points.at(~index).normal : index);
 }
 
 Vector &Mesh::GetColor(int index)
 {
-	return colors.at(index < 0 ? points[~index].color : index);
+	return colors.at(index < 0 ? points.at(~index).color : index);
+}
+
+void Mesh::GetPoints(int *indexes, Point *P, int n)
+{
+	for (int i = 0; i < n; ++i) P[i] = GetPoint(indexes[i]);
 }
 
 void Mesh::GetVertexes(int *indexes, Vector *V, int n)
@@ -145,6 +174,11 @@ void Mesh::GetNormals(int *indexes, Vector *V, int n)
 void Mesh::GetColors(int *indexes, Vector *V, int n)
 {
 	for (int i = 0; i < n; ++i) V[i] = GetColor(indexes[i]);
+}
+
+void Mesh::GetPoints(int index, Point *P)
+{
+	GetPoints(faces[index].points, P);
 }
 
 void Mesh::GetVertexes(int index, Vector *V)
@@ -199,13 +233,13 @@ int MeshComposer::BeginGroup(int id)
 {
 	group = id;
 	Group &G = Mesh::groups[group];
-	G.first = 3*Mesh::faces.size();
+	G.first = Mesh::faces.size();
 }
 
 int MeshComposer::EndGroup()
 {
 	Group &G = Mesh::groups[group];
-	G.count = 3*Mesh::faces.size() - G.first;
+	G.count = Mesh::faces.size() - G.first;
 	return group;
 }
 
@@ -222,29 +256,29 @@ int MeshComposer::End()
 	return faces.size();
 }
 
-int MeshComposer::Vertex(double x, double y, double z)
+int MeshComposer::Vertex(Scalar x, Scalar y, Scalar z)
 {
 	return Mesh::AddVertex(Vector(x, y, z));
 }
 
-int MeshComposer::TexCoord(double x, double y, double z)
+int MeshComposer::TexCoord(Scalar x, Scalar y, Scalar z)
 {
 	return Mesh::AddTexCoord(Vector(x, y, z));
 }
 
-int MeshComposer::Normal(double x, double y, double z)
+int MeshComposer::Normal(Scalar x, Scalar y, Scalar z)
 {
 	return Mesh::AddNormal(Vector(x, y, z));
 }
 
-int MeshComposer::Color(double x, double y, double z)
+int MeshComposer::Color(Scalar x, Scalar y, Scalar z)
 {
 	return Mesh::AddColor(Vector(x, y, z));
 }
 
 int MeshComposer::Next(Point P)
 {
-	return Next(Mesh::AddPoint(P));
+	return Next(~ Mesh::AddPoint(P));
 }
 
 int MeshComposer::Next(int index)

@@ -13,15 +13,15 @@ void Bezier::Cube(Vector A, Vector X, Vector Y, Vector B)
 	Ax = A; Ay = X; By = Y; Bx = B;
 }
 
-Vector Bezier::Equate(double u)
+Vector Bezier::Equate(Scalar u)
 {
-	double v = 1.0-u, v2 = v*v, v3 = v2*v, u2 = u*u, u3 = u2*u;
+	Scalar v = 1.0-u, v2 = v*v, v3 = v2*v, u2 = u*u, u3 = u2*u;
 	return Ax*v3 + Ay*v2*u*3.0 + By*u2*v*3.0 + Bx*u3;
 }
 
-Vector Bezier::Tangent(double u)
+Vector Bezier::Tangent(Scalar u)
 {
-	double v = 1.0-u, v2 = v*v, u2 = u*u;
+	Scalar v = 1.0-u, v2 = v*v, u2 = u*u;
 	return Ax*v2*3.0 + Ay*v*6.0 + By*u*6.0 + Bx*u2*3.0;
 }
 	

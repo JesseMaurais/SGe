@@ -196,9 +196,9 @@ void BSP::Split(Polygon polygon, Plane space, Polygon &front, Polygon &back)
 Plane::Cross BSP::Classify(Plane space, Polygon polygon)
 {
 	int *indexes = polygon.data();
-	int n = polygon.size();
-	Vector vertexes[n];
-	GetVertexes(indexes, vertexes, n);
-	return space.Classify(vertexes, n);
+	int size = polygon.size();
+	Vector vertexes[size];
+	GetVertexes(indexes, vertexes, size);
+	return space.Classify(vertexes, size);
 }
 

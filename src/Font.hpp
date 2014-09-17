@@ -7,7 +7,7 @@
 struct Font : virtual FontStruct, Stroke
 {
 	void LoadChar(int code);
-	void LoadChars(int size, int items=128, int *list=NULL);
+	void LoadChars(int items=128, int *list=NULL);
 
   private:
 

@@ -1,9 +1,9 @@
 #include "Quaternion.hpp"
 #include <cmath>
 
-Quaternion::Quaternion(void)
+Quaternion::Quaternion()
 {
-	w = 1; x = y = z = 0;
+	w = 1.0; x = y = z = 0.0;
 }
 
 void Quaternion::Concatenate(Quaternion Q, Quaternion R)
@@ -14,9 +14,9 @@ void Quaternion::Concatenate(Quaternion Q, Quaternion R)
 	z = Q.w*R.z + Q.z*R.w + Q.x*R.y - Q.y*R.x;
 }
 
-void Quaternion::Rotate(double radian, double X, double Y, double Z)
+void Quaternion::Rotate(Scalar radian, Scalar X, Scalar Y, Scalar Z)
 {
-	double s;
+	Scalar s;
 	s = sin(radian/2);
 	w = cos(radian/2);
 	x = X*s;
@@ -24,9 +24,9 @@ void Quaternion::Rotate(double radian, double X, double Y, double Z)
 	z = Z*s;
 }
 
-double Quaternion::Normalize(void)
+Scalar Quaternion::Normalize()
 {
-	double m = sqrt(w*w + x*x + y*y + z*z);
+	Scalar m = sqrt(w*w + x*x + y*y + z*z);
 	
 	w /= m;
 	x /= m;
@@ -36,9 +36,9 @@ double Quaternion::Normalize(void)
 	return m;
 }
 
-void Quaternion::Convert(double matrix [])
+void Quaternion::Convert(Scalar matrix [])
 {
-	double xx, yy, zz, xy, wz, xz, wy, yz, wx;
+	Scalar xx, yy, zz, xy, wz, xz, wy, yz, wx;
 	
 	Normalize();
 	
@@ -70,7 +70,7 @@ void Quaternion::Convert(double matrix [])
 	matrix[ 15 ] = 1.0;
 }
 
-Vector Quaternion::Direction(void)
+Vector Quaternion::Direction()
 {
 	Vector V;
 	

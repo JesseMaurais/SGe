@@ -22,14 +22,6 @@ int main(int argc, char **argv)
 	else
 	 atexit(SDL_Quit);
 
-	if (ODE_Init())
-	{
-	 SDL_perror("ODE_Init");
-	 return EXIT_SUCCESS;
-	}
-	else
-	 atexit(ODE_Quit);
-
 	if (Lua_Init())
 	{
 	 SDL_perror("Lua_Init");
@@ -37,6 +29,14 @@ int main(int argc, char **argv)
 	}
 	else
 	 atexit(Lua_Quit);
+
+	if (ODE_Init())
+	{
+	 SDL_perror("ODE_Init");
+	 return EXIT_SUCCESS;
+	}
+	else
+	 atexit(ODE_Quit);
 
 	if (OpenGL_Init())
 	{

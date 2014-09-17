@@ -2,10 +2,10 @@
 
 Stroke::Stroke(double size)
 {
-	Point(size);
+	Detail(size);
 }
 
-void Stroke::Point(double size)
+void Stroke::Detail(double size)
 {
 	step = size;
 }

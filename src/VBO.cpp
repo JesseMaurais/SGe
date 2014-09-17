@@ -70,6 +70,6 @@ void VBO::BindBuffers()
 void VBO::Draw(int group)
 {
 	Group &G = Mesh::groups[group];
-	glDrawElements(GL_TRIANGLES, G.count, GL_UNSIGNED_INT, (void*) G.first);
+	glDrawArrays(GL_TRIANGLES, G.first, G.count);
 }
 

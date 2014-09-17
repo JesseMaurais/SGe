@@ -211,7 +211,7 @@ void Crayon::DrawJoinConic(Vector U, Vector V, double d)
 
 // Cap
 
-void Crayon::DrawCap(void)
+void Crayon::DrawCap()
 {
 	switch (cap)
 	{
@@ -227,12 +227,12 @@ void Crayon::DrawCap(void)
 	}
 }
 
-void Crayon::DrawCapSquare(void)
+void Crayon::DrawCapSquare()
 {
 	//TODO
 }
 
-void Crayon::DrawCapRound(void)
+void Crayon::DrawCapRound()
 {
 	//TODO
 }

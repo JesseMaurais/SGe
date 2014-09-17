@@ -2,10 +2,10 @@
 #define __Geom__
 
 #include "ODE.hpp"
-#include "VBO.hpp"
 #include "Model.hpp"
+#include "Render.hpp"
 
-struct Geometry : virtual Model, Geom, VBO
+struct Geometry : virtual Model, Geom, Render
 {
 	~Geometry();
 
@@ -14,16 +14,14 @@ struct Geometry : virtual Model, Geom, VBO
 	dBodyID body;
 	dGeomID geom;
 
-	void Rotation(double radian, double x, double y, double z);
-	void Position(double x, double y, double z);
-	void LinearVel(double x, double y, double z);
-	void AngularVel(double x, double y, double z);
+	void Rotation(Scalar radian, Scalar x, Scalar y, Scalar z);
+	void Position(Scalar x, Scalar y, Scalar z);
+	void LinearVel(Scalar x, Scalar y, Scalar z);
+	void AngularVel(Scalar x, Scalar y, Scalar z);
+
+	void Box(Scalar size);
 };
 
-struct Box : Geometry
-{
-	Box();
-};
 
 #endif // file
 

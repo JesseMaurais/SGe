@@ -1,7 +1,7 @@
 #include "Matrix.hpp"
 #include <cmath>
 
-Matrix::Matrix(void)
+Matrix::Matrix()
 {
 	for (int i = 0; i < 4; ++i)
 	 for (int j = 0; j < 4; ++j)
@@ -23,23 +23,23 @@ void Matrix::Concatenate(Matrix M, Matrix N)
 	}
 }
 
-void Matrix::Translate(double x, double y, double z)
+void Matrix::Translate(Scalar x, Scalar y, Scalar z)
 {
 	W.x = x;
 	W.y = y;
 	W.z = z;
 }
 
-void Matrix::Scale(double x, double y, double z)
+void Matrix::Scale(Scalar x, Scalar y, Scalar z)
 {
 	X.x = x;
 	Y.y = y;
 	Z.z = z;
 }
 
-void Matrix::Rotate(double radian, double x, double y, double z)
+void Matrix::Rotate(Scalar radian, Scalar x, Scalar y, Scalar z)
 {
-	double xx, yy, zz,  xy, yz, zx,  sx, sy, sz,  s, c, a, m;
+	Scalar xx, yy, zz,  xy, yz, zx,  sx, sy, sz,  s, c, a, m;
 
 	s = sin(radian);
 	c = cos(radian);
@@ -73,7 +73,7 @@ void Matrix::Rotate(double radian, double x, double y, double z)
 	Z.z = a * zz + c;
 }
 
-Vector Matrix::Direction(void)
+Vector Matrix::Direction()
 {
 	Vector U;
 
@@ -85,7 +85,7 @@ Vector Matrix::Direction(void)
 	return U;
 }
 
-Vector Matrix::Position(void)
+Vector Matrix::Position()
 {
 	Vector U;
 
@@ -96,9 +96,9 @@ Vector Matrix::Position(void)
 	return U;
 }
 
-void Matrix::Transpose(void)
+void Matrix::Transpose()
 {
-	double temporary;
+	Scalar temporary;
 
 	for (int i = 0; i < 3; ++i)
 	{
@@ -138,7 +138,7 @@ void Matrix::Tangent(Vector V [3], Vector C [3])
 
 	// Denominator
 
-	double den = C1.s * C2.t - C2.s * C1.t;
+	Scalar den = C1.s * C2.t - C2.s * C1.t;
 
 	if (den == 0) return;
 	

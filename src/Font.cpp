@@ -1,28 +1,25 @@
 #include "Font.hpp"
 
-bool Font::LoadChars(int size, int items, int *list)
+void Font::LoadChars(int items, int *list)
 {
-	FT_Error error = FT_Set_Pixel_Sizes(face, 0, size);
-	if (error) return false;
 	for (int it = 0; it < items; ++it)
 	{
 	 LoadChar(list ? list[it] : it);
 	}
-	return true;
 }
 
 void Font::LoadChar(int code)
 {
 	FT_Load_Char(face, code, FT_LOAD_NO_BITMAP);
-	
-	static FT_Outline_Funcs funcs =
+	FT_Outline_Funcs funcs =
 	{
 	 move, line, cone, cube, 0, 0
 	};
-	
+	BeginGroup(code);
 	BeginPolygon();
 	FT_Outline_Decompose(&face->glyph->outline, &funcs, this);
 	EndPolygon();
+	EngGroup();
 }
 
 int Font::move(const FT_Vector *a, void *pen)

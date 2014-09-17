@@ -1,43 +1,45 @@
 #ifndef __Vector__
 #define __Vector__
 
+#include "Number.hpp"
+
 struct Vector
 {
 	union
 	{
-	 double v[3];
+	 Scalar v[3];
 	
-	 struct { double x,y,z; };
-	 struct { double i,j,k; };
-	 struct { double s,t,r; };
-	 struct { double R,G,B; };
+	 struct { Scalar x,y,z; };
+	 struct { Scalar i,j,k; };
+	 struct { Scalar s,t,r; };
+	 struct { Scalar R,G,B; };
 	};
 
-	Vector(void);
-	Vector(double *p);
-	Vector(double a);
-	Vector(double a, double b);
-	Vector(double a, double b, double c);
+	Vector();
+	Vector(Scalar *);
+	Vector(Scalar a);
+	Vector(Scalar a, Scalar b);
+	Vector(Scalar a, Scalar b, Scalar c);
 
-	double Dot(Vector V);
+	Scalar Dot(Vector V);
 	void Cross(Vector U, Vector V);
-	double Square(void);
-	double Magnitude(void);
-	double Normalize(void);
+	Scalar Square();
+	Scalar Magnitude();
+	Scalar Normalize();
 	void Right(Vector A, Vector B, Vector C);
 	Vector Project(Vector V);
-	double Quadratic(double t);
-	double Linear(double t);
+	Scalar Quadratic(Scalar t);
+	Scalar Linear(Scalar t);
 
-	Vector operator - (void);
+	Vector operator - ();
 	Vector operator + (Vector V);
 	Vector operator - (Vector V);
 	Vector operator * (Vector V);
 	Vector operator / (Vector V);
-	Vector operator + (double t);
-	Vector operator - (double t);
-	Vector operator * (double s);
-	Vector operator / (double s);
+	Vector operator + (Scalar t);
+	Vector operator - (Scalar t);
+	Vector operator * (Scalar s);
+	Vector operator / (Scalar s);
 	bool operator == (Vector V);
 };
 

@@ -5,15 +5,16 @@
 #include "Geom.hpp"
 #include "Shader.hpp"
 
-template <> const char *lux_Class<Box>::Type::name = "Box";
-template <> void lux_Class<Box>::setfuncs(lua_State *state)
+template <> const char *lux_Class<Geometry>::Type::name = "Geometry";
+template <> void lux_Class<Geometry>::setfuncs(lua_State *state)
 {
 	luaL_Reg regs[] =
 	{
-	{"Position", lux_wrap(Box::Position)},
-	{"Rotation", lux_wrap(Box::Rotation)},
-	{"LinearVel", lux_wrap(Box::LinearVel)},
-	{"AngularVel", lux_wrap(Box::AngularVel)},
+	{"Position", lux_wrap(Geometry::Position)},
+	{"Rotation", lux_wrap(Geometry::Rotation)},
+	{"LinearVel", lux_wrap(Geometry::LinearVel)},
+	{"AngularVel", lux_wrap(Geometry::AngularVel)},
+	{"Box", lux_wrap(Geometry::Box)},
 	{NULL, NULL}
 	};
 	luaL_setfuncs(state, regs, 0);
@@ -34,17 +35,17 @@ template <> void lux_Class<Shader>::setfuncs(lua_State *state)
 
 template <> const char *lux_Index<SDL_Event>::Type::name = "Event";
 
-static int next(lua_State *vm)
+static int next(lua_State *state)
 {
-	return lua_yield(vm, 0);
+	return lua_yield(state, 0);
 }
 
 signed Lux_Init()
 {
 	luxopen_array(State);
 
+	lux_Class<Geometry>::open(State);
 	lux_Class<Shader>::open(State);
-	lux_Class<Box>::open(State);
 
 	lux_Index<SDL_Event>::open(State);
 	lux_Index<SDL_Event>::get["next"] = next;

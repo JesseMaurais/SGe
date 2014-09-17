@@ -17,13 +17,13 @@ class Crayon
 	enum Cap { CapButt, CapRound, CapSquare };
 	enum Join { JoinBevel, JoinMiter, JoinRound, JoinConic };
 
-	Crayon(void);
+	Crayon();
 
 	void JoinStyle(enum Join style);
 	void CapStyle(enum Cap style);
 	void Width(double thickness);
-	void Begin(void);
-	void End(void);
+	void Begin();
+	void End();
 	void Vertex(Vector point);
 
  private:
@@ -38,7 +38,7 @@ class Crayon
 
 	enum Join join;
 
-	void DrawJoin(void);
+	void DrawJoin();
 	void DrawJoinBevel(Vector U, Vector V);
 	void DrawJoinMiter(Vector U, Vector V, double d);
 	void DrawJoinRoundPart(Vector U, Vector V, int n);
@@ -49,9 +49,9 @@ class Crayon
 
 	enum Cap cap;
 
-	void DrawCap(void);
-	void DrawCapSquare(void);
-	void DrawCapRound(void);
+	void DrawCap();
+	void DrawCapSquare();
+	void DrawCapRound();
 };
 
 #endif // file

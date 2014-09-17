@@ -1,6 +1,7 @@
 #ifndef __Bezier__
 #define __Bezier__
 
+#include "Number.hpp"
 #include "Vector.hpp"
 
 struct Bezier
@@ -10,8 +11,8 @@ struct Bezier
 	void Cone(Vector A, Vector Z, Vector B);
 	void Cube(Vector A, Vector X, Vector Y, Vector B);
 
-	Vector Equate(double u);
-	Vector Tangent(double u);
+	Vector Equate(Scalar u);
+	Vector Tangent(Scalar u);
 	
 	// Smoothing, control point calculators
 
