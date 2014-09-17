@@ -5,6 +5,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+#define SDL_ShowError(message)\
+ SDL_ShowSimpleMessageBox(SDL_MESSAGE_BOX_ERROR, __func__, message, Window)
+
 void SDL_perror(const char *string);
 
 extern SDL_Event *Event;

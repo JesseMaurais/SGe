@@ -40,9 +40,9 @@ bool Tree::Traverse(Vector eye, Vector at)
 
 	visit.pop();
 	return true;
-}	
+}
 
-void Tree::Perspective(double fov, double aspect)
+void Tree::Perspective(Scalar fov, Scalar aspect)
 {
 	Vector frame;
 

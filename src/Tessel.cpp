@@ -22,11 +22,6 @@ Tessel::~Tessel()
 	gluDeleteTess(obj);
 }
 
-void Tessel::Property(int name, double param)
-{
-	gluTessProperty(obj, name, param);
-}
-
 void Tessel::BeginPolygon()
 {
 	gluTessBeginPolygon(obj, this);

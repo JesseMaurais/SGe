@@ -7,8 +7,8 @@
 
 struct Stroke : virtual Tessel, Bezier
 {
-	Stroke(Scalar detail=5);
-	void Detail(Scalar s);
+	Stroke(Scalar step=5);
+	void Steps(Scalar s);
 	void Curve(Scalar n);
 	void Move(Vector to);
 	void Line(Vector to);
@@ -17,7 +17,7 @@ struct Stroke : virtual Tessel, Bezier
 
  protected:
 
-	double step;
+	Scalar step;
 	Vector from;
 	bool moving;
 };

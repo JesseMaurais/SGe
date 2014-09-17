@@ -1,6 +1,6 @@
 CC = c++
 CFLAGS = -std=c++11 -g -c
-OBJ = 3ds.o Bezier.o BSP.o Crayon.o Event.o FreeType.o Geom.o GUI.o Height.o Lua.o Lux.o Lwo.o main.o Matrix.o Mesh.o Model.o Nurbs.o Obj.o ODE.o OpenAL.o OpenGL.o Plane.o Ply.o Quaternion.o Render.o SDL.o Shader.o SkyBox.o Sphere.o Stroke.o Tessel.o Texture.o Tree.o VBO.o Vector.o Widget.o
+OBJ = 3ds.o Bezier.o BSP.o Crayon.o Event.o Font.o FreeType.o Geom.o GUI.o Height.o Lua.o Lux.o Lwo.o main.o Matrix.o Mesh.o Model.o Nurbs.o Obj.o ODE.o OpenAL.o OpenGL.o Plane.o Ply.o Quaternion.o Render.o SDL.o Shader.o SkyBox.o Sphere.o Stroke.o Tessel.o Texture.o Tree.o VBO.o Vector.o Widget.o
 
 all: $(OBJ)
 	c++ $(OBJ) -o SGe -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_net -lGLEW -lopenal -lode -l3ds -llwo -lrply -llua5.2 -lexpat

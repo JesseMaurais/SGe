@@ -1,23 +1,23 @@
 #include "Stroke.hpp"
 
-Stroke::Stroke(double size)
+Stroke::Stroke(Scalar s)
 {
-	Detail(size);
+	Steps(s);
 }
 
-void Stroke::Detail(double size)
+void Stroke::Steps(Scalar s)
 {
-	step = size;
+	step = s;
 }
 
-void Stroke::Curve(double n)
+void Stroke::Curve(Scalar n)
 {
 	if (step) n /= step;
 	
-	for (double i = 1; i < n; ++i)
+	for (Scalar i = 1; i < n; ++i)
 	{
 	 Vector V;
-	 double t = i/n;
+	 Scalar t = i/n;
 	 V = Bezier::Equate(t);
 	 Tessel::PolygonVertex(V);
 	}
@@ -52,7 +52,7 @@ void Stroke::Cone(Vector X, Vector to)
 	 Tessel::PolygonVertex(from);
 	}
 	
-	double n = (to - from).Magnitude();
+	Scalar n = (to - from).Magnitude();
 	Bezier::Cone(from, X, to);
 
 	Curve(n);
@@ -67,7 +67,7 @@ void Stroke::Cube(Vector X, Vector Y, Vector to)
 	 Tessel::PolygonVertex(from);
 	}
 	
-	double n = (to - from).Magnitude();
+	Scalar n = (to - from).Magnitude();
 	
 	Bezier::Cube(from, X, Y, to);
 	Curve(n);

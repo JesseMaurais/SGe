@@ -19,7 +19,7 @@ void Font::LoadChar(int code)
 	BeginPolygon();
 	FT_Outline_Decompose(&face->glyph->outline, &funcs, this);
 	EndPolygon();
-	EngGroup();
+	EndGroup();
 }
 
 int Font::move(const FT_Vector *a, void *pen)
