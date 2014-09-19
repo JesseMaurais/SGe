@@ -30,14 +30,6 @@ int main(int argc, char **argv)
 	else
 	 atexit(Lua_Quit);
 
-	if (ODE_Init())
-	{
-	 SDL_perror("ODE_Init");
-	 return EXIT_SUCCESS;
-	}
-	else
-	 atexit(ODE_Quit);
-
 	if (OpenGL_Init())
 	{
 	 SDL_perror("OpenGL_Init");
@@ -54,29 +46,28 @@ int main(int argc, char **argv)
 	else
 	 atexit(OpenAL_Quit);
 
+	if (ODE_Init())
+	{
+	 SDL_perror("ODE_Init");
+	 return EXIT_SUCCESS;
+	}
+	else
+	 atexit(ODE_Quit);
+
 	if (luaL_loadfile(Coroutine, argv[1]))
 	{
 	 Lua_perror(Coroutine, "luaL_loadfile");
 	 return EXIT_SUCCESS;
 	}
+	else
+	 atexit(Lua_Quit);
 
-	int w, h;
-	SDL_GetWindowSize(Window, &w, &h);
-	double aspect = double(w) / (h ? h : 1);
-
-	glMatrixMode(GL_PROJECTION);
-	gluPerspective(60.0, aspect, 0.1, 100.0);
-
-	glMatrixMode(GL_MODELVIEW);
 	gluLookAt(0, 5, 2,  0, 0, 0,  0, 1, 0);
+	glClearColor(1.0, 1.0, 1.0, 0.0);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
-
-	glClearColor(1.0, 1.0, 1.0, 0.0);
-	glLineWidth(4.0);
-	glPointSize(8.0);
 
 	SDL_bool quit = SDL_FALSE;
 	do
@@ -127,7 +118,7 @@ int main(int argc, char **argv)
 			switch (error)
 			{
 			default:
-				Lua_perror(Coroutine, "lua_resume");
+				Lua_perror(Coroutine, argv[1]);
 			case LUA_OK:
 				quit = SDL_TRUE;
 				break;
@@ -137,6 +128,5 @@ int main(int argc, char **argv)
 		}
 	}
 	while (!quit);
-	return EXIT_SUCCESS;
 }
 

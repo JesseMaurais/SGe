@@ -31,7 +31,7 @@ Scalar Plane::Cut(Vector U, Vector V)
 	return - Equate(U) / Dot(V - U);
 }
 
-Plane::Cross Plane::Classify(Vector V[], int n)
+Plane::Crossing Plane::Classify(Vector V[], int n)
 {
 	int planar=0, front=0, back=0;
 	

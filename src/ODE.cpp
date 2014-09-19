@@ -1,5 +1,6 @@
 #include "ODE.hpp"
 #include "SDL.hpp"
+#include "Lua.hpp"
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -89,15 +90,22 @@ static Uint32 SimulationTimer(Uint32 interval, void *unused)
 	 SDL_perror("SDL_LockMutex");
 	}
 	else
-	if (SDL_CondBroadcast(Cond))
+	if (SDL_CondSignal(Cond))
 	{
-	 SDL_perror("SDL_CondBroadcast");
+	 SDL_perror("SDL_CondSignal");
 	}
 	else
 	{
 	 SDL_UnlockMutex(Mutex);
 	}
-	return interval;	
+	/*
+	dReal elapsed = interval;
+	dReal approx = elapsed/1000;
+	dReal error = Step - approx;
+	dReal step = approx + error;
+	return Uint32(1000*step);
+	*/
+	return interval;
 }
 
 static void Error(int error, const char *format, va_list va)
@@ -119,7 +127,103 @@ signed ODE_Init()
 	World = dWorldCreate();
 	Space = dHashSpaceCreate(0);
 	Group = dJointGroupCreate(0);
-	Step = 50.0/1000.0;
+	Step = 1.0/50.0;
+
+	lua_getglobal(State, "World");
+	int table = lua_gettop(State);
+
+	if (!lua_isnil(State, table))
+	{
+	 lua_pushnil(State);
+	 while (lua_next(State, table))
+	 {
+		const char *key = lua_tostring(State, -2);
+		#define tointeger lua_tointeger(State, -1)
+		#define toboolean lua_toboolean(State, -1)
+		#define tonumber  lua_tonumber(State, -1)
+
+		if (!SDL_strcasecmp(key, "FPS"))
+		{
+		 Step = 1.0/tonumber;
+		}
+		else
+		if (!SDL_strcasecmp(key, "ERP"))
+		{
+		 dWorldSetERP(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "CFM"))
+		{
+		 dWorldSetCFM(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "LINEAR_DAMPING"))
+		{
+		 dWorldSetLinearDamping(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "LINEAR_DAMPING_THRESHOLD"))
+		{
+		 dWorldSetLinearDampingThreshold(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "ANGULAR_DAMPING"))
+		{
+		 dWorldSetAngularDamping(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "ANGULAR_DAMPING_THRESHOLD"))
+		{
+		 dWorldSetAngularDampingThreshold(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "MAX_ANGULAR_SPEED"))
+		{
+		 dWorldSetMaxAngularSpeed(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "CONTACT_MAX_CORRECTING_VELOCITY"))
+		{
+		 dWorldSetContactMaxCorrectingVel(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "CONTACT_SURFACE_LAYER"))
+		{
+		 dWorldSetContactSurfaceLayer(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "AUTO_DISABLE"))
+		{
+		 dWorldSetAutoDisableFlag(World, toboolean);
+		}
+		else
+		if (!SDL_strcasecmp(key, "AUTO_DISABLE_LINEAR_THRESHOLD"))
+		{
+		 dWorldSetAutoDisableLinearThreshold(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "AUTO_DISABLE_ANGULAR_THRESHOLD"))
+		{
+		 dWorldSetAutoDisableAngularThreshold(World, tonumber);
+		}
+		else
+		if (!SDL_strcasecmp(key, "AUTO_DISABLE_STEPS"))
+		{
+		 dWorldSetAutoDisableSteps(World, tointeger);
+		}
+		else
+		if (!SDL_strcasecmp(key, "AUTO_DISABLE_TIME"))
+		{
+		 dWorldSetAutoDisableTime(World, tonumber);
+		}
+		else
+		{
+		 SDL_Log("World: %s does not match", key);
+		}
+		lua_pop(State, 1);
+	 }
+	}
+	lua_pop(State, 1);
 
 	Cond = SDL_CreateCond();
 	if (!Cond)
@@ -151,7 +255,7 @@ signed ODE_Init()
 	 SDL_perror("SDL_CreateThread");
 	 return SDL_SetError("cannot create simulation thread");
 	}
-	TimerID = SDL_AddTimer(1000/50, SimulationTimer, NULL);
+	TimerID = SDL_AddTimer(Uint32(1000*Step), SimulationTimer, NULL);
 	if (!TimerID)
 	{
 	 dWorldDestroy(World);
@@ -183,21 +287,6 @@ signed ODE_Lock()
 	if (SDL_LockMutex(Mutex))
 	{
 	 SDL_perror("SDL_LockMutex");
-	 return -1;
-	}
-	return 0;
-}
-
-signed ODE_Wait()
-{
-	if (SDL_LockMutex(Mutex))
-	{
-	 SDL_perror("SDL_LockMutex");
-	 return -1;
-	}
-	if (SDL_CondWait(Cond, Mutex))
-	{
-	 SDL_perror("SDL_CondWait");
 	 return -1;
 	}
 	return 0;

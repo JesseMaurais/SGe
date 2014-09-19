@@ -1,13 +1,9 @@
-#include <cstring>
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
 #include "OpenGL.hpp"
 #include "Geom.hpp"
 #include "ODE.hpp"
 #include "Lua.hpp"
-
-extern dWorldID World;
-extern dSpaceID Space;
 
 Geometry::~Geometry()
 {
@@ -63,9 +59,8 @@ void Geometry::AngularVel(Scalar x, Scalar y, Scalar z)
 void Geometry::Box(Scalar l)
 {
 	BeginGroup(0);
-	Cube(l);
+	Model::Cube(l);
 	EndGroup();
-	Clear();
 
 	dMass mass;
 	mass.setBox(0.1, l, l, l);

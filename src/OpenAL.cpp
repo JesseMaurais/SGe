@@ -57,6 +57,10 @@ signed OpenAL_Init()
 		{
 		 string = tostring;
 		}
+		else
+		{
+		 SDL_Log("Audio: %s does not match", key);
+		}
 
 		lua_pop(State, 1);
 	 }

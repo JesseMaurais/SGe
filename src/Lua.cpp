@@ -39,6 +39,10 @@ signed Lua_Init()
 
 void Lua_Quit(void)
 {
-	lua_close(State);
+	if (State) 
+	{
+	 lua_close(State);
+	 State = nullptr;
+	}
 }
 

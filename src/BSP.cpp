@@ -133,7 +133,7 @@ int BSP::Select(Brush &brush)
 	return bestDivider;
 }
 
-void BSP::Split(Polygon polygon, Plane space, Brush &frontSet, Brush &backSet)
+void BSP::Split(Polygon &polygon, Plane &space, Brush &frontSet, Brush &backSet)
 {
 	Polygon front, back;
 	Split(polygon, space, front, back);
@@ -141,7 +141,7 @@ void BSP::Split(Polygon polygon, Plane space, Brush &frontSet, Brush &backSet)
 	backSet.push_back(back);
 }
 
-void BSP::Split(Polygon polygon, Plane space, Polygon &front, Polygon &back)
+void BSP::Split(Polygon &polygon, Plane &space, Polygon &front, Polygon &back)
 {
 	front.face = back.face = polygon.face;
 
@@ -193,11 +193,12 @@ void BSP::Split(Polygon polygon, Plane space, Polygon &front, Polygon &back)
 	}
 }
 
-Plane::Cross BSP::Classify(Plane space, Polygon polygon)
+Plane::Crossing BSP::Classify(Plane &space, Polygon &polygon)
 {
 	int *indexes = polygon.data();
 	int size = polygon.size();
 	Vector vertexes[size];
+
 	GetVertexes(indexes, vertexes, size);
 	return space.Classify(vertexes, size);
 }

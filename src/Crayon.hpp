@@ -3,28 +3,27 @@
 
 #include "Vector.hpp"
 
-class Crayon
+struct Crayon
 {
-	Vector lineA, perpA;
-	Vector lineB, perpB;
-
-	Vector pivot;
-	double width;
-	signed step;
-
- public:
-
 	enum Cap { CapButt, CapRound, CapSquare };
 	enum Join { JoinBevel, JoinMiter, JoinRound, JoinConic };
 
 	Crayon();
-
 	void JoinStyle(enum Join style);
 	void CapStyle(enum Cap style);
-	void Width(double thickness);
+	void Width(Scalar thickness);
+	void Vertex(Vector point);
 	void Begin();
 	void End();
-	void Vertex(Vector point);
+
+ protected:
+
+	Vector lineA, perpA;
+	Vector lineB, perpB;
+
+	Vector pivot;
+	Scalar width;
+	signed step;
 
  private:
 

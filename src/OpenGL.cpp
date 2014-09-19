@@ -1,6 +1,7 @@
 #include "SDL.hpp"
 #include "Lua.hpp"
 #include "OpenGL.hpp"
+#include <cstdlib>
 
 static SDL_GLContext Context;
 
@@ -26,6 +27,16 @@ signed OpenGL_Init()
 		#define toboolean lua_toboolean(State, -1)
 		#define tostring  lua_tostring(State, -1)
 
+		if (!SDL_strcasecmp(key, "DEVICE"))
+		{
+		 if (SDL_VideoInit(tostring))
+		 {
+		  SDL_perror("SDL_VideoInit");
+		 }
+		 else
+		  atexit(SDL_VideoQuit);
+		}
+		else
 		if (!SDL_strcasecmp(key, "ALPHA"))
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, tointeger))
@@ -143,12 +154,12 @@ signed OpenGL_Init()
 		 title = tostring;
 		}
 		else
-		if (!SDL_strcasecmp(key, "X"))
+		if (!SDL_strcasecmp(key, "COLUMN"))
 		{
 		 x = tointeger;
 		}
 		else
-		if (!SDL_strcasecmp(key, "Y"))
+		if (!SDL_strcasecmp(key, "ROW"))
 		{
 		 y = tointeger;
 		}
@@ -231,7 +242,7 @@ signed OpenGL_Init()
 		*/
 		else
 		{
-		 SDL_Log("%s does not match", key);
+		 SDL_Log("Video: %s does not match", key);
 		}
 
 		lua_pop(State, 1);
@@ -269,6 +280,12 @@ signed OpenGL_Init()
 	 SDL_GL_DeleteContext(Context);
 	 return SDL_SetError("glewInit: %s", glewGetErrorString(error));
 	}
+
+	double aspect = double(w) / (h ? h : 1);
+
+	glMatrixMode(GL_PROJECTION);
+	gluPerspective(60.0, aspect, 0.1, 1000.0);
+	glMatrixMode(GL_MODELVIEW);
 	
 	return 0;
 }

@@ -24,10 +24,9 @@ struct BSP : virtual Model, Tree
 	int Sort(Brush &brush);
 	int Sort(Brush &brush, Brush &front, Brush &back);
 	int Select(Brush &brush);
-	void Split(Polygon polygon, Plane space, Brush &front, Brush &back);
-	void Split(Polygon polygon, Plane space, Polygon &front, Polygon &back);
-
-	Plane::Cross Classify(Plane space, Polygon polygon);
+	void Split(Polygon &poly, Plane &space, Brush &front, Brush &back);
+	void Split(Polygon &poly, Plane &space, Polygon &front, Polygon &back);
+	Plane::Crossing Classify(Plane &space, Polygon &poly);
 };
 
 #endif // file

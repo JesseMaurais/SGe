@@ -6,7 +6,7 @@
 
 struct Plane
 {
-	enum Cross { Planar, Spanning, Front, Back };
+	enum Crossing { Planar, Spanning, Front, Back };
 
 	Vector normal;
 	Scalar distance;
@@ -17,7 +17,7 @@ struct Plane
 	Scalar Equate(Vector V);
 	Scalar Cut(Vector U, Vector V);
 	bool Agree(Vector N);
-	Cross Classify(Vector V[], int n=3);
+	Crossing Classify(Vector V[], int n=3);
 };
 
 #endif // file
