@@ -1,0 +1,4 @@
+<map id="MeshComposer::End" name="MeshComposer::End">
+<area shape="rect" id="node3" href="$struct_model.html#a0fca5dc0d694a846c8de744551d55027" title="Model::Cube" alt="" coords="200,5,296,35"/>
+<area shape="rect" id="node5" href="$struct_geometry.html#a6d092ed693ad3df36bb91fd3de2c6da7" title="Geometry::Box" alt="" coords="345,5,455,35"/>
+</map>

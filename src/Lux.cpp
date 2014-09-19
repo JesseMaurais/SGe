@@ -3,7 +3,6 @@
 #include "Lux.hpp"
 #include "SDL.hpp"
 #include "Geom.hpp"
-#include "Shader.hpp"
 
 template <> const char *lux_Class<Geometry>::Type::name = "Geometry";
 template <> void lux_Class<Geometry>::setfuncs(lua_State *state)
@@ -15,19 +14,6 @@ template <> void lux_Class<Geometry>::setfuncs(lua_State *state)
 	{"LinearVel", lux_wrap(Geometry::LinearVel)},
 	{"AngularVel", lux_wrap(Geometry::AngularVel)},
 	{"Box", lux_wrap(Geometry::Box)},
-	{NULL, NULL}
-	};
-	luaL_setfuncs(state, regs, 0);
-}
-template <> const char *lux_Class<Shader>::Type::name = "Shader";
-template <> void lux_Class<Shader>::setfuncs(lua_State *state)
-{
-	luaL_Reg regs[] =
-	{
-	{"LoadFragmentSource", lux_wrap(Shader::LoadFragmentSource)},
-	{"LoadVertexSource", lux_wrap(Shader::LoadVertexSource)},
-	{"LinkProgram", lux_wrap(Shader::LinkProgram)},
-	{"UseProgram", lux_wrap(Shader::UseProgram)},
 	{NULL, NULL}
 	};
 	luaL_setfuncs(state, regs, 0);

@@ -56,7 +56,7 @@ void Geometry::AngularVel(Scalar x, Scalar y, Scalar z)
 	dBodySetAngularVel(body, x, y, z);
 }
 
-void Geometry::Box(Scalar l)
+void Geometry::Cube(Scalar l)
 {
 	BeginGroup(0);
 	Model::Cube(l);

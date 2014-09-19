@@ -1,0 +1,12 @@
+<map id="Mesh::GetTangentSpace" name="Mesh::GetTangentSpace">
+<area shape="rect" id="node3" href="$struct_mesh.html#a57d2e12e76fbca821d5d52e2bb3cddf4" title="Mesh::GetVertexes" alt="" coords="228,5,361,35"/>
+<area shape="rect" id="node7" href="$struct_mesh.html#af9132c639ff46e0e50dc8a51b493ba07" title="Mesh::GetTexCoords" alt="" coords="221,59,368,88"/>
+<area shape="rect" id="node11" href="$struct_matrix.html#a470a93f7c8922718d2dee50094684303" title="Matrix::Tangent" alt="" coords="239,112,351,141"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="427,5,547,35"/>
+<area shape="rect" id="node9" href="$struct_mesh.html#ab2f08a166dd7fba703c9a476ad4d3b20" title="Mesh::GetTexCoord" alt="" coords="417,59,556,88"/>
+<area shape="rect" id="node13" href="$struct_vector.html#a4d8f563af105d54dee24340ddccbb636" title="Vector::Cross" alt="" coords="436,112,537,141"/>
+<area shape="rect" id="node15" href="$struct_vector.html#a22227be2820058b6b881c330d980a3ea" title="Vector::Normalize" alt="" coords="424,165,549,195"/>
+<area shape="rect" id="node17" href="$struct_vector.html#a297d988bc710f14ad1acb46ef2a2d953" title="Vector::Magnitude" alt="" coords="605,165,733,195"/>
+<area shape="rect" id="node19" href="$struct_vector.html#acdddd2d7602c3c7a4583e9d86f56cc78" title="Vector::Square" alt="" coords="781,165,891,195"/>
+<area shape="rect" id="node21" href="$struct_vector.html#af0bc5daad8bc940913f7fd3a42a3d120" title="Vector::Dot" alt="" coords="940,165,1028,195"/>
+</map>

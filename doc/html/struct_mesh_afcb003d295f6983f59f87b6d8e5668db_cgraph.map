@@ -1,0 +1,15 @@
+<map id="Mesh::NewPoint" name="Mesh::NewPoint">
+<area shape="rect" id="node3" href="$struct_mesh.html#a4efcfa450aa2da6d746da717620a3fe7" title="Mesh::NewVertex" alt="" coords="184,59,309,88"/>
+<area shape="rect" id="node9" href="$struct_mesh.html#aa3d0c6a6517b4107bc30887555cef5d7" title="Mesh::NewTexCoord" alt="" coords="173,165,320,195"/>
+<area shape="rect" id="node15" href="$struct_mesh.html#a4aac3612f265baeb2364db03a905434b" title="Mesh::NewNormal" alt="" coords="181,232,312,261"/>
+<area shape="rect" id="node21" href="$struct_mesh.html#a836d1f650266a2b05b3d6352120dddf9" title="Mesh::NewColor" alt="" coords="187,312,307,341"/>
+<area shape="rect" id="node27" href="$struct_mesh.html#a8fa7204cb30f957bc599bfa08f91d991" title="Mesh::AddPoint" alt="" coords="189,365,304,395"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="380,5,500,35"/>
+<area shape="rect" id="node7" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="379,59,501,88"/>
+<area shape="rect" id="node11" href="$struct_mesh.html#ab2f08a166dd7fba703c9a476ad4d3b20" title="Mesh::GetTexCoord" alt="" coords="371,112,509,141"/>
+<area shape="rect" id="node13" href="$struct_mesh.html#a6abaee7a368a0fa0fdb78908116389d6" title="Mesh::AddTexCoord" alt="" coords="369,165,511,195"/>
+<area shape="rect" id="node17" href="$struct_mesh.html#aefea174126a7d6273de34788316d5192" title="Mesh::GetNormal" alt="" coords="377,219,503,248"/>
+<area shape="rect" id="node19" href="$struct_mesh.html#ad6a6c113f1f3f0cd924f3e686677e6d1" title="Mesh::AddNormal" alt="" coords="377,272,503,301"/>
+<area shape="rect" id="node23" href="$struct_mesh.html#a6e922185d9c3792d784c783dadacce64" title="Mesh::GetColor" alt="" coords="383,325,497,355"/>
+<area shape="rect" id="node25" href="$struct_mesh.html#a81f833d6f687b2904e1227381b0c3131" title="Mesh::AddColor" alt="" coords="383,379,497,408"/>
+</map>

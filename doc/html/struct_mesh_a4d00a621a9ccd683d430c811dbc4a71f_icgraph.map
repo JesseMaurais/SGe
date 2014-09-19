@@ -1,0 +1,21 @@
+<map id="Mesh::GetVertex" name="Mesh::GetVertex">
+<area shape="rect" id="node3" href="$struct_mesh.html#a4efcfa450aa2da6d746da717620a3fe7" title="Mesh::NewVertex" alt="" coords="191,59,316,88"/>
+<area shape="rect" id="node9" href="$struct_mesh.html#a57d2e12e76fbca821d5d52e2bb3cddf4" title="Mesh::GetVertexes" alt="" coords="187,192,320,221"/>
+<area shape="rect" id="node30" href="$struct_tessel.html#ae03acfbf1a6f72b4c7997778c7b4a317" title="Tessel::PolygonVertex" alt="" coords="176,401,331,431"/>
+<area shape="rect" id="node5" href="$struct_b_s_p.html#a2c783caf634edf05f705ace6ce041fa9" title="BSP::Split" alt="" coords="421,5,504,35"/>
+<area shape="rect" id="node7" href="$struct_mesh.html#afcb003d295f6983f59f87b6d8e5668db" title="Mesh::NewPoint" alt="" coords="404,59,521,88"/>
+<area shape="rect" id="node11" href="$struct_b_s_p.html#ad64c54be1c3ab9f6d4a912e7591a0555" title="BSP::Classify" alt="" coords="411,112,515,141"/>
+<area shape="rect" id="node18" href="$struct_mesh.html#aa4f1d38e2465f8edd13be497e6c5fad0" title="Mesh::GetVertexes" alt="" coords="396,165,529,195"/>
+<area shape="rect" id="node20" href="$struct_mesh.html#a03c042e171ee4ee5b5d04c237b9e589b" title="Mesh::GetTriangle" alt="" coords="399,219,527,248"/>
+<area shape="rect" id="node28" href="$struct_mesh.html#a80c2b4f3d3860e35b8056bdc88dcf0b5" title="Mesh::GetTangentSpace" alt="" coords="380,272,545,301"/>
+<area shape="rect" id="node13" href="$struct_b_s_p.html#a6c543b453dd89561556eb07b966d0f03" title="BSP::Sort" alt="" coords="761,113,841,143"/>
+<area shape="rect" id="node15" href="$struct_b_s_p.html#a445eb897e3932862fa3b7513eb6e52e0" title="BSP::Select" alt="" coords="607,139,700,168"/>
+<area shape="rect" id="node22" href="$struct_mesh.html#aa06060ad8a1082d1c06952f8da40102e" title="Mesh::GetPlane" alt="" coords="596,219,711,248"/>
+<area shape="rect" id="node24" href="$struct_b_s_p.html#a24c00ff2d3632c19af1780970c094d07" title="BSP::Sort" alt="" coords="761,219,841,248"/>
+<area shape="rect" id="node26" href="$struct_b_s_p.html#acfd843ca8a467f9ebbb6d861dd489b09" title="BSP::Sort" alt="" coords="892,219,972,248"/>
+<area shape="rect" id="node32" href="$struct_stroke.html#a181070046909d2c068c538a8c247d68a" title="Stroke::Curve" alt="" coords="412,376,513,405"/>
+<area shape="rect" id="node34" href="$struct_stroke.html#a122f7c60083473154d16566e055659c3" title="Stroke::Cone" alt="" coords="604,349,703,379"/>
+<area shape="rect" id="node36" href="$struct_stroke.html#abc38594adb61740f65d5ce9f5f60f62e" title="Stroke::Cube" alt="" coords="604,415,703,444"/>
+<area shape="rect" id="node38" href="$struct_stroke.html#a7b05fecd7920afe56aba40943fd363f6" title="Stroke::Line" alt="" coords="417,480,508,509"/>
+<area shape="rect" id="node42" href="$struct_tessel.html#a69dfc59105e9948f86ee4fbbe0d83197" title="Tessel::PolygonVertex" alt="" coords="385,533,540,563"/>
+</map>

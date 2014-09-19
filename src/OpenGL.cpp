@@ -7,7 +7,7 @@ static SDL_GLContext Context;
 
 signed OpenGL_Init()
 {
-	const char *title = NULL;
+	const char *title = nullptr;
 	int x = SDL_WINDOWPOS_UNDEFINED;
 	int y = SDL_WINDOWPOS_UNDEFINED;
 	int w = 800;

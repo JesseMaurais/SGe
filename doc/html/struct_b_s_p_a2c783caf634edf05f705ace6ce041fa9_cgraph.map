@@ -1,0 +1,9 @@
+<map id="BSP::Split" name="BSP::Split">
+<area shape="rect" id="node3" href="$struct_plane.html#a1f4d4455f47b0a8138fb4f9b60c0b413" title="Plane::Equate" alt="" coords="321,5,425,35"/>
+<area shape="rect" id="node9" href="$struct_plane.html#a2dfe96739add0e3704b6179fb3b0b7ae" title="Plane::Cut" alt="" coords="159,57,241,87"/>
+<area shape="rect" id="node13" href="$struct_mesh.html#a4efcfa450aa2da6d746da717620a3fe7" title="Mesh::NewVertex" alt="" coords="137,111,263,140"/>
+<area shape="rect" id="node5" href="$struct_plane.html#a5f90dc47643272501cbcf75181971769" title="Plane::Dot" alt="" coords="484,32,567,61"/>
+<area shape="rect" id="node7" href="$struct_vector.html#af0bc5daad8bc940913f7fd3a42a3d120" title="Vector::Dot" alt="" coords="617,32,705,61"/>
+<area shape="rect" id="node15" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="313,109,433,139"/>
+<area shape="rect" id="node17" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="312,163,435,192"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Stroke" name="Stroke">
+<area shape="rect" id="node2" href="$struct_tessel.html" title="Tessel" alt="" coords="32,232,93,261"/>
+<area shape="rect" id="node4" href="$struct_mesh_composer.html" title="MeshComposer" alt="" coords="5,85,120,115"/>
+<area shape="rect" id="node6" href="$struct_mesh.html" title="Mesh" alt="" coords="36,5,89,35"/>
+<area shape="rect" id="node8" href="$struct_bezier.html" title="Bezier" alt="" coords="196,232,255,261"/>
+<area shape="rect" id="node10" href="$struct_vector.html" title="Vector" alt="" coords="160,85,219,115"/>
+</map>

@@ -98,14 +98,13 @@ static Uint32 SimulationTimer(Uint32 interval, void *unused)
 	{
 	 SDL_UnlockMutex(Mutex);
 	}
-	/*
-	dReal elapsed = interval;
-	dReal approx = elapsed/1000;
-	dReal error = Step - approx;
-	dReal step = approx + error;
+
+	double elapsed = interval;
+	double approx = elapsed / 1000;
+	double error = Step - approx;
+	double step = Step + error;
+
 	return Uint32(1000*step);
-	*/
-	return interval;
 }
 
 static void Error(int error, const char *format, va_list va)

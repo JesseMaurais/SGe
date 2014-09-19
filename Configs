@@ -1,15 +1,11 @@
 
 Video =	{
-	TITLE="SoftGeometry",
 	ALPHA=8,
 	RED=8,
 	GREEN=8,
 	BLUE=8,
 	DEPTH=16,
-	DOUBLEBUFFER=true,
-	MAJOR=2,
-	MINOR=1,
-	PROFILE_COMPATIBILITY=true
+	DOUBLEBUFFER=true
 	}
 
 Audio = {

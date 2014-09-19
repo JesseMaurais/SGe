@@ -1,0 +1,6 @@
+<map id="Mesh::GetColor" name="Mesh::GetColor">
+<area shape="rect" id="node3" href="$struct_mesh.html#a836d1f650266a2b05b3d6352120dddf9" title="Mesh::NewColor" alt="" coords="169,5,289,35"/>
+<area shape="rect" id="node7" href="$struct_mesh.html#a32f1af2f2c4a7b8e9af938f6f6512dfa" title="Mesh::GetColors" alt="" coords="169,59,289,88"/>
+<area shape="rect" id="node5" href="$struct_mesh.html#afcb003d295f6983f59f87b6d8e5668db" title="Mesh::NewPoint" alt="" coords="341,5,459,35"/>
+<area shape="rect" id="node9" href="$struct_mesh.html#a895c1d594ac4d7f2f6517840a1b8c820" title="Mesh::GetColors" alt="" coords="340,59,460,88"/>
+</map>

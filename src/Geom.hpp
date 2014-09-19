@@ -19,7 +19,7 @@ struct Geometry : virtual Model, Geom, Render
 	void LinearVel(Scalar x, Scalar y, Scalar z);
 	void AngularVel(Scalar x, Scalar y, Scalar z);
 
-	void Box(Scalar size);
+	void Cube(Scalar size);
 };
 
 
