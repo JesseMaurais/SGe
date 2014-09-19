@@ -1,7 +1,0 @@
-<map id="Matrix::Tangent" name="Matrix::Tangent">
-<area shape="rect" id="node3" href="$struct_vector.html#a4d8f563af105d54dee24340ddccbb636" title="Vector::Cross" alt="" coords="181,5,283,35"/>
-<area shape="rect" id="node5" href="$struct_vector.html#a22227be2820058b6b881c330d980a3ea" title="Vector::Normalize" alt="" coords="169,59,295,88"/>
-<area shape="rect" id="node7" href="$struct_vector.html#a297d988bc710f14ad1acb46ef2a2d953" title="Vector::Magnitude" alt="" coords="344,59,472,88"/>
-<area shape="rect" id="node9" href="$struct_vector.html#acdddd2d7602c3c7a4583e9d86f56cc78" title="Vector::Square" alt="" coords="520,59,629,88"/>
-<area shape="rect" id="node11" href="$struct_vector.html#af0bc5daad8bc940913f7fd3a42a3d120" title="Vector::Dot" alt="" coords="679,59,767,88"/>
-</map>

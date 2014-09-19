@@ -1,6 +1,0 @@
-<map id="Stroke::Cube" name="Stroke::Cube">
-<area shape="rect" id="node3" href="$struct_tessel.html#ae03acfbf1a6f72b4c7997778c7b4a317" title="Tessel::PolygonVertex" alt="" coords="304,5,459,35"/>
-<area shape="rect" id="node7" href="$struct_stroke.html#a181070046909d2c068c538a8c247d68a" title="Stroke::Curve" alt="" coords="153,57,255,87"/>
-<area shape="rect" id="node5" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="508,5,628,35"/>
-<area shape="rect" id="node9" href="$struct_bezier.html#a0c3380bee4a72cf2198bd183dbc07a15" title="Bezier::Equate" alt="" coords="328,59,435,88"/>
-</map>

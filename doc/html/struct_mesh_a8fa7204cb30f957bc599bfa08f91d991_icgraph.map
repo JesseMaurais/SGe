@@ -1,6 +1,0 @@
-<map id="Mesh::AddPoint" name="Mesh::AddPoint">
-<area shape="rect" id="node3" href="$struct_mesh.html#afcb003d295f6983f59f87b6d8e5668db" title="Mesh::NewPoint" alt="" coords="185,5,303,35"/>
-<area shape="rect" id="node5" href="$struct_mesh_composer.html#a0a6d1546f394d783393b52ec6a64b8a5" title="MeshComposer::Next" alt="" coords="169,59,319,88"/>
-<area shape="rect" id="node7" href="$struct_model.html#a0fca5dc0d694a846c8de744551d55027" title="Model::Cube" alt="" coords="368,59,464,88"/>
-<area shape="rect" id="node9" href="$struct_geometry.html#a6d092ed693ad3df36bb91fd3de2c6da7" title="Geometry::Box" alt="" coords="513,59,623,88"/>
-</map>

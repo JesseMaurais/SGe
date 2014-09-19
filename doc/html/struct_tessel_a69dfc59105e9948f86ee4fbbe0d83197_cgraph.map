@@ -1,5 +1,0 @@
-<map id="Tessel::PolygonVertex" name="Tessel::PolygonVertex">
-<area shape="rect" id="node3" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="224,5,347,35"/>
-<area shape="rect" id="node5" href="$struct_tessel.html#ae03acfbf1a6f72b4c7997778c7b4a317" title="Tessel::PolygonVertex" alt="" coords="208,59,363,88"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#a4d00a621a9ccd683d430c811dbc4a71f" title="Mesh::GetVertex" alt="" coords="412,59,532,88"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Mesh::GetTexCoord" name="Mesh::GetTexCoord">
-<area shape="rect" id="node3" href="$struct_mesh.html#aa3d0c6a6517b4107bc30887555cef5d7" title="Mesh::NewTexCoord" alt="" coords="195,5,341,35"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#af9132c639ff46e0e50dc8a51b493ba07" title="Mesh::GetTexCoords" alt="" coords="195,59,341,88"/>
-<area shape="rect" id="node5" href="$struct_mesh.html#afcb003d295f6983f59f87b6d8e5668db" title="Mesh::NewPoint" alt="" coords="415,5,532,35"/>
-<area shape="rect" id="node9" href="$struct_mesh.html#a54be3412193e280eb3431c28f8e8880a" title="Mesh::GetTexCoords" alt="" coords="400,59,547,88"/>
-<area shape="rect" id="node11" href="$struct_mesh.html#a80c2b4f3d3860e35b8056bdc88dcf0b5" title="Mesh::GetTangentSpace" alt="" coords="391,112,556,141"/>
-</map>

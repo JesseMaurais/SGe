@@ -1,8 +1,0 @@
-<map id="Sphere::Divide" name="Sphere::Divide">
-<area shape="rect" id="node3" href="$struct_sphere.html#a10d34bdccca5ab0086184ed1517bcfb6" title="Sphere::Draw" alt="" coords="176,5,277,35"/>
-<area shape="rect" id="node7" href="$struct_vector.html#a22227be2820058b6b881c330d980a3ea" title="Vector::Normalize" alt="" coords="164,59,289,88"/>
-<area shape="rect" id="node5" href="$struct_sphere.html#a6b7e3e1b01a04612f156597c852758c7" title="Sphere::Vertex" alt="" coords="348,5,457,35"/>
-<area shape="rect" id="node9" href="$struct_vector.html#a297d988bc710f14ad1acb46ef2a2d953" title="Vector::Magnitude" alt="" coords="339,59,467,88"/>
-<area shape="rect" id="node11" href="$struct_vector.html#acdddd2d7602c3c7a4583e9d86f56cc78" title="Vector::Square" alt="" coords="515,59,624,88"/>
-<area shape="rect" id="node13" href="$struct_vector.html#af0bc5daad8bc940913f7fd3a42a3d120" title="Vector::Dot" alt="" coords="673,59,761,88"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Tessel::PolygonVertex" name="Tessel::PolygonVertex">
-<area shape="rect" id="node3" href="$struct_stroke.html#a181070046909d2c068c538a8c247d68a" title="Stroke::Curve" alt="" coords="235,44,336,73"/>
-<area shape="rect" id="node5" href="$struct_stroke.html#a122f7c60083473154d16566e055659c3" title="Stroke::Cone" alt="" coords="411,5,509,35"/>
-<area shape="rect" id="node7" href="$struct_stroke.html#abc38594adb61740f65d5ce9f5f60f62e" title="Stroke::Cube" alt="" coords="411,71,509,100"/>
-<area shape="rect" id="node9" href="$struct_stroke.html#a7b05fecd7920afe56aba40943fd363f6" title="Stroke::Line" alt="" coords="240,148,331,177"/>
-<area shape="rect" id="node13" href="$struct_tessel.html#a69dfc59105e9948f86ee4fbbe0d83197" title="Tessel::PolygonVertex" alt="" coords="208,201,363,231"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Mesh::AddNormal" name="Mesh::AddNormal">
-<area shape="rect" id="node3" href="$struct_mesh.html#a4aac3612f265baeb2364db03a905434b" title="Mesh::NewNormal" alt="" coords="199,5,329,35"/>
-<area shape="rect" id="node7" href="$struct_mesh_composer.html#af79135c0fbc56d6c21324c5a6bca2de8" title="MeshComposer::Normal" alt="" coords="183,59,345,88"/>
-<area shape="rect" id="node5" href="$struct_mesh.html#afcb003d295f6983f59f87b6d8e5668db" title="Mesh::NewPoint" alt="" coords="396,5,513,35"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Geometry::Update" name="Geometry::Update">
-<area shape="rect" id="node3" href="$struct_render.html#a79f85fbc1d73bf647610bc9a5080733b" title="Render::Draw" alt="" coords="185,5,287,35"/>
-<area shape="rect" id="node5" href="$struct_render.html#ac8155d322f9dd8afed0f00efea220bbf" title="Render::DrawGroup" alt="" coords="336,5,475,35"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#a1a395a19857517aae86c2d3d3d8c8e16" title="Mesh::GetPoints" alt="" coords="523,5,643,35"/>
-<area shape="rect" id="node9" href="$struct_mesh.html#af81ff5fbb28c0b5e783184d9ec60d2d8" title="Mesh::GetPoint" alt="" coords="692,5,804,35"/>
-</map>

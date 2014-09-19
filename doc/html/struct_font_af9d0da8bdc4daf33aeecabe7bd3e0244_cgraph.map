@@ -1,6 +1,0 @@
-<map id="Font::LoadChar" name="Font::LoadChar">
-<area shape="rect" id="node3" href="$struct_mesh_composer.html#a0481f8090f9a3728f41341e77fab4e05" title="MeshComposer::BeginGroup" alt="" coords="167,5,356,35"/>
-<area shape="rect" id="node5" href="$struct_tessel.html#a0288e4a15192fe3e95faacfc4b25832d" title="Tessel::BeginPolygon" alt="" coords="187,59,336,88"/>
-<area shape="rect" id="node7" href="$struct_tessel.html#a3c8afd5b8e1ea56fb72ca7d453c9deb6" title="Tessel::EndPolygon" alt="" coords="192,112,331,141"/>
-<area shape="rect" id="node9" href="$struct_mesh_composer.html#a6bb598e3f984a6e0c72e0d75c205696a" title="MeshComposer::EndGroup" alt="" coords="172,165,351,195"/>
-</map>

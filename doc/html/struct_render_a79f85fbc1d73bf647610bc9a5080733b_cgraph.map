@@ -1,5 +1,0 @@
-<map id="Render::Draw" name="Render::Draw">
-<area shape="rect" id="node3" href="$struct_render.html#ac8155d322f9dd8afed0f00efea220bbf" title="Render::DrawGroup" alt="" coords="157,5,296,35"/>
-<area shape="rect" id="node5" href="$struct_mesh.html#a1a395a19857517aae86c2d3d3d8c8e16" title="Mesh::GetPoints" alt="" coords="344,5,464,35"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#af81ff5fbb28c0b5e783184d9ec60d2d8" title="Mesh::GetPoint" alt="" coords="513,5,625,35"/>
-</map>

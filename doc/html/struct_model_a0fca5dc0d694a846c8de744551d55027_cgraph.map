@@ -1,8 +1,0 @@
-<map id="Model::Cube" name="Model::Cube">
-<area shape="rect" id="node3" href="$struct_mesh_composer.html#ae701ee2b46d75f138f1b0e4f44ccc317" title="MeshComposer::Begin" alt="" coords="152,5,307,35"/>
-<area shape="rect" id="node5" href="$struct_mesh_composer.html#a0a6d1546f394d783393b52ec6a64b8a5" title="MeshComposer::Next" alt="" coords="155,59,304,88"/>
-<area shape="rect" id="node9" href="$struct_mesh_composer.html#a419dc497ce7579ef2fa982f6690f0ee3" title="MeshComposer::Vertex" alt="" coords="149,112,309,141"/>
-<area shape="rect" id="node13" href="$struct_mesh_composer.html#acaca9dd5fc693086a1b2e4a0e40db32e" title="MeshComposer::End" alt="" coords="157,165,301,195"/>
-<area shape="rect" id="node7" href="$struct_mesh.html#a8fa7204cb30f957bc599bfa08f91d991" title="Mesh::AddPoint" alt="" coords="361,59,476,88"/>
-<area shape="rect" id="node11" href="$struct_mesh.html#a0fc537db318e7c7c47497585df0839dd" title="Mesh::AddVertex" alt="" coords="357,112,480,141"/>
-</map>
