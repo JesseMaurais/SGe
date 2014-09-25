@@ -61,19 +61,19 @@ int BSP::Sort(Brush &brush, Brush &front, Brush &back)
 
 		switch (Classify(space, polygon))
 		{
-		 case Plane::Spanning:
+		case Plane::Spanning:
 			Split(polygon, space, front, back);
 			break;
-		 case Plane::Planar:
+		case Plane::Planar:
 			if (spaces[polygon.face].Agree(space.normal))
 			  front.push_back(polygon);
 			else
 			  back.push_back(polygon);
 			break;
-		 case Plane::Front:
+		case Plane::Front:
 			front.push_back(polygon);
 			break;
-		 case Plane::Back:
+		case Plane::Back:
 			back.push_back(polygon);
 			break;
 		}
@@ -101,19 +101,19 @@ int BSP::Select(Brush &brush)
 
 			switch (Classify(space, polygon))
 			{
-			 case Plane::Spanning:
+			case Plane::Spanning:
 				++spanning;
 				break;
-			 case Plane::Planar:
+			case Plane::Planar:
 				if (spaces[polygon.face].Agree(space.normal))
 				  ++front;
 				else
 				  ++back;
 				break;
-			 case Plane::Front:
+			case Plane::Front:
 				++front;
 				break;
-			 case Plane::Back:
+			case Plane::Back:
 				++back;
 				break;
 			}

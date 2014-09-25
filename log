@@ -1,0 +1,1833 @@
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h: In instantiation of ‘_RandomAccessIterator std::__find(_RandomAccessIterator, _RandomAccessIterator, const _Tp&, std::random_access_iterator_tag) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<icos::Edge*, std::vector<icos::Edge> >; _Tp = icos::Edge]’:
+/usr/include/c++/4.7/bits/stl_algo.h:4466:45:   required from ‘_IIter std::find(_IIter, _IIter, const _Tp&) [with _IIter = __gnu_cxx::__normal_iterator<icos::Edge*, std::vector<icos::Edge> >; _Tp = icos::Edge]’
+src/Hedron.cpp:84:13:   required from here
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:162:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:166:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:170:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:174:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:182:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:186:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: error: no match for ‘operator==’ in ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >() == __val’
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note: candidates are:
+In file included from /usr/include/c++/4.7/bits/locale_facets.h:50:0,
+                 from /usr/include/c++/4.7/bits/basic_ios.h:39,
+                 from /usr/include/c++/4.7/ios:45,
+                 from /usr/include/c++/4.7/ostream:40,
+                 from /usr/include/c++/4.7/iostream:40,
+                 from src/Hedron.cpp:66:
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+/usr/include/c++/4.7/bits/streambuf_iterator.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2383:5: note: template<class _Res, class ... _Args> bool std::operator==(std::nullptr_t, const std::function<_Res(_ArgTypes ...)>&)
+/usr/include/c++/4.7/functional:2383:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   cannot convert ‘__first.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator*<icos::Edge*, std::vector<icos::Edge> >()’ (type ‘icos::Edge’) to type ‘std::nullptr_t’
+In file included from /usr/include/c++/4.7/bits/stl_algo.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/functional:2377:5: note: template<class _Res, class ... _Args> bool std::operator==(const std::function<_Res(_ArgTypes ...)>&, std::nullptr_t)
+/usr/include/c++/4.7/functional:2377:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::function<_Res(_ArgTypes ...)>’
+In file included from /usr/include/c++/4.7/functional:56:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:68,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/tuple:797:5: note: template<class ... _TElements, class ... _UElements> bool std::operator==(const std::tuple<_TElements ...>&, const std::tuple<_Elements ...>&)
+/usr/include/c++/4.7/tuple:797:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::tuple<_TElements ...>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5326:5: note: template<class _RealType> bool std::operator==(const std::piecewise_linear_distribution<_RealType>&, const std::piecewise_linear_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5326:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_linear_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:5084:5: note: template<class _RealType> bool std::operator==(const std::piecewise_constant_distribution<_RealType>&, const std::piecewise_constant_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:5084:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::piecewise_constant_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4845:5: note: template<class _IntType> bool std::operator==(const std::discrete_distribution<_IntType>&, const std::discrete_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:4845:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::discrete_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4613:5: note: template<class _RealType> bool std::operator==(const std::extreme_value_distribution<_RealType>&, const std::extreme_value_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4613:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::extreme_value_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4438:5: note: template<class _RealType> bool std::operator==(const std::weibull_distribution<_RealType>&, const std::weibull_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4438:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::weibull_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:4263:5: note: template<class _RealType> bool std::operator==(const std::exponential_distribution<_RealType>&, const std::exponential_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:4263:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::exponential_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3721:5: note: template<class _IntType> bool std::operator==(const std::geometric_distribution<_IntType>&, const std::geometric_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:3721:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::geometric_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:51:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note: template<class _RealType1> bool std::operator==(const std::normal_distribution<_RealType>&, const std::normal_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.tcc:1712:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::normal_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:3345:3: note: bool std::operator==(const std::bernoulli_distribution&, const std::bernoulli_distribution&)
+/usr/include/c++/4.7/bits/random.h:3345:3: note:   no known conversion for argument 1 from ‘icos::Edge’ to ‘const std::bernoulli_distribution&’
+/usr/include/c++/4.7/bits/random.h:2808:5: note: template<class _RealType> bool std::operator==(const std::cauchy_distribution<_RealType>&, const std::cauchy_distribution<_RealType>&)
+/usr/include/c++/4.7/bits/random.h:2808:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::cauchy_distribution<_RealType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1919:5: note: template<class _IntType> bool std::operator==(const std::uniform_real_distribution<_IntType>&, const std::uniform_real_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1919:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_real_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/random:50:0,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/random.h:1738:5: note: template<class _IntType> bool std::operator==(const std::uniform_int_distribution<_IntType>&, const std::uniform_int_distribution<_IntType>&)
+/usr/include/c++/4.7/bits/random.h:1738:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::uniform_int_distribution<_IntType>’
+In file included from /usr/include/c++/4.7/vector:65:0,
+                 from /usr/include/c++/4.7/bits/random.h:34,
+                 from /usr/include/c++/4.7/random:50,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+/usr/include/c++/4.7/bits/stl_vector.h:1370:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+/usr/include/c++/4.7/bits/basic_string.h:2516:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2504:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   mismatched types ‘const _CharT*’ and ‘icos::Edge’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+/usr/include/c++/4.7/bits/basic_string.h:2490:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT>’
+In file included from /usr/include/c++/4.7/string:54:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+/usr/include/c++/4.7/bits/basic_string.h:2483:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::basic_string<_CharT, _Traits, _Alloc>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:124:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:124:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_Tp>’
+In file included from /usr/include/c++/4.7/string:43:0,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/allocator.h:119:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_T1>&, const std::allocator<_Tp>&)
+/usr/include/c++/4.7/bits/allocator.h:119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::allocator<_T1>’
+In file included from /usr/include/c++/4.7/bits/char_traits.h:42:0,
+                 from /usr/include/c++/4.7/string:42,
+                 from /usr/include/c++/4.7/random:41,
+                 from /usr/include/c++/4.7/bits/stl_algo.h:67,
+                 from /usr/include/c++/4.7/algorithm:63,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/postypes.h:218:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+/usr/include/c++/4.7/bits/postypes.h:218:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::fpos<_StateT>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note: template<class _Iterator> bool std::operator==(const std::move_iterator<_Iterator>&, const std::move_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1039:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:1033:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::move_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_IteratorL>&, const std::reverse_iterator<_IteratorR>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:343:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_IteratorL>’
+In file included from /usr/include/c++/4.7/bits/stl_algobase.h:68:0,
+                 from /usr/include/c++/4.7/algorithm:62,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+/usr/include/c++/4.7/bits/stl_iterator.h:293:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+In file included from /usr/include/c++/4.7/utility:72:0,
+                 from /usr/include/c++/4.7/algorithm:61,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note: template<class _T1, class _T2> constexpr bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+/usr/include/c++/4.7/bits/stl_pair.h:206:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/4.7/algorithm:63:0,
+                 from src/Hedron.cpp:65:
+/usr/include/c++/4.7/bits/stl_algo.h:190:4: note:   ‘icos::Edge’ is not derived from ‘const std::pair<_T1, _T2>’
+make: *** [Hedron.o] Error 1

@@ -1,96 +1,87 @@
 #include "Sphere.hpp"
-#include "OpenGL.hpp"
-#include "Metric.hpp"
-#include <cmath>
+#include "Hedron.hpp"
 
-void Sphere::Vertex(Vector &V, double s, double t)
+void Sphere::AddEdge(Edge E)
 {
-	glNormal3dv(V.v);
-	glTexCoord2d(s,t);
-	glVertex3dv(V.v);
+	int index = edges.size();
+	edges.push_back(E);
+	return index;
 }
 
-void Sphere::Draw(Vector V [3])
+void Sphere::AddAdjacent(Adjacent A)
 {
-	for (register int i=0, j=1, k=2; i<3; j=k, k=i, ++i)
+	int index = adjacents.size();
+	adjacents.push_back(A);
+	return index;
+}
+
+void Sphere::Create(int depth)
+{
+	for (int i = 0; i < icos::nRects; ++i)
 	{
-		// Close seam at poles
-
-		Vector U = V[i];
-
-		if (U.x == 0 && U.z == 0)
+		for (int j = 0; j < 4; ++j)
 		{
-		 U.x = V[j].x + V[k].x;
-		 U.z = V[j].z + V[k].z;
+			AddVertex(icos::Rects[i][j]);
 		}
-
-		// Calculate texture coordinates
-
-		double s = atan2(U.x,U.z) / (Pi*2);
-		double t = 1.0 - acos(U.y) / Pi;
-
-		// Close seam at 0/2pi overlap
-
-		if (U.z <= 0 && V[j].z <= 0 && V[k].z <= 0)
+	}
+	for (int i = 0; i < icos::nEdges; ++i)
+	{
+		Edge E;
+		for (int j = 0; j < 2; ++j)
 		{
-		 if (U.x < 0 && (V[j].x >= 0 || V[k].x >= 0))
-		 {
-		  s += 1.0;
-		 }
+			E.child[j] = Knot;
 		}
-
-		// New point
-
-		Vertex(V[i], s, t);
+		E.point = Knot;
+		AddEdge(E);
+	}
+	for (int i = 0; i < icos::nFaces; ++i)
+	{
+		Surface S:
+		Adjacent A:
+		for (int j = 0; j < 3; ++j)
+		{
+			S.points[j] = icos::PFaces[i][j];
+			A.edges[j] = icos::EFaces[i].edges[j];
+		}
+		for (int j = 0; j < 4; ++j)
+		{
+			A.child[j] = Knot;
+		}
+		AddAdjacent(A);
+		AddSurface(S);
 	}
 }
 
-void Sphere::Divide(unsigned depth, Vector V [3])
+void Sphere::Divide()
 {
-	if (!depth)
+	int n = edges.size();
+	edges.reserve(3*n);
+	n = faces.size();
+
+	for (int i = 0; i < n; ++i)
 	{
-	 Draw(V);
-	 return;
+		Surface &S = faces[i];
+		Adjacent &A = adjacents[i];
+
+		Surface T;
+		Adjacent B[4];
+
+		for (int j = 0, k = 2; j < 3; k = j++)
+		{
+			Edge &F = edges[A.edges[j]];
+			if (Knot == F.point)
+			{
+			 F.point = NewVertex(S.points[j], S.points[k], 0.5);
+			 Edge E = {Knot, Knot, Knot};
+			 F.child[0] = AddEdge(E);
+			 F.child[1] = AddEdge(E);
+			}
+			T.points[j] = F.point;
+		}
 	}
-	else --depth;
-
-	Vector U [3];
-
-	for (int i=0, j=1, k=2; i<3; j=k, k=i, ++i)
-	{
-	 U[k] = V[i] + V[j];
-	 U[k].Normalize();
-	}
-
-	Divide(depth, U);
-
-	for (int i=0, j=1, k=2; i<3; j=k, k=i, ++i)
-	{
-	 Vector W [3] = { V[i], U[k], U[j] };
-
-	 Divide(depth, W);
-	}
+	return 
 }
 
-void Sphere::Draw(unsigned depth)
-{
-	using namespace Icosahedron;
 
-	glBegin(GL_TRIANGLES);
 
-	for (int i = 0; i < nFaces; ++i)
-	{
-	 Vector V [3];
-
-	 for (int j = 0; j < 3; ++j)
-	 {
-	  V[j] = Rects[Faces[i][j].box][Faces[i][j].point];
-	  V[j].Normalize();
-	 }
-
-	 Divide(depth, V);
-	}
-	
-	glEnd();
-}
 

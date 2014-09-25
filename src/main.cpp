@@ -3,8 +3,10 @@
 #include "ODE.hpp"
 #include "OpenGL.hpp"
 #include "OpenAL.hpp"
-#include <cstdio>
 #include <cstdlib>
+#include <cstdio>
+
+extern void FindFaces();
 
 int main(int argc, char **argv)
 {

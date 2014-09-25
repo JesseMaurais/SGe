@@ -9,7 +9,7 @@ static ALCcontext *Context;
 signed OpenAL_Init()
 {
 	std::vector<ALCint> attributes;
-	const char *string = NULL;
+	const char *string = nullptr;
 
 	lua_getglobal(State, "Audio");
 	int table = lua_gettop(State);
@@ -70,8 +70,8 @@ signed OpenAL_Init()
 	Device = alcOpenDevice(string);
 	if (!Device)
 	{
-	 ALCenum error = alcGetError(NULL);
-	 string = alcGetString(NULL, error);
+	 ALCenum error = alcGetError(nullptr);
+	 string = alcGetString(nullptr, error);
 	 return SDL_SetError("alcOpenDevice: %s", string);
 	}
 

@@ -13,7 +13,7 @@ template <> void lux_Class<Geometry>::setfuncs(lua_State *state)
 	{"Rotation", lux_wrap(Geometry::Rotation)},
 	{"LinearVel", lux_wrap(Geometry::LinearVel)},
 	{"AngularVel", lux_wrap(Geometry::AngularVel)},
-	{"Box", lux_wrap(Geometry::Box)},
+	{"Cube", lux_wrap(Geometry::Cube)},
 	{NULL, NULL}
 	};
 	luaL_setfuncs(state, regs, 0);
@@ -31,7 +31,6 @@ signed Lux_Init()
 	luxopen_array(State);
 
 	lux_Class<Geometry>::open(State);
-	lux_Class<Shader>::open(State);
 
 	lux_Index<SDL_Event>::open(State);
 	lux_Index<SDL_Event>::get["next"] = next;

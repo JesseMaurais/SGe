@@ -1,23 +1,29 @@
 #ifndef __Sphere__
 #define __Sphere__
 
-#include "Hedron.hpp"
-#include "Vector.hpp"
+#include "Model.hpp"
+#include <vector>
+
+struct Edge
+{
+	int point, child[2];
+};
+
+struct Adjacent
+{
+	int edges[3], child[4];
+};
 
 struct Sphere
 {
-	static void Vertex(Vector &V, double s, double t);
-	static void Draw(Vector V [3]);
-	static void Divide(unsigned depth, Vector V [3]);
-	static void Draw(unsigned depth);
+	std::vector<Edge> edges;
+	std::vector<Adjacent> adjacents;
+
+	int AddEdge(Edge);
+	int AddAdjacent(Adjacent);
+
+	void Create(int depth);
 };
 
 #endif // file
-
-
-/* NOTES
- *
- * At depth = 0 the texture on the polar triangle in the negative x is skewed.
- * This artifact disappears where depth > 0
- */
 
