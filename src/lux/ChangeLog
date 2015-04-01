@@ -1,0 +1,55 @@
+2014-05-11 Jesse Maurais <jessemaurais@gmail.com>
+	* Reopened the project: Lots of code changes.
+	* Using C++11
+	* Using Lua5.2
+	* Using GNU Make
+
+2011-04-23 Jesse Maurais <jessemaurais@gmail.com>
+	* lxsigma.hpp : Added an additional macro on the recommendation made by
+		Simon Cooke. This should allow MSVC to use sigma properly.
+
+2010-08-21 Jesse Maurais <jessemaurais@gmail.com>
+	* .cc -> .hpp : All files now use the proper header extension.
+	* luxpand.hpp : Copied the old lxthunk.hpp here. The new lxthunk is the
+		luxpand file preprocessed using gcc -E and cleaned up a bit.
+		MSVC compilers should have no problem with Lux anymore.
+	* unistd.cxx : Testing the capacity for Lux to bind UNIX functions. This
+		does not work very well.
+	* lxdebug.hpp : Was deleted.
+	* lxbytes.hpp : Attempt at a struct/union container like Python's.
+
+2009-02-18 Jesse Maurais <jessemaurais@gmail.com>
+	* lxarray.cc : Array manipulation now works correctly accept for float
+		which imprecisely rounds to lua_Number (double) when promoted.
+		This appears to be a bug in lua_pushnumber, possibly from the
+		way my library was compiled (ubuntu 8.10).
+
+2009-02-11 Jesse Maurais <jessemaurais@gmail.com>
+	* make : Created a generic build script in lua to make test programs.
+	* lxclass.cc : Exporting classes now works thanks to Luna @ lua-users
+		but the style of wrapper isn't exactly what I want yet.
+
+2009-01-29 Jesse Maurais <jessemaurais@gmail.com>
+	* lxclass.cc : Split from lxthunk.cc and hoping to have it working soon.
+
+2008-06-13 Jesse Maurais <jessemaurais@gmail.com>
+	* lxthunk.cc : GC now calls class destructor before freeing memory.
+	* lxtuple.cc : Push/to many values at once (like Python does).
+	* lxtuple.cc : Generic C++ call interface for Lua functions.
+	* lxdebug.cc : Hooks for tracing state machine execution.
+
+2008-06-11 Jesse Maurais <jessemaurais@gmail.com>
+	* lxthunk.cc : Pointer-to-object & pointer-to-function cast prohibited
+		in GCC >= 3.4.4 but used a union container to work around this.
+	* lxarray.cc : C++ version of C data arrays to Lua based on the book
+		"Programming in Lua" by Roberto Ierusalimschy.
+	* lxstack.cc : More extensive C data type support.
+	* lxthunk.cc : Added class dispatching to template metafunctions.
+	* lxparse.cc : lux_[push|to] with stdarg interface.
+	* lxalloc.cc : Overload operator new for lua_newuserdata.
+	* lxpanic.cc : Exception class to throw on as Lua panic function.
+	* README txt : Corrected my email address (thanks George).
+
+2008-06-10 Jesse Maurais <jessemaurais@gmail.com>
+	* this file! : Now there is a change log.
+	* lxthunk.cc : Arguments were being popped in the wrong order.
