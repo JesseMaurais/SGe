@@ -1,3 +1,7 @@
+#ifndef __lxbufsz__
+#define __lxbufsz__
+
+#include "lua.hpp"
 
 struct lux_Buffer : luaL_Buffer
 {
@@ -18,7 +22,7 @@ struct lux_Buffer : luaL_Buffer
 
 	void add(const char *str)
 	{
-		luaL_addstring(this str);
+		luaL_addstring(this, str);
 	}
 
 	void add(const char *str, size_t sz)
@@ -26,18 +30,18 @@ struct lux_Buffer : luaL_Buffer
 		luaL_addlstring(this, str, sz);
 	}
 
-	void add(char byte)
+	void addchar(char byte)
 	{
 		luaL_addchar(this, byte);
 	}
 
-	void add(int index)
+	void addvalue(int index)
 	{
 		lua_pushvalue(L, index);
 		add();
 	}
 
-	void add(void)
+	void addvalue(void)
 	{
 		luaL_addvalue(this);
 	}
@@ -62,4 +66,6 @@ struct lux_Buffer : luaL_Buffer
 		luaL_pushresultsize(this, sz);
 	}
 };
+
+#endif // file
 

@@ -28,8 +28,14 @@ struct Point
 	int vertex, texCoord, normal, color;
 };
 
+struct Edge
+{
+	int points[2];
+};
+
 struct Mesh
 {
+	std::vector<Edge> edges;
 	std::vector<Point> points;
 	std::vector<Surface> faces;
 	std::map<int, Group> groups;
@@ -43,6 +49,7 @@ struct Mesh
 	void Swap(Mesh &);
 
 	int AddSurface(Surface);
+	int AddEdge(Edge);
 	int AddPoint(Point);
 	int AddVertex(Vector);
 	int AddTexCoord(Vector);

@@ -1,6 +1,7 @@
 #include "3ds.hpp"
 #include <vector>
 #include <cstring>
+#include <cstdio>
 
 bool Model3ds::Load(const char *path)
 {
@@ -36,6 +37,16 @@ void Model3ds::AddNode(Lib3dsFile *file, Lib3dsNode *node)
 	 {
 	  Lib3dsMesh *mesh = lib3ds_file_mesh_by_name(file, node->name);
 	  AddMesh(file, mesh);
+	 }
+	 break;
+	 case LIB3DS_UNKNOWN_NODE:
+	 case LIB3DS_AMBIENT_NODE:
+	 case LIB3DS_CAMERA_NODE:
+	 case LIB3DS_TARGET_NODE:
+	 case LIB3DS_LIGHT_NODE:
+	 case LIB3DS_SPOT_NODE:
+	 {
+	  fputs("Unhandled node type\n", stderr);
 	 }
 	 break;
 	}

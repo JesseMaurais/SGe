@@ -1,5 +1,6 @@
 #include "BSP.hpp"
 #include <cmath>
+#include <vector>
 #include <climits>
 #include <cstdlib>
 
@@ -197,9 +198,9 @@ Plane::Crossing BSP::Classify(Plane &space, Polygon &polygon)
 {
 	int *indexes = polygon.data();
 	int size = polygon.size();
-	Vector vertexes[size];
-
-	GetVertexes(indexes, vertexes, size);
-	return space.Classify(vertexes, size);
+	std::vector<Vector> vertexes(size);
+	Vector *pointer = vertexes.data();
+	GetVertexes(indexes, pointer, size);
+	return space.Classify(pointer, size);
 }
 

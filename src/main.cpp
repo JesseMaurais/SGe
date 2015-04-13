@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-extern void FindFaces();
 
 int main(int argc, char **argv)
 {

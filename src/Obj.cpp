@@ -98,12 +98,13 @@ int ModelObj::ReadFace(char *line)
 	
 	Begin(GL_POLYGON);
 	
-	while (line = strtok(0, delim))
+	while ((line = strtok(0, delim)))
 	{
 	 signed point = ReadPoint(line);
 	 Next(point);
 	}
 	
 	End();
+	return Knot;
 }
 

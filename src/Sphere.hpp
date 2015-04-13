@@ -1,28 +1,21 @@
 #ifndef __Sphere__
 #define __Sphere__
 
-#include "Model.hpp"
+#include "Mesh.hpp"
 #include <vector>
 
-struct Edge
+struct Sphere : MeshComposer
 {
-	int point, child[2];
-};
+	Sphere(int depth);
 
-struct Adjacent
-{
-	int edges[3], child[4];
-};
+ private:
 
-struct Sphere
-{
-	std::vector<Edge> edges;
-	std::vector<Adjacent> adjacents;
+	void Divide(int depth);
 
-	int AddEdge(Edge);
-	int AddAdjacent(Adjacent);
+	std::vector<Surface> nodes;
 
-	void Create(int depth);
+	int AddNode(Surface);
+	int NewVertex(Edge);
 };
 
 #endif // file

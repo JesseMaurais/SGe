@@ -43,6 +43,7 @@ template <class C> C lux_to(lua_State *state, int index)
 	return obj;
 }
 
+template <> void lux_push<bool>(lua_State *state, bool value);
 template <> void lux_push<int>(lua_State *state, int value);
 template <> void lux_push<char>(lua_State *state, char value);
 template <> void lux_push<short>(lua_State *state, short value);
@@ -57,6 +58,7 @@ template <> void lux_push<unsigned char>(lua_State *state, unsigned char value);
 template <> void lux_push<unsigned short>(lua_State *state, unsigned short value);
 template <> void lux_push<unsigned long>(lua_State *state, unsigned long value);
 
+template <> bool lux_to<bool>(lua_State *state, int index);
 template <> int lux_to<int>(lua_State *state, int index);
 template <> char lux_to<char>(lua_State *state, int index);
 template <> short lux_to<short>(lua_State *state, int index);

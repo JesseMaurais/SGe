@@ -57,6 +57,10 @@ int lux_stackdump(lua_State *vm)
 }
 
 
+template <> void lux_push<bool>(lua_State *vm, bool value)
+{
+	lua_pushboolean(vm, value);
+}
 template <> void lux_push<int>(lua_State *vm, int value)
 {
 	lua_pushinteger(vm, value);
@@ -117,6 +121,10 @@ template <> void lux_push<unsigned long>(lua_State *vm, unsigned long value)
 	lua_pushunsigned(vm, value);
 }
 
+template <> bool lux_to<bool>(lua_State *vm, int index)
+{
+	return lua_toboolean(vm, index);
+}
 template <> int lux_to<int>(lua_State *vm, int index)
 {
 	return lua_tointeger(vm, index);

@@ -1,9 +1,9 @@
-CC = c++
+CC = clang 
 CFLAGS = -std=c++11 -g -c
-OBJ = 3ds.o Bezier.o BSP.o Crayon.o Event.o Font.o FreeType.o Geom.o GUI.o Hedron.o Height.o Lua.o Lux.o Lwo.o main.o Matrix.o Mesh.o Model.o Nurbs.o Obj.o ODE.o OpenAL.o OpenGL.o Plane.o Ply.o Quaternion.o Render.o SDL.o Shader.o SkyBox.o Stroke.o Tessel.o Texture.o Tree.o VBO.o Vector.o Widget.o
+OBJ = 3ds.o Bezier.o BSP.o Crayon.o Event.o Font.o FreeType.o Geom.o GUI.o Hedron.o Height.o Lua.o Lux.o Lwo.o main.o Matrix.o Mesh.o Model.o Nurbs.o Obj.o ODE.o OpenAL.o OpenGL.o Plane.o Ply.o Quaternion.o Render.o SDL.o Shader.o SkyBox.o Stroke.o Tessel.o Texture.o Tree.o VBO.o Vector.o Widget.o XML.o
 
 all: $(OBJ)
-	c++ $(OBJ) -o SGe -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_net -lGLEW -lopenal -lode -l3ds -llwo -lrply -llua5.2 -lexpat
+	c++ $(OBJ) -o SGe -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_net -lGLEW -lGLU -lopenal -lode -l3ds -llwo -lrply -llua5.2 -lexpat
 
 clean:
 	rm *.o SGe
@@ -121,3 +121,6 @@ Vector.o: src/Vector.cpp src/Vector.hpp
 
 Widget.o: src/Widget.cpp src/GUI.cpp src/GUI.hpp src/Event.cpp src/Event.hpp
 	$(CC) $(CFLAGS) src/Widget.cpp
+
+XML.o: src/XML.cpp src/XML.hpp
+	$(CC) $(CFLAGS) src/XML.cpp

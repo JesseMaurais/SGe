@@ -1,5 +1,5 @@
 #ifndef __String__
-#define __String
+#define __String__
 
 #include <string>
 #include <vector>

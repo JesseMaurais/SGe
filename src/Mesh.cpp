@@ -3,6 +3,7 @@
 
 void Mesh::Clear()
 {
+	edges.clear();
 	points.clear();
 	faces.clear();
 	colors.clear();
@@ -14,6 +15,7 @@ void Mesh::Clear()
 void Mesh::Copy(Mesh &M)
 {
 	groups = M.groups;
+	edges = M.edges;
 	points = M.points;
 	faces = M.faces;
 	colors = M.colors;
@@ -25,6 +27,7 @@ void Mesh::Copy(Mesh &M)
 void Mesh::Swap(Mesh &M)
 {
 	groups.swap(M.groups);
+	edges.swap(M.edges);
 	points.swap(M.points);
 	faces.swap(M.faces);
 	colors.swap(M.colors);
@@ -37,6 +40,13 @@ int Mesh::AddSurface(Surface S)
 {
 	int index = faces.size();
 	faces.push_back(S);
+	return index;
+}
+
+int Mesh::AddEdge(Edge E)
+{
+	int index = edges.size();
+	edges.push_back(E);
 	return index;
 }
 
@@ -234,13 +244,14 @@ int MeshComposer::BeginGroup(int id)
 	group = id;
 	Group &G = Mesh::groups[group];
 	G.first = Mesh::faces.size();
+	return G.first;
 }
 
 int MeshComposer::EndGroup()
 {
 	Group &G = Mesh::groups[group];
 	G.count = Mesh::faces.size() - G.first;
-	return group;
+	return G.count;
 }
 
 int MeshComposer::Begin(int type)

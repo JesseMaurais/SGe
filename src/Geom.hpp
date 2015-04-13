@@ -20,6 +20,7 @@ struct Geometry : virtual Model, Geom, Render
 	void AngularVel(Scalar x, Scalar y, Scalar z);
 
 	void Cube(Scalar size);
+	void Sphere(int depth);
 };
 
 

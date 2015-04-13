@@ -8,7 +8,8 @@ const Uint32 USER_EVENT = SDL_RegisterEvents(LAST_EVENT);
 
 void SDL_perror(const char *string)
 {
-	SDL_Log("%s: %s", string, SDL_GetError());
+	const char *error = SDL_GetError();
+	SDL_Log("%s: %s", string, error);
 }
 	
 static signed FindFormat(SDL_PixelFormat *pixmap, GLenum *format, GLenum *type)

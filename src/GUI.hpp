@@ -7,9 +7,8 @@ struct GUI : SDL_Rect
 {
 	GUI();
 
+	bool Load(SDL_RWops *ops);
 	bool Load(const char *path);
-	bool Load(SDL_RWops *op);
-	bool Load(FILE *file);
 
 	virtual ~GUI();
 	virtual void Done();

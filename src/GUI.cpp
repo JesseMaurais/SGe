@@ -80,9 +80,7 @@ bool GUI::Load(SDL_RWops *ops)
 	{
 		buf = XML_GetBuffer(parser, BUFSIZ);
 		sz = SDL_RWread(ops, buf, sizeof(char), BUFSIZ);
-		if (sz < 0) SDL_perror("SDL_RWread");
-		else
-		if (!XML_ParseBuffer(parser, sz, !sz))
+		if (!XML_ParseBuffer(parser, sz, sz == 0))
 		{
 			XML_Error code = XML_GetErrorCode(parser);
 			const char *string = XML_ErrorString(code);
@@ -110,19 +108,6 @@ bool GUI::Load(const char *path)
 	 SDL_RWclose(ops);
 	}
 	return result; 
-}
-
-bool GUI::Load(FILE *file)
-{
-	bool result = false;
-	SDL_RWops *ops = SDL_RWFromFP(file, SDL_FALSE);
-	if (!ops) SDL_perror("SDL_RWFromFP");
-	else
-	{
-	 result = Load(ops);
-	 SDL_RWclose(ops);
-	}
-	return result;
 }
 
 GUI::~GUI(void)
