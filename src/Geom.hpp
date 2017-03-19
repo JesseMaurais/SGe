@@ -1,8 +1,8 @@
 #ifndef __Geom__
 #define __Geom__
 
-#include "ODE.hpp"
 #include "Model.hpp"
+#include "Ode.hpp"
 #include "Render.hpp"
 
 struct Geometry : virtual Model, Geom, Render

@@ -1,133 +1,85 @@
 #include "Lua.hpp"
 #include "SDL.hpp"
-#include "ODE.hpp"
-#include "OpenGL.hpp"
-#include "OpenAL.hpp"
+#include "Event.hpp"
+#include "Error.hpp"
+#include "Strings.hpp"
+#include "Command.hpp"
 #include <cstdlib>
 #include <cstdio>
 
+static bool Quit = false;
+static bool OnQuit(const SDL_Event &event)
+{
+	Quit = true;
+	return true;
+}
 
 int main(int argc, char **argv)
 {
-	if (argc < 2)
+	const char *program = argv[0];
+	const char *script = argv[1];
+
+	if (not script)
 	{
-	 puts("usage: SGe <lua-script>");
-	 return EXIT_SUCCESS;
+		script = ConfigScript;
 	}
 
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER))
+	if (SDL_Init(SDL_INIT_VIDEO))
 	{
-	 SDL_perror("SDL_Init");
-	 return EXIT_SUCCESS;
-	}
-	else
-	 atexit(SDL_Quit);
-
-	if (Lua_Init())
-	{
-	 SDL_perror("Lua_Init");
-	 return EXIT_SUCCESS;
+		SDL_perror("SDL_Init");
+		return EXIT_FAILURE;
 	}
 	else
-	 atexit(Lua_Quit);
-
-	if (OpenGL_Init())
+	if (std::atexit(SDL_Quit))
 	{
-	 SDL_perror("OpenGL_Init");
-	 return EXIT_SUCCESS;
+		SDL_Log(CannotMakeExit, "SDL_Quit");
+		return EXIT_FAILURE;
+	}
+
+	SetErrorHandler(nullptr);
+	if (std::atexit(ResetErrorHandler))
+	{
+		SDL_Log(CannotMakeExit, "ResetErrorHandler");
+	}
+
+	if (Lua_Init(script))
+	{
+		SDL_perror("Lua_Init");
+		return EXIT_FAILURE;
 	}
 	else
-	 atexit(OpenGL_Quit);
-
-	if (OpenAL_Init())
+	if (std::atexit(Lua_Quit))
 	{
-	 SDL_perror("OpenAL_Init");
-	 return EXIT_SUCCESS;
+		SDL_Log(CannotMakeExit, "Lua_Quit");
+		return EXIT_FAILURE;
+	}
+
+	if (CommandInit(CommandPrompt))
+	{
+		SDL_perror("CommandInit");
+		return EXIT_FAILURE;
 	}
 	else
-	 atexit(OpenAL_Quit);
-
-	if (ODE_Init())
+	if (std::atexit(CommandQuit))
 	{
-	 SDL_perror("ODE_Init");
-	 return EXIT_SUCCESS;
+		SDL_Log(CannotMakeExit, "CommandQuit");
+		return EXIT_FAILURE;
 	}
-	else
-	 atexit(ODE_Quit);
 
-	if (luaL_loadfile(Coroutine, argv[1]))
+	PushEventHandler(SDL_QUIT, OnQuit);
+
+	SDL_Event event;
+	while (not Quit)
 	{
-	 Lua_perror(Coroutine, "luaL_loadfile");
-	 return EXIT_SUCCESS;
-	}
-	else
-	 atexit(Lua_Quit);
-
-	gluLookAt(0, 5, 2,  0, 0, 0,  0, 1, 0);
-	glClearColor(1.0, 1.0, 1.0, 0.0);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDisable(GL_CULL_FACE);
-
-	SDL_bool quit = SDL_FALSE;
-	do
-	{
-		if (!SDL_WaitEvent(Event))
+		if (SDL_WaitEvent(&event))
 		{
-		 SDL_perror("SDL_WaitEvent");
-		 continue;
-		}
-
-		if (HaveEvent(UPDATE))
-		{
-			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-			if (ODE_Lock())
-			{
-			 SDL_Log("cannot lock");
-			 continue;
-			}
-
-			Update(Space);
-
-			if (ODE_Unlock())
-			{
-			 SDL_Log("cannot unlock");
-			}
-
-			SDL_GL_SwapWindow(Window);
+			Dispatch(event);
 		}
 		else
 		{
-			bool requested = SDL_QuitRequested();
-			lua_pushboolean(Coroutine, !requested);
-
-			if (ODE_Lock())
-			{
-			 SDL_Log("cannot lock");
-			 continue;
-			}
-
-			int error = lua_resume(Coroutine, NULL, 1);
-
-			if (ODE_Unlock())
-			{
-			 SDL_Log("cannot unlock");
-			}
-
-			switch (error)
-			{
-			default:
-				Lua_perror(Coroutine, argv[1]);
-			case LUA_OK:
-				quit = SDL_TRUE;
-				break;
-			case LUA_YIELD:
-				continue;
-			}
+			SDL_perror("SDL_WaitEvent");
 		}
 	}
-	while (!quit);
+	return EXIT_SUCCESS;
 }
 

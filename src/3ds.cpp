@@ -29,7 +29,7 @@ void Model3ds::AddChildNodes(Lib3dsFile *file, Lib3dsNode *node)
 
 void Model3ds::AddNode(Lib3dsFile *file, Lib3dsNode *node)
 {
-	if (!strcmp(node->name, "$$$DUMMY")) return;
+	if (not std::strcmp(node->name, "$$$DUMMY")) return;
 
 	switch (node->type)
 	{
@@ -46,7 +46,7 @@ void Model3ds::AddNode(Lib3dsFile *file, Lib3dsNode *node)
 	 case LIB3DS_LIGHT_NODE:
 	 case LIB3DS_SPOT_NODE:
 	 {
-	  fputs("Unhandled node type\n", stderr);
+	  std::fputs("Unhandled node type\n", stderr);
 	 }
 	 break;
 	}

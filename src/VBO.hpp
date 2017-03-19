@@ -2,17 +2,16 @@
 #define __VBO__
 
 #include "Mesh.hpp"
-#include "OpenGL.hpp"
 
 struct VBO : virtual Mesh
 {
 	union {
-	 GLuint buffers[5];
+	 unsigned buffers[5];
 	 struct {
-	  GLuint element, vertex, texCoord, normal, color;
+	  unsigned element, vertex, texCoord, normal, color;
 	 };
 	};
-	void GenBuffers(GLenum usage);
+	void GenBuffers(unsigned usage);
 	void DeleteBuffers();
 	void Enable();
 	void Disable();

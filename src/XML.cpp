@@ -1,45 +1,43 @@
 #include "XML.hpp"
-#include "Lua.hpp"
 #include "SDL.hpp"
-#include <cstdlib>
-#include <cerrno>
-
-static int eval(const char *string)
-{
-	switch (luaL_loadstring(State, string))
-	{
-	  case LUA_OK:
-		break;
-	  case LUA_ERRMEM:
-		return SDL_SetError("out of memory");
-	  case LUA_ERRGCMM:
-		return SDL_SetError("gc method fault");
-	  case LUA_ERRSYNTAX:
-		return SDL_SetError("syntax error");
-	}
-	switch (lua_pcall(State, 0, 1, 0))
-	{
-	  case LUA_OK:
-		break;
-	  case LUA_ERRMEM:
-		return SDL_SetError("out of memory");
-	  case LUA_ERRGCMM:
-		return SDL_SetError("gc method fault");
-	  case LUA_ERRRUN:
-		{
-		const char *error = lua_tostring(State, -1);
-		int code = SDL_SetError("%s", error);
-		lua_pop(State, 1);
-		return code;
-		}
-	}
-	return 0;
-}
+#include "Strings.hpp"
+#include <stdexcept>
+#include <expat.h>
 
 XML::XML(const char *encoding)
 {
+	auto start = [](void *user, const char *name, const char **attributes)
+	{
+		union {
+		 void *addr;
+		 XML *obj;
+		};
+		addr = user;
+		obj->Start(name, attributes);
+	};
+
+	auto end = [](void *user, const char *name)
+	{
+		union {
+		 void *addr;
+		 XML *obj;
+		};
+		addr = user;
+		obj->End(name);
+	};
+
+	auto cdata = [](void *user, const char *string, int length)
+	{
+		union {
+		 void *addr;
+		 XML *obj;
+		};
+		addr = user;
+		obj->CData(string, length);
+	};
+
 	parser = XML_ParserCreate(encoding);
-	assert(parser);
+	if (not parser) throw std::runtime_error(CannotCreateParser);
 	XML_SetElementHandler(parser, start, end);
 	XML_SetCharacterDataHandler(parser, cdata);
 	XML_SetUserData(parser, this);
@@ -47,48 +45,18 @@ XML::XML(const char *encoding)
 
 XML::~XML(void)
 {
-	XML_ParserFree(parser);
-}
-
-void XML::start(void *user, const char *name, const char **attributes)
-{
-	union {
-	 void *addr;
-	 XML *obj;
-	};
-	addr = user;
-	obj->Start(name, attributes);
-}
-
-void XML::end(void *user, const char *name)
-{
-	union {
-	 void *addr;
-	 XML *obj;
-	};
-	addr = user;
-	obj->End(name);
-}
-
-void XML::cdata(void *user, const char *string, int length)
-{
-	union {
-	 void *addr;
-	 XML *obj;
-	};
-	addr = user;
-	obj->CData(string, length);
+	if (parser) XML_ParserFree(parser);
 }
 
 bool XML::Load(SDL_RWops *ops)
 {
 	void *buffer;
-	size_t size;
+	std::size_t size;
 	do
 	{
 		buffer = XML_GetBuffer(parser, BUFSIZ);
 		size = SDL_RWread(ops, buffer, sizeof(char), BUFSIZ);
-		if (!XML_ParseBuffer(parser, size, 0 == size))
+		if (not XML_ParseBuffer(parser, size, 0 == size))
 		{
 			XML_Error code = XML_GetErrorCode(parser);
 			const char *string = XML_ErrorString(code);
@@ -105,39 +73,16 @@ bool XML::Load(SDL_RWops *ops)
 bool XML::Load(const char *path)
 {
 	SDL_RWops *ops = SDL_RWFromFile(path, "r");
-	if (!ops) SDL_perror("SDL_RWFromFile");
-	else
+	if (ops)
 	{
-	 bool okay = Load(ops);
-	 SDL_RWclose(ops);
-	 return okay;
+		bool okay = Load(ops);
+		if (SDL_RWclose(ops))
+		{
+			SDL_perror(path);
+		}
+		return okay;
 	}
+	SDL_perror(path);
 	return false;
-}
-
-void XML::Start(const char *name, const char **attributes)
-{
-	lua_getfield(State, -1, "child");
-	lua_len(State, -1);
-
-	lua_newtable(State);
-	luaL_setmetatable(State, name);
-	for (int key=0, value=1; attributes[key]; key += 2, value += 2)
-	{
-		lua_pushstring(State, attributes[key]);
-		lua_pushstring(State, attributes[value]);
-		lua_settable(State, -3);
-	}
-}
-
-void XML::End(const char *name)
-{
-	lua_settable(State, -3);
-	lua_pop(State, 1);
-}
-
-void XML::CData(const char *string, int length)
-{
-
 }
 

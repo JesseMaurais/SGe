@@ -11,9 +11,9 @@ signed OpenAL_Init()
 	std::vector<ALCint> attributes;
 	const char *string = nullptr;
 
-	lua_getglobal(State, "Audio");
+	lua_getglobal(state, "Audio");
 	int table = lua_gettop(State);
-	if (!lua_isnil(State, table))
+	if (!lua_isnil(state, table))
 	{
 	 lua_pushnil(State);
 	 while (lua_next(State, table))

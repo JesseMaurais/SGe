@@ -1,6 +1,9 @@
 #include "Texture.hpp"
+#include "Surface.hpp"
 #include "Vector.hpp"
+#include "OpenGL.hpp"
 #include "SDL.hpp"
+#include <cstdio>
 
 static signed LoadCubeFace(int face, const char *path)
 {
@@ -20,26 +23,26 @@ void LoadCubeMap(const char *dir, const char *ext)
 	char path[FILENAME_MAX];
 	CubeTexParameters(GL_TEXTURE_CUBE_MAP);
 
-	sprintf(path, "%s/left.%s", dir, ext);
+	std::sprintf(path, "%s/left.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, path);
 
-	sprintf(path, "%s/right.%s", dir, ext);
+	std::sprintf(path, "%s/right.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_X, path);
 
-	sprintf(path, "%s/bottom.%s", dir, ext);
+	std::sprintf(path, "%s/bottom.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, path);
 
-	sprintf(path, "%s/top.%s", dir, ext);
+	std::sprintf(path, "%s/top.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, path);
 
-	sprintf(path, "%s/back.%s", dir, ext);
+	std::sprintf(path, "%s/back.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, path);
 
-	sprintf(path, "%s/front.%s", dir, ext);
+	std::sprintf(path, "%s/front.%s", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, path);
 }
 
-void CubeTexParameters(GLenum type)
+void CubeTexParameters(unsigned type)
 {
 	// Filters
 	glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -104,18 +107,18 @@ static void CubeMapPackPixel(char RGB[3], double x, double y, double z)
 	RGB[2] = int(V.B * 255);
 }
 
-void NormalCubeMap(int power)
+void NormalCubeMap(unsigned power)
 {
-	int size = 1 << power;
-	int half = size >> 1;
+	unsigned size = 1 << power;
+	unsigned half = size >> 1;
 
 	char map[6][size][size][3];
 
-	for (int i = 0; i < size; ++i)
+	for (unsigned i = 0; i < size; ++i)
 	{
 		double v = 0.5 + i - half;
 
-		for (int j = 0; j < size; ++j)
+		for (unsigned j = 0; j < size; ++j)
 		{
 			double u = 0.5 + j - half;
 

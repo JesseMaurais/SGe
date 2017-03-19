@@ -3,9 +3,10 @@
 
 #include <GL/glew.h>
 #include <GL/glu.h>
+#include <GL/gl.h>
 
-signed OpenGL_Init();
-void OpenGL_Quit();
+signed OpenGL_SetError(const char *string, GLenum error);
+signed OpenGL_CheckError(const char *string);
 
 #endif // file
 

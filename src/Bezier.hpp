@@ -1,5 +1,5 @@
-#ifndef __Bezier__
-#define __Bezier__
+#ifndef Bezier_hpp
+#define Bezier_hpp
 
 #include "Number.hpp"
 #include "Vector.hpp"

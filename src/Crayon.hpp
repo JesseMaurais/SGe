@@ -1,5 +1,5 @@
-#ifndef __Crayon__
-#define __Crayon__
+#ifndef Crayon_hpp
+#define Crayon_hpp
 
 #include "Vector.hpp"
 

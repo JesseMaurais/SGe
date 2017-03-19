@@ -2,8 +2,8 @@
 #include "Quaternion.hpp"
 #include "OpenGL.hpp"
 #include "Geom.hpp"
-#include "ODE.hpp"
 #include "Lua.hpp"
+#include "Ode.hpp"
 
 Geometry::~Geometry()
 {

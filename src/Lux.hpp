@@ -1,7 +1,8 @@
-#ifndef __Lux__
-#define __Lux__
+#ifndef Lux_hpp
+#define Lux_hpp
 
-signed Lux_Init();
+#include "Lua.hpp"
 
-#endif
+signed Lux_Init(lua_State *state);
 
+#endif // file

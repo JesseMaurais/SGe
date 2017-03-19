@@ -1,31 +1,26 @@
-#ifndef __XML__
-#define __XML__
+#ifndef XML_hpp
+#define XML_hpp
 
-#include <string>
-#include <expat.h>
-#include <SDL2/SDL_rwops.h>
+struct SDL_RWops;
+struct XML_ParserStruct;
 
 struct XML
 {
-	XML_Parser parser;
-	XML(const char *encoding=NULL);
-	~XML();
+	XML(const char *encoding=nullptr);
+	virtual ~XML();
 
 	bool Load(SDL_RWops *ops);
 	bool Load(const char *path);
 
   protected:
 
-	virtual void Start(const char *name, const char **attributes);
-	virtual void End(const char *name);
-	virtual void CData(const char *string, int length);
+	virtual void Start(const char *name, const char **attributes) = 0;
+	virtual void End(const char *name) = 0;
+	virtual void CData(const char *string, int length) = 0;
 
   private:
 
-	static void start(void *user, const char *name, const char **attr);
-	static void end(void *user, const char *name);
-	static void cdata(void *user, const char *string, int length);
+	XML_ParserStruct *parser;
 };
 
 #endif // file
-

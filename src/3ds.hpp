@@ -1,5 +1,5 @@
-#ifndef __3ds__
-#define __3ds__
+#ifndef Model3ds_hpp
+#define Model3ds_hpp
 
 #include "Model.hpp"
 

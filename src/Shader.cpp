@@ -1,17 +1,25 @@
-#include "SDL.hpp"
-#include "Lua.hpp"
 #include "Shader.hpp"
+#include "Strings.hpp"
 #include "OpenGL.hpp"
-#include <cstdio>
-#include <vector>
+#include "Error.hpp"
+#include "SDL.hpp"
 
-void Shader::LoadFragment(const char **paths)
+
+bool Shader::LoadFragment(const char **paths)
 {
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	Load(fragment, paths);
-	
-	glCompileShader(fragment);
-	Log(__func__, fragment);
+	if (fragment)
+	{
+		LoadShader(fragment, paths);
+		glCompileShader(fragment);
+		LogShader(__func__, fragment);
+	}
+	else
+	{
+		auto error = glGetError();
+		OpenGL_SetError("glCreateShader", error);
+		return false;
+	}
 }
 
 void Shader::LoadFragment(const char *path)
@@ -20,25 +28,13 @@ void Shader::LoadFragment(const char *path)
 	LoadFragment(paths);
 }
 
-void Shader::LoadFragmentSource(Strings list)
-{
-	const int size = list.size();
-	const char *paths[size + 1];
-	for (int item = 0; item < size; ++item)
-	{
-	 paths[item] = list[item].c_str();
-	}
-	paths[size] = NULL;
-	LoadFragment(paths);
-}
-
 void Shader::LoadVertex(const char **paths)
 {
 	vertex = glCreateShader(GL_VERTEX_SHADER);
-	Load(vertex, paths);
+	LoadShader(vertex, paths);
 	
 	glCompileShader(vertex);
-	Log(__func__, vertex);
+	LogShader(__func__, vertex);
 }
 
 void Shader::LoadVertex(const char *path)
@@ -47,88 +43,82 @@ void Shader::LoadVertex(const char *path)
 	LoadVertex(paths);
 }
 
-void Shader::LoadVertexSource(Strings list)
-{
-	const int size = list.size();
-	const char *paths[size + 1];
-	for (int item = 0; item < size; ++item)
-	{
-	 paths[item] = list[item].c_str();
-	}
-	paths[size] = NULL;
-	LoadVertex(paths);
-}
-
 void Shader::LinkProgram(void)
 {
 	program = glCreateProgram();
 	if (glIsShader(fragment))
 	{
-	 glAttachShader(program, fragment);
+		glAttachShader(program, fragment);
 	}
 	if (glIsShader(vertex))
 	{
-	 glAttachShader(program, vertex);
+		glAttachShader(program, vertex);
 	}
 	glLinkProgram(program);
-	Log(program);
+	LogProgram(program);
 }
 
 void Shader::UseProgram()
 {
 	glUseProgram(program);
-	Log(program);
+	LogProgram(program);
 }
 
 Shader::~Shader()
 {
 	if (glIsProgram(program))
 	{
-	 if (glIsShader(fragment))
-	 {
-	  glDetachShader(program, fragment);
-	 }
-	 if (glIsShader(vertex))
-	 {
-	  glDetachShader(program, vertex);
-	 }
-	 glDeleteProgram(program);
+		if (glIsShader(fragment))
+		{
+			glDetachShader(program, fragment);
+		}
+		if (glIsShader(vertex))
+		{
+			glDetachShader(program, vertex);
+		}
+		glDeleteProgram(program);
 	}
 
 	if (glIsShader(fragment))
 	{
-	 glDeleteShader(fragment);
+		glDeleteShader(fragment);
 	}
 	if (glIsShader(vertex))
 	{
-	 glDeleteShader(vertex);
+		glDeleteShader(vertex);
 	}
 }
 
-char *Shader::Read(const char *path, int &size)
+char *Shader::ReadSource(const char *path, size_t &size)
 {
-	FILE *file = fopen(path, "r");
-	if (file)
+	SDL_RWops *ops = SDL_RWFromFile(path, "r");
+	if (ops)
 	{
-		fseek(file, 0, SEEK_END);
-		size = ftell(file);
-		fseek(file, 0, SEEK_SET);
+		SDL_RWseek(ops, 0, RW_SEEK_END);
+		size = SDL_RWtell(ops);
+		SDL_RWseek(ops, 0, RW_SEEK_SET);
 		
 		char *data = new char [size];
-		fread(data, size, 1, file);
+		if (!SDL_RWread(ops, data, size, sizeof(char)))
+		{
+			SDL_perror(path);
+		}
 		
-		fclose(file);
+		if (SDL_RWclose(ops))
+		{
+			SDL_perror(path);
+		}
 		return data;
 	}
-	else perror(path);
-	return 0;
+	SDL_perror(path);
+	return nullptr;
 }
 
-void Shader::Load(GLuint shader, const char **paths)
+void Shader::LoadShader(GLuint shader, const char **paths)
 {
-	int n = 0; while (paths[n]) ++n;
-	
-	int *size = new int [n];
+	size_t n = 0;
+	while (paths[n++]);
+	size_t *size = new size_t [n];
 	
 	const char **data = new const char *[n];
 	
@@ -145,29 +135,52 @@ void Shader::Load(GLuint shader, const char **paths)
 	delete size;
 }
 
-void Shader::Log(GLuint program)
-{
-	int n;
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &n);
-	if (n > 1)
-	{
-		char *data = new char [n];
-		glGetProgramInfoLog(program, n, &n, data);
-		SDL_Log("%s", data);
-		delete data;
-	}
-}
-
-void Shader::Log(const char *type, GLuint shader)
+void Shader::LogShader(const char *type, GLuint shader)
 {
 	int n;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &n);
+	if (OpenGL_CheckError("GL_INFO_LOG_LENGTH"))
+	{
+		ShowError(CannotUseShader);
+	}
+	else
 	if (n > 1)
 	{
 		char *data = new char [n];
 		glGetShaderInfoLog(shader, n, &n, data);
-		SDL_Log("%s\n%s\n", type, data);
+		if (OpenGL_CheckError("glGetShaderInfoLog"))
+		{
+			ShowError(CannotUseShader);
+		}
+		else
+		{
+			SDL_Log("%s\n%s\n", type, data);
+		}
 		delete data;
 	}
 }
 
+void Shader::LogProgram(unsigned program)
+{
+	int n;
+	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &n);
+	if (OpenGL_CheckError("GL_INFO_LOG_LENGTH"))
+	{
+		ShowError(CannotUseShaderProgram);
+	}
+	else
+	if (n > 1)
+	{
+		char *data = new char [n];
+		glGetProgramInfoLog(program, n, &n, data);
+		if (OpenGL_CheckError("glGetProgramInfoLog"))
+		{
+			ShowError(CannotUseShaderProgram);
+		}
+		else
+		{
+			SDL_Log("%s", data);
+		}
+		delete data;
+	}
+}

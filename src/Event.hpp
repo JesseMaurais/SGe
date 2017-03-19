@@ -1,41 +1,13 @@
-#ifndef __Event__
-#define __Event__
+#ifndef Event_hpp
+#define Event_hpp
 
-#include "GUI.hpp"
+enum UserEventType { UpdateSpace, ExecuteCommand, UserEventCount };
+unsigned UserEvent(enum UserEventType type);
 
-extern const Uint32 GUI_EVENT;
-
-void Process(SDL_UserEvent &event);
-
-struct UserEvent
-{
-	virtual void Event(GUI *obj, int code)=0;
-	signed Send(GUI *obj, int code);
-};
-
-signed Send(GUI *obj, UserEvent *user, int code);
-
-template <class C> signed Send(C *obj, void (C::*event)(int code), int code)
-{
-	struct Userdata : UserEvent
-	{
-		void (C::*event)(int code);
-
-		void Event(GUI *obj, int code)
-		{
-			C *user = dynamic_cast<C*>(obj);
-			(user->*event)(code);
-			delete this;
-		}
-
-		Userdata(void (C::*event)(int code))
-		{
-			this->event = event;
-		}
-	};
-
-	return Send(obj, new Userdata(event), code);
-}
+union SDL_Event;
+using EventHandler = bool(*)(const SDL_Event &event);
+void PushEventHandler(unsigned type, EventHandler function);
+void PopEventHandler(unsigned type);
+void Dispatch(const SDL_Event &event);
 
 #endif // file
-

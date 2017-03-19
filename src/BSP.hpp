@@ -1,5 +1,5 @@
-#ifndef __BSP__
-#define __BSP__
+#ifndef BSP_hpp
+#define BSP_hpp
 
 #include "Model.hpp"
 #include "Tree.hpp"

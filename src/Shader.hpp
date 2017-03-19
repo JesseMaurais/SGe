@@ -1,35 +1,30 @@
-#ifndef __Shader__
-#define __Shader__
-
-#include "OpenGL.hpp"
-#include "String.hpp"
+#ifndef Shader_hpp
+#define Shader_hpp
 
 struct Shader
 {
-	void LoadFragment(const char **paths);
-	void LoadVertex(const char **paths);
+	bool LoadFragment(const char **path);
+	bool LoadVertex(const char **path);
 
-	void LoadFragment(const char *path);
-	void LoadVertex(const char *path);
+	bool LoadFragment(const char *path);
+	bool LoadVertex(const char *path);
 
-	void LoadFragmentSource(Strings path);
-	void LoadVertexSource(Strings path);
-
-	void LinkProgram();
-	void UseProgram();
+	bool LinkProgram();
+	bool UseProgram();
 
 	~Shader();
 
  protected:
 
-	GLuint program, vertex, fragment;
+	unsigned program, vertex, fragment;
 
  private:
 
-	static char *Read(const char *path, int &size);
-	static void Load(GLuint shader, const char **paths);
-	static void Log(GLuint program);
-	static void Log(const char *type, GLuint shader);
+	static char *ReadSource(SDL_RWops *ops, size_t &size);
+	static char *ReadSource(const char *path, size_t &size);
+	static void LoadShader(unsigned shader, const char **paths);
+	static void LogShader(const char *type, unsigned shader);
+	static void LogProgram(unsigned program);
 };
 
 #endif // file

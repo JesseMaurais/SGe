@@ -1,14 +1,23 @@
-#ifndef __Lua__
-#define __Lua__
+#ifndef Lua_hpp
+#define Lua_hpp
 
-#include <lua5.2/lua.hpp>
+extern "C"
+{
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
 
-void Lua_perror(lua_State *state, const char *string);
+extern lua_State *CoState;
 
-extern lua_State *State; // Virtual Machine
-extern lua_State *Coroutine; // Pseudo Thread
+signed Lua_SetError(lua_State *state);
+signed Lua_GetError(lua_State *state);
+void Lua_perror(lua_State *state, const char *prefix);
 
-signed Lua_Init();
+signed Lua_Init(const char *path);
 void Lua_Quit();
 
-#endif
+int Lua_Yield(lua_State *state);
+int Lua_Resume(lua_State *state);
+
+#endif // file

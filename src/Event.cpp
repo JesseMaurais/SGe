@@ -1,26 +1,51 @@
 #include "Event.hpp"
+#include "SDL.hpp"
+#include <stack>
+#include <map>
 
-const Uint32 GUI_EVENT = SDL_RegisterEvents(1);
-
-signed UserEvent::Send(GUI *obj, int code)
+unsigned UserEvent(enum UserEventType type)
 {
-	return ::Send(obj, this, code);
+	static const auto base = SDL_RegisterEvents(UserEventCount);
+	return static_cast<unsigned>(base + type);
 }
 
-signed Send(GUI *obj, UserEvent *user, int code)
+using Stack = std::stack<EventHandler>;
+using StackMap = std::map<Uint32, Stack>;
+
+static Stack &HandlerStack(Uint32 eventCode)
 {
-	SDL_Event event;
-	event.type = GUI_EVENT;
-	event.user.code = code;
-	event.user.data1 = reinterpret_cast<void*>(obj);
-	event.user.data2 = reinterpret_cast<void*>(user);
-	return SDL_PushEvent(&event);
+	static StackMap eventStacks;
+	return eventStacks[eventCode];
 }
 
-void Process(SDL_UserEvent &event)
+void Dispatch(const SDL_Event &event)
 {
-	GUI *obj = reinterpret_cast<GUI*>(event.data1);
-	UserEvent *user = reinterpret_cast<UserEvent*>(event.data2);
-	user->Event(obj, event.code);
+	Stack store;
+	Stack &stack = HandlerStack(event.type);
+	while (not stack.empty())
+	{
+		EventHandler handler = stack.top();
+		if (not handler(event))
+		{
+			store.push(handler);
+			stack.pop();
+		}
+		else break;
+	}
+	while (not store.empty())
+	{
+		EventHandler handler = store.top();
+		stack.push(handler);
+		store.pop();
+	}
 }
 
+void PushEventHandler(unsigned eventCode, EventHandler function)
+{
+	HandlerStack(eventCode).push(function);
+}
+
+void PopEventHandler(unsigned eventCode)
+{
+	HandlerStack(eventCode).pop();
+}
