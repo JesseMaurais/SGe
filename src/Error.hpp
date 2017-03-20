@@ -1,5 +1,5 @@
-#ifndef SGe_Error
-#define SGe_Error
+#ifndef Error_hpp
+#define Error_hpp
 
 struct SDL_Window;
 void SetErrorHandler(SDL_Window *window);
