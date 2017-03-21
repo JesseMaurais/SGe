@@ -1,5 +1,5 @@
-#ifndef __Obj__
-#define __Obj__
+#ifndef Obj_hpp
+#define Obj_hpp
 
 #include "Model.hpp"
 

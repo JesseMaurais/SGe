@@ -1,8 +1,9 @@
-#ifndef __Nurbs__
-#define __Nurbs__
+#ifndef Nurbs_hpp
+#define Nurbs_hpp
 
 #include "Mesh.hpp"
-#include "OpenGL.hpp"
+
+class GLUnurbs;
 
 struct Nurbs : virtual MeshComposer
 {	
@@ -24,16 +25,6 @@ struct Nurbs : virtual MeshComposer
  protected:
 
 	GLUnurbs *obj;
-	
- private:
- 
-	static void error(int code);
-	static void begin(int mode, MeshComposer *self);
-	static void end(MeshComposer *self);
-	static void vertex(float *v, MeshComposer *self);
-	static void texCoord(float *v, MeshComposer *self);
-	static void normal(float *v, MeshComposer *self);
-	static void color(float *v, MeshComposer *self);
 };
 
 #endif // file

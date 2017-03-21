@@ -1,5 +1,5 @@
-#ifndef __Vector__
-#define __Vector__
+#ifndef Vector_hpp
+#define Vector_hpp
 
 #include "Number.hpp"
 

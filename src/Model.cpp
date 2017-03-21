@@ -5,7 +5,7 @@ void Model::Cube(Scalar size)
 {
 	Scalar l = 0.5*size;
 
-	Begin(GL_QUADS);
+	Begin(Quads);
 
 	Next(Vertex(+l, +l, -l));
 	Next(Vertex(-l, +l, -l));

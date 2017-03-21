@@ -1,63 +1,75 @@
-#include "SDL.hpp"
 #include "Nurbs.hpp"
+#include "OpenGL.hpp"
+#include "SDL.hpp"
 #include <stdexcept>
 
-Nurbs::Nurbs()
+static void Error(int code)
 {
-	obj = gluNewNurbsRenderer();
-	if (!obj) throw std::bad_alloc();
-
-	typedef _GLUfuncptr FP;
-
-	gluNurbsCallbackData(obj, this);
-	gluNurbsCallback(obj, GLU_NURBS_ERROR, (FP) error);
-	gluNurbsCallback(obj, GLU_NURBS_BEGIN_DATA, (FP) begin);
-	gluNurbsCallback(obj, GLU_NURBS_END_DATA, (FP) end);
-	gluNurbsCallback(obj, GLU_NURBS_VERTEX_DATA, (FP) vertex);
-	gluNurbsCallback(obj, GLU_NURBS_NORMAL_DATA, (FP) normal);
-	gluNurbsCallback(obj, GLU_NURBS_TEXTURE_COORD_DATA, (FP) texCoord);
-	gluNurbsCallback(obj, GLU_NURBS_COLOR_DATA, (FP) color);
+	SDL_Log("Nurbs: %s", gluErrorString(code));
 }
 
-Nurbs::~Nurbs()
+static void Begin(int mode, MeshComposer *self)
 {
-	gluDeleteNurbsRenderer(obj);
+	switch (mode)
+	{
+	case GL_TRIANGLE_FAN:
+		self->Begin(MeshComposer::Fan);
+		break;
+	case GL_QUAD_STRIP:
+	case GL_TRIANGLE_STRIP:
+		self->Begin(MeshComposer::Strip);
+		break;
+	case GL_TRIANGLES:
+		self->Begin(MeshComposer::Triangles);
+		break;
+	}
 }
 
-void Nurbs::error(int code)
-{
-	SDL_Log("%s: %s\n", __func__, gluErrorString(code));
-}
-
-void Nurbs::begin(int mode, MeshComposer *self)
-{
-	self->Begin(mode);
-}
-
-void Nurbs::end(MeshComposer *self)
+static void End(MeshComposer *self)
 {
 	self->End();
 }
 
-void Nurbs::vertex(float *v, MeshComposer *self)
+static void Vertex(float *v, MeshComposer *self)
 {
 	int index = self->Vertex(v[0], v[1], v[2]);
 	self->Next(index);
 }
 
-void Nurbs::texCoord(float *v, MeshComposer *self)
+static void TexCoord(float *v, MeshComposer *self)
 {
 	self->TexCoord(v[0], v[1], v[2]);
 }
 
-void Nurbs::normal(float *v, MeshComposer *self)
+static void Normal(float *v, MeshComposer *self)
 {
 	self->Normal(v[0], v[1], v[2]);
 }
 
-void Nurbs::color(float *v, MeshComposer *self)
+static void Color(float *v, MeshComposer *self)
 {
 	self->Color(v[0], v[1], v[2]);
+}
+
+Nurbs::Nurbs()
+{
+	obj = gluNewNurbsRenderer();
+	if (not obj) throw std::bad_alloc();
+
+
+	gluNurbsCallbackData(obj, this);
+	gluNurbsCallback(obj, GLU_NURBS_ERROR, (_GLUfuncptr)::Error);
+	gluNurbsCallback(obj, GLU_NURBS_BEGIN_DATA, (_GLUfuncptr)::Begin);
+	gluNurbsCallback(obj, GLU_NURBS_END_DATA, (_GLUfuncptr)::End);
+	gluNurbsCallback(obj, GLU_NURBS_VERTEX_DATA, (_GLUfuncptr)::Vertex);
+	gluNurbsCallback(obj, GLU_NURBS_NORMAL_DATA, (_GLUfuncptr)::Normal);
+	gluNurbsCallback(obj, GLU_NURBS_TEXTURE_COORD_DATA, (_GLUfuncptr)::TexCoord);
+	gluNurbsCallback(obj, GLU_NURBS_COLOR_DATA, (_GLUfuncptr)::Color);
+}
+
+Nurbs::~Nurbs()
+{
+	gluDeleteNurbsRenderer(obj);
 }
 
 void Nurbs::BeginCurve()

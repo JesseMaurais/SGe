@@ -1,0 +1,8 @@
+.settings
+.project
+.cproject
+.gitignore
+SGe
+obj/*.o
+obj/*.d
+src/*.pch

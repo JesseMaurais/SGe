@@ -1,38 +1,26 @@
 #include "Ply.hpp"
 #include <cstdio>
+#include <rply.h>
 
-bool ModelPly::Load(const char *path)
-{
-	p_ply ply = ply_open(path, error, 0, this);
-	
-	if (ply && ply_read_header(ply))
-	{
-	 int nVertexes =
-	  ply_set_read_cb(ply, "vertex", "x", vertex, this, 0);
-	  ply_set_read_cb(ply, "vertex", "y", vertex, this, 1);
-	  ply_set_read_cb(ply, "vertex", "z", vertex, this, 2);
-	
-	 int nFaces =
-	  ply_set_read_cb(ply, "face", "vertex_indices", face, this, 0);
-	
-	 vertexes.resize(nVertexes);
-	 faces.reserve(nFaces);
-	
-	 return ply_read(ply);
-	} else return false;
-}
 
-void ModelPly::Vertex(p_ply_argument arg, int axis)
+static int Vertex(p_ply_argument arg)
 {
+	ModelPly *self;
+	long axis;
+	ply_get_argument_user_data(arg, (void**) &self, &axis);
 	long index;
-	if (ply_get_argument_element(arg, NULL, &index))
+	if (ply_get_argument_element(arg, nullptr, &index))
 	{
-	 vertexes[index].v[axis] = ply_get_argument_value(arg);
+		self->vertexes[index].v[axis] = ply_get_argument_value(arg);
 	}
+	return 1;
 }
 
-void ModelPly::Face(p_ply_argument arg, int index)
+static int Face(p_ply_argument arg)
 {
+	ModelPly *self;
+	long index;
+	ply_get_argument_user_data(arg, (void**)&self, &index);
 	long length, point;
 	ply_get_argument_property(arg, NULL, &length, &point);
 
@@ -45,35 +33,39 @@ void ModelPly::Face(p_ply_argument arg, int index)
 	
 	if (point+1 == length)
 	{
-	 Begin(GL_POLYGON);
-	  for (point = 0; point < data.size(); ++point)
-	  {
-	   Next(data[point]);
-	  }
-	 End();
+		self->BeginPolygon();
+		for (const long point : data)
+		{
+			self->Next(point);
+		}
+		self->EndPolygon();
 	}
-}
-
-int ModelPly::vertex(p_ply_argument arg)
-{
-	ModelPly *self;
-	long index;
-	ply_get_argument_user_data(arg, (void**)&self, &index);
-	self->Vertex(arg, index);
 	return 1;
 }
 
-int ModelPly::face(p_ply_argument arg)
+static void Error(p_ply ply, const char *message)
 {
-	ModelPly *self;
-	long index;
-	ply_get_argument_user_data(arg, (void**)&self, &index);
-	self->Face(arg, index);
-	return 1;
+	std::fprintf(stderr, "%s\n", message);
 }
 
-void ModelPly::error(p_ply ply, const char *message)
+bool ModelPly::Load(const char *path)
 {
-	fprintf(stderr, "%s\n", message);
+	p_ply ply = ply_open(path, ::Error, 0, this);
+
+	if (ply && ply_read_header(ply))
+	{
+	 int nVertexes =
+	  ply_set_read_cb(ply, "vertex", "x", ::Vertex, this, 0);
+	  ply_set_read_cb(ply, "vertex", "y", ::Vertex, this, 1);
+	  ply_set_read_cb(ply, "vertex", "z", ::Vertex, this, 2);
+
+	 int nFaces =
+	  ply_set_read_cb(ply, "face", "vertex_indices", ::Face, this, 0);
+
+	 vertexes.resize(nVertexes);
+	 faces.reserve(nFaces);
+
+	 return ply_read(ply);
+	} else return false;
 }
 

@@ -1,40 +1,40 @@
-#ifndef __Mesh__
-#define __Mesh__
+#ifndef Mesh_hpp
+#define Mesh_hpp
 
 #include "Matrix.hpp"
 #include "Plane.hpp"
 #include <vector>
 #include <map>
 
-const int Knot = -1;
-
-struct Triangle
-{
-	Vector normal, vertexes[3];
-};
-
-struct Group
-{
-	int first, count;
-};
-
-union Surface
-{
-	int points[3], edges[3];
-};
-
-struct Point
-{
-	int vertex, texCoord, normal, color;
-};
-
-struct Edge
-{
-	int points[2];
-};
+constexpr int Knot = -1;
 
 struct Mesh
 {
+	struct Triangle
+	{
+		Vector normal, vertexes[3];
+	};
+
+	struct Group
+	{
+		int first, count;
+	};
+
+	union Surface
+	{
+		int points[3], edges[3];
+	};
+
+	struct Point
+	{
+		int vertex, texCoord, normal, color;
+	};
+
+	struct Edge
+	{
+		int points[2];
+	};
+
 	std::vector<Edge> edges;
 	std::vector<Point> points;
 	std::vector<Surface> faces;
@@ -45,7 +45,6 @@ struct Mesh
 	std::vector<Vector> colors;
 
 	void Clear();
-	void Copy(Mesh &);
 	void Swap(Mesh &);
 
 	int AddSurface(Surface);
@@ -87,10 +86,12 @@ struct Mesh
 
 struct MeshComposer : virtual Mesh
 {
+	enum Compose { Triangles, Quads, Strip, Fan };
+
 	int BeginGroup(int id);
 	int EndGroup();
 
-	int Begin(int mode);
+	int Begin(Compose);
 	int End();
 
 	int Vertex(Scalar x, Scalar y, Scalar z);
@@ -103,7 +104,8 @@ struct MeshComposer : virtual Mesh
 	
  private:
  
- 	int group, mode, counter;
+	Compose mode;
+ 	int group, counter;
 };
 
 #endif // file

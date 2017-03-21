@@ -4,8 +4,12 @@
 Matrix::Matrix()
 {
 	for (int i = 0; i < 4; ++i)
-	 for (int j = 0; j < 4; ++j)
-	  dim[i][j] = (i == j);
+	{
+		 for (int j = 0; j < 4; ++j)
+		 {
+			 dim[i][j] = (i == j);
+		 }
+	}
 }
 
 void Matrix::Concatenate(Matrix M, Matrix N)
@@ -41,10 +45,10 @@ void Matrix::Rotate(Scalar radian, Scalar x, Scalar y, Scalar z)
 {
 	Scalar xx, yy, zz,  xy, yz, zx,  sx, sy, sz,  s, c, a, m;
 
-	s = sin(radian);
-	c = cos(radian);
+	s = std::sin(radian);
+	c = std::cos(radian);
 	a = 1 - c;
-	m = sqrt(x*x + y*y + z*z);
+	m = std::sqrt(x*x + y*y + z*z);
 	
 	x /= m;
 	y /= m;
@@ -142,7 +146,7 @@ void Matrix::Tangent(Vector V [3], Vector C [3])
 
 	if (den == 0) return;
 	
-	Vector T,B,N;
+	Vector T, B, N;
 
 	// Tangent
 	T.x = (C2.t * V1.x - C1.t * V2.x) / den;
@@ -162,9 +166,9 @@ void Matrix::Tangent(Vector V [3], Vector C [3])
 	  
 	Vector X,Y,Z;
 	// Inverse
-	X.Cross(B,N);
-	Y.Cross(N,T);
-	Z.Cross(T,B);
+	X.Cross(B, N);
+	Y.Cross(N, T);
+	Z.Cross(T, B);
 	// Tangent
 	T.x = +X.x/den;
 	T.y = -Y.x/den;
@@ -183,12 +187,11 @@ void Matrix::Tangent(Vector V [3], Vector C [3])
 	N.Normalize();
 
 	// Store matrix
-
 	for (int n = 0; n < 3; ++n)
 	{
-	 dim[0][n] = T.v[n];
-	 dim[1][n] = B.v[n];
-	 dim[2][n] = N.v[n];
+		dim[0][n] = T.v[n];
+		dim[1][n] = B.v[n];
+		dim[2][n] = N.v[n];
 	}
 }
 

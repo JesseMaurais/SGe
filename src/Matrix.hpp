@@ -1,5 +1,5 @@
-#ifndef __Matrix__
-#define __Matrix__
+#ifndef Matrix_hpp
+#define Matrix_hpp
 
 #include "Number.hpp"
 #include "Vector.hpp"

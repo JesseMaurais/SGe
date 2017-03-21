@@ -6,28 +6,28 @@
 
 bool ModelObj::Load(const char *path)
 {
-	FILE *file = fopen(path, "r");
+	std::FILE *file = std::fopen(path, "r");
 	if (file)
 	{
 		char buffer[BUFSIZ];
-		while (!feof(file))
+		while (not std::feof(file))
 		{
-			char *line = fgets(buffer, BUFSIZ, file);
+			char *line = std::fgets(buffer, BUFSIZ, file);
 			if (!line) continue;
 			
-			while (isspace(*line)) ++line;
+			while (std::isspace(*line)) ++line;
 			if ('#' == *line) continue;
 			
-			if (!strncmp(line, "vn", 2))
+			if (not std::strncmp(line, "vn", 2))
 				ReadNormal(line);
 			else
-			if (!strncmp(line, "vt", 2))
+			if (not std::strncmp(line, "vt", 2))
 				ReadTexCoord(line);
 			else
-			if (!strncmp(line, "v", 1))
+			if (not std::strncmp(line, "v", 1))
 				ReadVertex(line);
 			else
-			if (!strncmp(line, "f", 1))
+			if (not std::strncmp(line, "f", 1))
 				ReadFace(line);
 			/*
 			else
@@ -41,30 +41,30 @@ bool ModelObj::Load(const char *path)
 				fprintf(stderr, "%s", line); //TODO
 			*/
 		}
-		fclose(file);
+		std::fclose(file);
 	}
-	else perror(path);
+	else std::perror(path);
 	return file;
 }
 
 int ModelObj::ReadVertex(char *line)
 {
 	Vector V;
-	sscanf(line, "v%*[ \t]%lf%*[ \t]%lf%*[ \t]%lf", &V.x, &V.z, &V.y);
+	std::sscanf(line, "v%*[ \t]%lf%*[ \t]%lf%*[ \t]%lf", &V.x, &V.z, &V.y);
 	return AddVertex(V);
 }
 
 int ModelObj::ReadTexCoord(char *line)
 {
 	Vector V;
-	sscanf(line, "vt%*[ \t]%lf%*[ \t]%lf", &V.s, &V.t);
+	std::sscanf(line, "vt%*[ \t]%lf%*[ \t]%lf", &V.s, &V.t);
 	return AddTexCoord(V);	
 }
 
 int ModelObj::ReadNormal(char *line)
 {
 	Vector V;
-	sscanf(line, "vn%*[ \t]%lf%*[ \t]%lf%*[ \t]%lf", &V.i, &V.k, &V.j);
+	std::sscanf(line, "vn%*[ \t]%lf%*[ \t]%lf%*[ \t]%lf", &V.i, &V.k, &V.j);
 	return AddNormal(V);
 }
 
@@ -73,16 +73,16 @@ int ModelObj::ReadPoint(char *it)
 	Point P;
 	char *a;
 	
-	if (strstr(it, "//"))
-	 sscanf(it, "%d//%d", &P.vertex, &P.normal);
+	if (std::strstr(it, "//"))
+		std::sscanf(it, "%d//%d", &P.vertex, &P.normal);
 	else
-	if (!(a = strchr(it, '/')))
-	 sscanf(it, "%d", &P.vertex);
+	if (not (a = std::strchr(it, '/')))
+		std::sscanf(it, "%d", &P.vertex);
 	else
-	if (strrchr(it, '/') == a)
-	 sscanf(it, "%d/%d", &P.vertex, &P.texCoord);
+	if (std::strrchr(it, '/') == a)
+		std::sscanf(it, "%d/%d", &P.vertex, &P.texCoord);
 	else
-	 sscanf(it, "%d/%d/%d", &P.vertex, &P.texCoord, &P.normal);
+		std::sscanf(it, "%d/%d/%d", &P.vertex, &P.texCoord, &P.normal);
 	
 	P.vertex += 0 > P.vertex ? vertexes.size() : Knot;
 	P.texCoord += 0 > P.texCoord ? texCoords.size() : Knot;
@@ -94,11 +94,11 @@ int ModelObj::ReadPoint(char *it)
 int ModelObj::ReadFace(char *line)
 {
 	const char *delim = " \t\n";
-	line = strtok(line, delim);
+	line = std::strtok(line, delim);
 	
 	Begin(GL_POLYGON);
 	
-	while ((line = strtok(0, delim)))
+	while ((line = std::strtok(0, delim)))
 	{
 	 signed point = ReadPoint(line);
 	 Next(point);

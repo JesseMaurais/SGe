@@ -1,8 +1,9 @@
-#ifndef __Tessel__
-#define __Tessel__
+#ifndef Tessel_hpp
+#define Tessel_hpp
 
-#include "OpenGL.hpp"
 #include "Mesh.hpp"
+
+class GLUtesselator;
 
 struct Tessel : virtual MeshComposer
 {
@@ -18,14 +19,6 @@ struct Tessel : virtual MeshComposer
  protected:
 
 	GLUtesselator *obj;
-
- private:
-
-	static void combine(double *v, void*, void*, int *index, MeshComposer *self);
-	static void begin(int mode, MeshComposer *self);
-	static void next(int index, MeshComposer *self);
-	static void end(MeshComposer *self);
-	static void error(int code);
 };
 
 #endif // file

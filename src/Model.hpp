@@ -1,5 +1,5 @@
-#ifndef __Model__
-#define __Model__
+#ifndef Model_hpp
+#define Model_hpp
 
 #include "Mesh.hpp"
 #include "Nurbs.hpp"

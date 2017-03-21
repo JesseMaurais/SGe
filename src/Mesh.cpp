@@ -1,27 +1,16 @@
 #include "Mesh.hpp"
-#include "OpenGL.hpp"
+#include "STL.hpp"
 
 void Mesh::Clear()
 {
 	edges.clear();
 	points.clear();
 	faces.clear();
+	groups.clear();
 	colors.clear();
 	normals.clear();
 	vertexes.clear();
 	texCoords.clear();
-}
-
-void Mesh::Copy(Mesh &M)
-{
-	groups = M.groups;
-	edges = M.edges;
-	points = M.points;
-	faces = M.faces;
-	colors = M.colors;
-	normals = M.normals;
-	vertexes = M.vertexes;
-	texCoords = M.texCoords;
 }
 
 void Mesh::Swap(Mesh &M)
@@ -38,51 +27,52 @@ void Mesh::Swap(Mesh &M)
 
 int Mesh::AddSurface(Surface S)
 {
-	int index = faces.size();
+	using namespace stl;
+	std::size_t index = faces.size();
 	faces.push_back(S);
-	return index;
+	return as<int>(index);
 }
 
 int Mesh::AddEdge(Edge E)
 {
-	int index = edges.size();
+	std::size_t index = edges.size();
 	edges.push_back(E);
-	return index;
+	return stl::as_int(index);
 }
 
 int Mesh::AddPoint(Point P)
 {
-	int index = points.size();
+	std::size_t index = points.size();
 	points.push_back(P);
-	return ~index;
+	return ~ stl::as_int(index);
 }
 
 int Mesh::AddVertex(Vector V)
 {
-	int index = vertexes.size();
+	std::size_t index = vertexes.size();
 	vertexes.push_back(V);
-	return index;
+	return stl::as_int(index);
 }
 
 int Mesh::AddTexCoord(Vector T)
 {
-	int index = texCoords.size();
+	std::size_t index = texCoords.size();
 	texCoords.push_back(T);
-	return index;
+	return stl::as_int(index);
 }
 
 int Mesh::AddNormal(Vector N)
 {
-	int index = normals.size();
+	std::size_t index = normals.size();
 	normals.push_back(N);
-	return index;
+	return stl::as_int(index);
 }
 
 int Mesh::AddColor(Vector C)
 {
-	int index = colors.size();
+	std::size_t index = colors.size();
 	colors.push_back(C);
-	return index;
+	return stl::as_int(index);
 }
 
 int Mesh::NewPoint(int a, int b, Scalar c)
@@ -127,11 +117,11 @@ int Mesh::NewColor(int a, int b, Scalar c)
 	return AddColor(A*c + B*(1-c));
 }
 
-Point  &Mesh::GetPoint(int index)
+Mesh::Point &Mesh::GetPoint(int index)
 {
 	if (index < 0)
 	{
-	 return points.at(~index);
+		return points.at(~index);
 	}
 	static Point point;
 	point.vertex = index;
@@ -218,7 +208,7 @@ Plane Mesh::GetPlane(int index)
 	return Plane(T.normal, T.vertexes[0]);
 }
 
-Triangle Mesh::GetTriangle(int index)
+Mesh::Triangle Mesh::GetTriangle(int index)
 {
 	Triangle T;
 	GetVertexes(index, T.vertexes);
@@ -254,7 +244,7 @@ int MeshComposer::EndGroup()
 	return G.count;
 }
 
-int MeshComposer::Begin(int type)
+int MeshComposer::Begin(Compose type)
 {
 	mode = type;
 	counter = 0;
@@ -263,7 +253,6 @@ int MeshComposer::Begin(int type)
 
 int MeshComposer::End()
 {
-	mode = Knot;
 	return faces.size();
 }
 
@@ -300,7 +289,7 @@ int MeshComposer::Next(int index)
 
 	switch (mode)
 	{
-	case GL_TRIANGLES:
+	case Triangles:
 	 
 		n = count % 3;
 		S.points[n] = index;
@@ -310,7 +299,7 @@ int MeshComposer::Next(int index)
 		}
 	 	break;
 
-	case GL_TRIANGLE_FAN:
+	case Fan:
 	 
 		if (count > 2)
 		{
@@ -329,8 +318,7 @@ int MeshComposer::Next(int index)
 		}
 	 	break;
 
-	case GL_TRIANGLE_STRIP:
-	case GL_QUAD_STRIP:
+	case Strip:
 	 
 		if (count > 2)
 		{
@@ -349,7 +337,7 @@ int MeshComposer::Next(int index)
 		}
 	 	break;
 
-	case GL_QUADS:
+	case Quads:
 	 
 		n = count % 4;
 		if (n > 2)
