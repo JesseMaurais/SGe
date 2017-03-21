@@ -74,7 +74,6 @@ extern "C"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
-#include <smpeg2/smpeg.h>
 
 
 #endif // file

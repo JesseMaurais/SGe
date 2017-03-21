@@ -1,11 +1,10 @@
+#include "Options.hpp"
+#include "Command.hpp"
+#include "Strings.hpp"
+#include "Event.hpp"
 #include "Lua.hpp"
 #include "SDL.hpp"
-#include "Event.hpp"
-#include "Error.hpp"
-#include "Strings.hpp"
-#include "Command.hpp"
 #include <cstdlib>
-#include <cstdio>
 
 static bool Quit = false;
 static bool OnQuit(const SDL_Event &event)
@@ -17,14 +16,38 @@ static bool OnQuit(const SDL_Event &event)
 int main(int argc, char **argv)
 {
 	const char *program = argv[0];
-	const char *script = argv[1];
+	const char *script = ConfigScript;
+	unsigned media = 0;
 
-	if (not script)
+	if (argc > 1)
 	{
-		script = ConfigScript;
+		CommandLine cmd;
+		do {
+			cmd = ParseCommandLine(argc, argv);
+			switch (cmd.opt)
+			{
+			case Option::Configs:
+				script = cmd.arg;
+				break;
+			case Option::Video:
+				media |= SDL_INIT_VIDEO;
+				break;
+			case Option::Video:
+				media |= SDL_INIT_AUDIO;
+				break;
+			case Option::Help:
+				return EXIT_SUCCESS;
+			}
+		}
+		while (cmd.opt);
 	}
 
-	if (SDL_Init(SDL_INIT_VIDEO))
+	if (not media)
+	{
+		media = SDL_INIT_EVERYTHING;
+	}
+
+	if (SDL_Init(media))
 	{
 		SDL_perror("SDL_Init");
 		return EXIT_FAILURE;

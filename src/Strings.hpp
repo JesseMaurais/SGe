@@ -11,7 +11,16 @@ constexpr auto Break = "Break";
 constexpr auto Abort = "Abort";
 constexpr auto Ignore = "Ignore";
 constexpr auto AlwaysIgnore = "Always Ignore";
-};
+}
+
+namespace CommandLineOption
+{
+constexpr auto Unknown = "Unknown command %s";
+constexpr auto Help = "help";
+constexpr auto Configs = "init";
+constexpr auto Video = "video";
+constexpr auto Audio = "audio";
+}
 
 constexpr auto NoError = "Error reported without information";
 constexpr auto OutOfMemory = "Out of memory";

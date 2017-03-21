@@ -3,7 +3,7 @@ RM = rm
 MKDIR = mkdir
 CFLAGS = -std=c++14 -g -MMD -MP
 LIB = -ldl -lreadline -lX11 -lSDL2 -lGL -lGLU -lGLEW -lopenal -lode -llua -lexpat -l3ds
-ALL = 3ds.o Bezier.o Command.o Document.o Error.o Event.o Lua.o Lux.o main.o Matrix.o Mesh.o Model.o Nurbs.o OpenGL.o Plane.o Quaternion.o SDL.o Tessel.o Vector.o Window.o XML.o
+ALL = 3ds.o Bezier.o Command.o Document.o Error.o Event.o Lua.o Lux.o main.o Matrix.o Mesh.o Model.o Nurbs.o OpenGL.o Options.o Plane.o Quaternion.o SDL.o Tessel.o Vector.o Window.o XML.o
 OBJDIR = obj/
 SRCDIR = src/
 PCH = $(SRCDIR)main.pch
@@ -28,6 +28,6 @@ $(OBJDIR)%.o: $(SRCDIR)%.cpp $(PCH)
 	$(CC) $(CFLAGS) -c $< -o $@
 		
 $(SRCDIR)%.pch: $(SRCDIR)%.hpp
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 -include $(DEP)
