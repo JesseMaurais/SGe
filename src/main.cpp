@@ -1,7 +1,8 @@
-#include "Options.hpp"
 #include "Command.hpp"
 #include "Strings.hpp"
 #include "Event.hpp"
+#include "Error.hpp"
+#include "Args.hpp"
 #include "Lua.hpp"
 #include "SDL.hpp"
 #include <cstdlib>
@@ -15,36 +16,27 @@ static bool OnQuit(const SDL_Event &event)
 
 int main(int argc, char **argv)
 {
-	const char *program = argv[0];
+	unsigned media = SDL_INIT_EVENTS;
 	const char *script = ConfigScript;
-	unsigned media = 0;
 
 	if (argc > 1)
 	{
-		CommandLine cmd;
+		CommandLineOption cmd;
 		do {
 			cmd = ParseCommandLine(argc, argv);
 			switch (cmd.opt)
 			{
+			case Option::Media:
+				media |= SDL_INIT_EVERYTHING;
+				break;
 			case Option::Configs:
 				script = cmd.arg;
-				break;
-			case Option::Video:
-				media |= SDL_INIT_VIDEO;
-				break;
-			case Option::Video:
-				media |= SDL_INIT_AUDIO;
 				break;
 			case Option::Help:
 				return EXIT_SUCCESS;
 			}
 		}
-		while (cmd.opt);
-	}
-
-	if (not media)
-	{
-		media = SDL_INIT_EVERYTHING;
+		while (Option::End != cmd.opt);
 	}
 
 	if (SDL_Init(media))

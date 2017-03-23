@@ -13,13 +13,13 @@ constexpr auto Ignore = "Ignore";
 constexpr auto AlwaysIgnore = "Always Ignore";
 }
 
-namespace CommandLineOption
+namespace CommandLine
 {
 constexpr auto Unknown = "Unknown command %s";
 constexpr auto Help = "help";
 constexpr auto Configs = "init";
-constexpr auto Video = "video";
-constexpr auto Audio = "audio";
+constexpr auto Media = "media";
+constexpr auto Hint = "hint";
 }
 
 constexpr auto NoError = "Error reported without information";
