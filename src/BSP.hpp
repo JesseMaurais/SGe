@@ -5,21 +5,21 @@
 #include "Tree.hpp"
 #include <vector>
 
-struct Polygon : std::vector<int>
-{
-	int face;
-};
-
-struct Brush : std::vector<Polygon>
-{
-	bool operator!()
-	{
-		return empty();
-	}
-};
-
 struct BSP : virtual Model, Tree
 {
+	struct Polygon : std::vector<int>
+	{
+		int face;
+	};
+
+	struct Brush : std::vector<Polygon>
+	{
+		bool operator!()
+		{
+			return empty();
+		}
+	};
+
 	int Sort();
 	int Sort(Brush &brush);
 	int Sort(Brush &brush, Brush &front, Brush &back);

@@ -72,7 +72,7 @@ void Document::Start(const char *name, const char **attributes)
 			// Check that name is not already being used
 			if (lua_getfield(state, root, attributes[value]))
 			{
-				SDL_Log(NameNotUnique, value);
+				SDL_Log(NameNotUnique, attributes[value]);
 			}
 			lua_pop(state, 1);
 			// Make root.value = table
@@ -88,6 +88,7 @@ void Document::Start(const char *name, const char **attributes)
 
 void Document::End(const char *name)
 {
+	(void) name;
 	// Position under stack
 	constexpr int table = -3;
 	// Make parent[index] = table
@@ -95,8 +96,3 @@ void Document::End(const char *name)
 	index.pop(); // unwind
 }
 
-
-void Document::CData(const char *string, int length)
-{
-	// TODO
-}

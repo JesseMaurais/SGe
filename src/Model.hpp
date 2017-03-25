@@ -5,7 +5,7 @@
 #include "Nurbs.hpp"
 #include "Tessel.hpp"
 
-struct Model : virtual Nurbs, Tessel
+struct Model : virtual Mesh, Nurbs, Tessel
 {
 	void Cube(Scalar size);
 };

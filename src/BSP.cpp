@@ -33,12 +33,12 @@ int BSP::Sort()
 
 int BSP::Sort(Brush &brush)
 {
-	if (!brush) return Leaf;
+	if (not brush) return Leaf;
 
 	Branch node;
 	Brush front, back;
 
-	int n = vertexes.size();
+	std::size_t n = vertexes.size();
 	node.face = Sort(brush, front, back);
 	brush.clear();
 	node.front = Sort(front);
@@ -50,11 +50,11 @@ int BSP::Sort(Brush &brush)
 
 int BSP::Sort(Brush &brush, Brush &front, Brush &back)
 {
-	int size = brush.size();
+	std::size_t size = brush.size();
 	int divider = Select(brush);
 	Plane &space = spaces[divider];
 
-	for (int it = 0; it < size; ++it)
+	for (std::size_t it = 0; it < size; ++it)
 	{
 		Polygon &polygon = brush[it];
 
@@ -85,16 +85,16 @@ int BSP::Sort(Brush &brush, Brush &front, Brush &back)
 
 int BSP::Select(Brush &brush)
 {
-	int items = brush.size();
+	std::size_t items = brush.size();
 	int bestDivider, bestScore = INT_MAX;
 
-	for (int it = 0; it < items; ++it)
+	for (std::size_t it = 0; it < items; ++it)
 	{
 		int divider = brush[it].face;
 		Plane &space = spaces[divider];
 		int spanning=0, front=0, back=0;
 
-		for (int test = 0; test < items; ++test)
+		for (std::size_t test = 0; test < items; ++test)
 		{
 			if (it == test) continue;
 
@@ -120,7 +120,7 @@ int BSP::Select(Brush &brush)
 			}
 		}
 
-		int score = abs(front - back) + spanning;
+		int score = std::abs(front - back) + spanning;
 
 		if (score < bestScore)
 		{
@@ -149,13 +149,13 @@ void BSP::Split(Polygon &polygon, Plane &space, Polygon &front, Polygon &back)
 	int a, b;
 	Vector A, B;
 	double dotA, dotB;
-	int n = polygon.size();
+	std::size_t n = polygon.size();
 
 	a = polygon[n-1];
 	A = vertexes[a];
 	dotA = space.Equate(A);
 
-	for (int it=0; it<n; ++it, a=b, A=B, dotA=dotB)
+	for (std::size_t it = 0; it < n; ++it, a=b, A=B, dotA=dotB)
 	{
 		b = polygon[it];
 		B = vertexes[b];
@@ -197,7 +197,7 @@ void BSP::Split(Polygon &polygon, Plane &space, Polygon &front, Polygon &back)
 Plane::Crossing BSP::Classify(Plane &space, Polygon &polygon)
 {
 	int *indexes = polygon.data();
-	int size = polygon.size();
+	std::size_t size = polygon.size();
 	std::vector<Vector> vertexes(size);
 	Vector *pointer = vertexes.data();
 	GetVertexes(indexes, pointer, size);

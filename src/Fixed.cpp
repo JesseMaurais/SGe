@@ -4,8 +4,8 @@
 #include <cmath>
 
 
-constexpr size_t CircuitBits = 9;
-constexpr size_t Circuit = 1 << CircuitBits;
+constexpr std::size_t CircuitBits = 9;
+constexpr std::size_t Circuit = 1 << CircuitBits;
 
 typedef int_fast32_t signed_int;
 typedef uint_fast32_t unsigned_int;
@@ -20,7 +20,7 @@ struct Lookup
 	{
 		static Lookup singleton;
 		unsigned_int index = theta >> Angle::Point;
-		std::assert(index < Circuit);
+		assert(index < Circuit);
 		return singleton.table[index].n;
 	}
 
@@ -32,7 +32,7 @@ struct Lookup
 	{
 		constexpr auto Convert = Circuit / M_PI;
 
-		for (int index = 0; index < Circuit; ++index)
+		for (std::size_t index = 0; index < Circuit; ++index)
 		{
 			table[index] = std::sin(Convert * index);
 		}

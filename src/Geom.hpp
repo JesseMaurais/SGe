@@ -1,5 +1,5 @@
-#ifndef __Geom__
-#define __Geom__
+#ifndef Geom_hpp
+#define Geom_hpp
 
 #include "Model.hpp"
 #include "Ode.hpp"
@@ -7,7 +7,7 @@
 
 struct Geometry : virtual Model, Geom, Render
 {
-	~Geometry();
+	virtual ~Geometry();
 
 	void Update();
 

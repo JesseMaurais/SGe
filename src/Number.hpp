@@ -1,5 +1,5 @@
-#ifndef __Number__
-#define __Number__
+#ifndef Number_hpp
+#define Number_hpp
 
 using Scalar = double;
 const Scalar Phi = 1.61803398874989484820;

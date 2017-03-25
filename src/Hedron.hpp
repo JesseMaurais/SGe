@@ -1,5 +1,5 @@
-#ifndef __Hedron__
-#define __Hedron__
+#ifndef Hedron_hpp
+#define Hedron_hpp
 
 #include "Number.hpp"
 

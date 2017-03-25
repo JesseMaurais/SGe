@@ -26,20 +26,9 @@ XML::XML(const char *encoding)
 		obj->End(name);
 	};
 
-	auto cdata = [](void *user, const char *string, int length)
-	{
-		union {
-		 void *addr;
-		 XML *obj;
-		};
-		addr = user;
-		obj->CData(string, length);
-	};
-
 	parser = XML_ParserCreate(encoding);
 	if (not parser) throw std::runtime_error(CannotCreateParser);
 	XML_SetElementHandler(parser, start, end);
-	XML_SetCharacterDataHandler(parser, cdata);
 	XML_SetUserData(parser, this);
 }
 

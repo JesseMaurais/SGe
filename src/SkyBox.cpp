@@ -1,7 +1,8 @@
-#include <cstdio>
 #include "SkyBox.hpp"
 #include "Texture.hpp"
+#include "OpenGL.hpp"
 #include "SDL.hpp"
+#include <cstdio>
 
 static void LoadBoxFace(GLuint texture, char *path)
 {

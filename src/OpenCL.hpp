@@ -1,5 +1,5 @@
-#ifndef __OpenCL__
-#define __OpenCL__
+#ifndef OpenCL_hpp
+#define OpenCL_hpp
 
 #include <CL/cl.h>
 

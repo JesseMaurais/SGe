@@ -1,15 +1,13 @@
-#ifndef __SkyBox__
-#define __SkyBox__
-
-#include "OpenGL.hpp"
+#ifndef SkyBox_hpp
+#define SkyBox_hpp
 
 struct SkyBox
 {
 	union {
 	 struct {
-	  GLuint left, right, bottom, top, back, front;
+	  unsigned left, right, bottom, top, back, front;
 	 };
-	 GLuint maps[6];
+	 unsigned maps[6];
 	};
 
 	void Load(const char *dir, const char *ext="jpg");

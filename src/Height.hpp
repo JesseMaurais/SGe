@@ -1,5 +1,5 @@
-#ifndef __Height__
-#define __Height__
+#ifndef Height_hpp
+#define Height_hpp
 
 #include "Model.hpp"
 

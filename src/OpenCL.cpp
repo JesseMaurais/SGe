@@ -237,6 +237,8 @@ private:
 
 	static void NotifyCallback(const char *error, const void *info, size_t cb, void *user)
 	{
+		(void) info;
+		(void) cb;
 		reinterpret_cast<Context*>(user)->Notify(error);
 	}
 };

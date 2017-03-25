@@ -1,20 +1,20 @@
-#ifndef __Tree__
-#define __Tree__
+#ifndef Tree_hpp
+#define Tree_hpp
 
 #include "Plane.hpp"
 #include "Mesh.hpp"
 #include <vector>
 #include <queue>
 
-const int Leaf = Knot;
-
-struct Branch
-{
-	int face, front, back;
-};
-
 struct Tree : virtual Mesh
 {
+	static constexpr int Leaf = Knot;
+
+	struct Branch
+	{
+		int face, front, back;
+	};
+
 	std::vector<Branch> nodes;
 	std::vector<Plane> spaces;
 

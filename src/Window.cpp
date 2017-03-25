@@ -1,5 +1,4 @@
 #include "Window.hpp"
-#include "Error.hpp"
 #include "SDL.hpp"
 #include <SDL2/SDL_syswm.h>
 #include <set>

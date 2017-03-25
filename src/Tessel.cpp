@@ -10,6 +10,8 @@ static void Error(int code)
 
 static void Combine(double *v, void *data[4], float *weight, int *index, MeshComposer *self)
 {
+	(void) data;
+	(void) weight;
 	*index = self->Vertex(v[0], v[1], v[2]);
 }
 

@@ -2,7 +2,6 @@
 #include "Lua.hpp"
 #include "SDL.hpp"
 #include "XML.hpp"
-#include "Error.hpp"
 #include "Window.hpp"
 #include "Strings.hpp"
 #include "Document.hpp"

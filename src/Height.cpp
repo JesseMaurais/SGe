@@ -1,4 +1,6 @@
 #include "Height.hpp"
+#include "Surface.hpp"
+#include "OpenGL.hpp"
 #include "SDL.hpp"
 
 bool HeightMap::Load(const char *path)

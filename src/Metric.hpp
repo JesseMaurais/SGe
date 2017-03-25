@@ -1,5 +1,5 @@
-#ifndef __Metric__
-#define __Metric__
+#ifndef Metric_hpp
+#define Metric_hpp
 
 #include "Number.hpp"
 

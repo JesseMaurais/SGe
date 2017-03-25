@@ -1,5 +1,5 @@
-#ifndef __Ode__
-#define __Ode__
+#ifndef Ode_hpp
+#define Ode_hpp
 
 #define dDOUBLE
 #include <ode/ode.h>

@@ -1,4 +1,5 @@
 #include "VBO.hpp"
+#include "OpenGL.hpp"
 #include <cstdio>
 
 template <class C>

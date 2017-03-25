@@ -1,18 +1,22 @@
 #ifndef Args_hpp
 #define Args_hpp
 
-enum class Option : char
+namespace Option
 {
-	Unknown  = '?',
-	Help     = 'h',
-	Configs  = 'f',
-	Media    = 'm',
-	End      = '\0'
-};
+	enum
+	{
+		Unknown  = '?',
+		Help     = 'h',
+		Quit     = 'q',
+		Configs  = 'f',
+		Media    = 'm',
+		End      = '\0'
+	};
+}
 
 struct CommandLineOption
 {
-	enum Option opt;
+	int opt;
 	const char *arg;
 };
 

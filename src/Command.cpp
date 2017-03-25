@@ -19,6 +19,7 @@ static SDL_cond *Cond;
 
 static int CommandThread(void *unused)
 {
+	(void) unused;
 	SDL_Event event;
 	Sint32 sequence = 0;
 	event.type = UserEvent(ExecuteCommand);

@@ -1,5 +1,5 @@
-#ifndef __Stroke__
-#define __Stroke__
+#ifndef Stroke_hpp
+#define Stroke_hpp
 
 #include "Number.hpp"
 #include "Bezier.hpp"

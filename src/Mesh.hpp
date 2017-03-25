@@ -6,10 +6,10 @@
 #include <vector>
 #include <map>
 
-constexpr int Knot = -1;
-
 struct Mesh
 {
+	static constexpr int Knot = -1;
+
 	struct Triangle
 	{
 		Vector normal, vertexes[3];

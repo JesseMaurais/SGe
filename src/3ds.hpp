@@ -15,7 +15,7 @@ struct Model3ds : virtual Model
 
 	void AddChildNodes(Lib3dsFile *file, Lib3dsNode *node);
 	void AddNode(Lib3dsFile *file, Lib3dsNode *node);
-	void AddMesh(Lib3dsFile *file, Lib3dsMesh *mesh);
+	void AddMesh(Lib3dsMesh *mesh);
 };
 
 #endif // file

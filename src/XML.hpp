@@ -16,7 +16,6 @@ struct XML
 
 	virtual void Start(const char *name, const char **attributes) = 0;
 	virtual void End(const char *name) = 0;
-	virtual void CData(const char *string, int length) = 0;
 
   private:
 

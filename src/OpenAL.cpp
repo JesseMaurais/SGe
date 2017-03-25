@@ -1,99 +1,154 @@
-#include "SDL.hpp"
-#include "Lua.hpp"
 #include "OpenAL.hpp"
-#include <vector>
+#include "Strings.hpp"
+#include "SDL.hpp"
 
-static ALCdevice *Device;
-static ALCcontext *Context;
 
-signed OpenAL_Init()
+ALCdevice *OpenAL_GetDevice(const char *name)
 {
-	std::vector<ALCint> attributes;
-	const char *string = nullptr;
-
-	lua_getglobal(state, "Audio");
-	int table = lua_gettop(State);
-	if (!lua_isnil(state, table))
+	static struct AudioDevice
 	{
-	 lua_pushnil(State);
-	 while (lua_next(State, table))
-	 {
-		const char *key = lua_tostring(State, -2);
-		#define tointeger lua_tointeger(State, -1)
-		#define toboolean lua_toboolean(State, -1)
-		#define tostring  lua_tostring(State, -1)
-
-		if (!SDL_strcasecmp(key, "SYNC"))
+		ALCdevice *device = nullptr;
+		AudioDevice() = default;
+		AudioDevice(const char *name)
 		{
-		 attributes.push_back(ALC_SYNC);
-		 attributes.push_back(toboolean);
+			// Open the named device
+			device = alcOpenDevice(name);
+			if (not device)
+			{
+				// Set the error string and return null
+				OpenAL_SetError(nullptr, "alcOpenDevice");
+			}
 		}
-		else
-		if (!SDL_strcasecmp(key, "REFRESH"))
+		~AudioDevice()
 		{
-		 attributes.push_back(ALC_REFRESH);
-		 attributes.push_back(tointeger);
-		}
-		else
-		if (!SDL_strcasecmp(key, "FREQUENCY"))
-		{
-		 attributes.push_back(ALC_FREQUENCY);
-		 attributes.push_back(tointeger);
-		}
-		else
-		if (!SDL_strcasecmp(key, "MONO_SOURCES"))
-		{
-		 attributes.push_back(ALC_MONO_SOURCES);
-		 attributes.push_back(tointeger);
-		}
-		else
-		if (!SDL_strcasecmp(key, "STEREO_SOURCES"))
-		{
-		 attributes.push_back(ALC_STEREO_SOURCES);
-		 attributes.push_back(tointeger);
-		}
-		else
-		if (!SDL_strcasecmp(key, "DEVICE"))
-		{
-		 string = tostring;
-		}
-		else
-		{
-		 SDL_Log("Audio: %s does not match", key);
+			// Close device if it was opened
+			if (device and not alcCloseDevice(device))
+			{
+				OpenAL_LogError(nullptr, "alcCloseDevice");
+			}
 		}
 
-		lua_pop(State, 1);
-	 }
-	}
-	lua_pop(State, 1);
-
-	Device = alcOpenDevice(string);
-	if (!Device)
+	} singleton;
+	// Either new or not initialized
+	if (name or not singleton.device)
 	{
-	 ALCenum error = alcGetError(nullptr);
-	 string = alcGetString(nullptr, error);
-	 return SDL_SetError("alcOpenDevice: %s", string);
+		// Update to the named device
+		singleton = AudioDevice(name);
 	}
+	return singleton.device;
+}
 
-	attributes.push_back(0);
 
-	Context = alcCreateContext(Device, attributes.data());
-	if (!Context)
+ALCcontext *OpenAL_GetContext(const int *attributes)
+{
+	static struct AudioContext
 	{
-	 ALCenum error = alcGetError(Device);
-	 string = alcGetString(Device, error);
-	 alcCloseDevice(Device);
-	 return SDL_SetError("alcCreateContext: %s", string);
-	}
+		ALCcontext *context = nullptr;
+		AudioContext() = default;
+		AudioContext(const int *attributes)
+		{
+			// Get the singleton device first
+			ALCdevice *device = OpenAL_GetDevice();
+			if (device)
+			{
+				// Create a context with the given attributes
+				context = alcCreateContext(device, attributes);
+				if (not context)
+				{
+					// Set the error string and return null
+					OpenAL_SetError(device, "alcCreateContext");
+				}
+				else
+				{
+					// Attach when creation succeeds
+					if (not alcMakeContextCurrent(context))
+					{
+						OpenAL_LogError(device, "alcMakeContextCurrent");
+					}
+					alcProcessContext(context);
+				}
+			}
+		}
+		~AudioContext()
+		{
+			// Destroy if it was created
+			if (context)
+			{
+				alcSuspendContext(context);
+				// Detach before we destroy it
+				if (alcGetCurrentContext() == context)
+				{
+					if (not alcMakeContextCurrent(nullptr))
+					{
+						ALCdevice *device = alcGetContextsDevice(context);
+						OpenAL_LogError(device, "alcMakeContextCurrent");
+					}
+				}
+				alcDestroyContext(context);
+			}
+		}
 
-	alcMakeContextCurrent(Context);
-	alcProcessContext(Context);
+	} singleton;
+	// Either new or not initialized
+	if (attributes or not singleton.context)
+	{
+		// Update with given attributes
+		singleton = AudioContext(attributes);
+	}
+	return singleton.context;
+}
+
+
+// OpenAL error utility functions
+
+signed OpenAL_SetError(const char *origin, ALenum error)
+{
+	return SDL_SetError("%s: %s", origin, alGetString(error));
+}
+
+signed OpenAL_SetError(const char *origin)
+{
+	ALenum error = alGetError();
+	if (error)
+	{
+		return OpenAL_SetError(origin, error);
+	}
 	return 0;
 }
 
-void OpenAL_Quit()
+signed OpenAL_LogError(const char *origin)
 {
-	alcDestroyContext(Context);
-	alcCloseDevice(Device);
+	ALenum error = alGetError();
+	if (error)
+	{
+		return SDL_perror(origin, alGetString(error));
+	}
+	return 0;
 }
 
+// ALC error utility functions
+
+signed OpenAL_SetError(ALCdevice *device, const char *origin, ALenum error)
+{
+	return SDL_SetError("%s: %s", origin, alcGetString(device, error));
+}
+
+signed OpenAL_SetError(ALCdevice *device, const char *origin)
+{
+	ALCenum error = alcGetError(device);
+	if (error)
+	{
+		return OpenAL_SetError(device, origin, error);
+	}
+	return 0;
+}
+
+signed OpenAL_LogError(ALCdevice *device, const char *origin)
+{
+	ALCenum error = alcGetError(device);
+	if (error)
+	{
+		return SDL_perror(origin, alcGetString(device, error));
+	}
+	return 0;
+}

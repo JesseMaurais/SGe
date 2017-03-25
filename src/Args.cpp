@@ -9,7 +9,8 @@ CommandLineOption ParseCommandLine(int argc, char **argv)
 	{ CommandLine::Help    , no_argument       , nullptr , Option::Help    },
 	{ CommandLine::Configs , required_argument , nullptr , Option::Configs },
 	{ CommandLine::Media   , optional_argument , nullptr , Option::Media   },
-	{ 0, 0, 0, 0 }
+	{ CommandLine::Quit    , no_argument       , nullptr , Option::Quit    },
+	{ nullptr              , 0                 , nullptr , Option::End     }
 	};
 
 	CommandLineOption cmd;
@@ -25,7 +26,7 @@ CommandLineOption ParseCommandLine(int argc, char **argv)
 		cmd.arg = argv[index];
 		break;
 	default:
-		cmd.opt = static_cast<Option>(opt);
+		cmd.opt = opt;
 		cmd.arg = optarg;
 	}
 	return cmd;

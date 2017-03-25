@@ -2,27 +2,13 @@
 #define SDL_hpp
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-extern SDL_Event *Event;
-extern SDL_MessageBoxColorScheme MessageBoxColorScheme;
+signed SDL_perror(const char *origin, const char *error);
+signed SDL_perror(const char *origin);
 
-signed SDL_perror(const char *prefix);
-
-template <unsigned Media> struct ScopedSubSystem
-{
-	ScopedSubSystem()
-	{
-		if (SDL_InitSubSystem(Media))
-		{
-			SDL_perror("SDL_InitSubSystem");
-		}
-	}
-
-	~ScopedSubSystem()
-	{
-		SDL_QuitSubSystem(Media);
-	}
-};
+void SetAssertHandler(SDL_Window *window);
+void ResetAssertHandler();
 
 #endif // file
 

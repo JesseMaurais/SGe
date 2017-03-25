@@ -17,7 +17,6 @@ struct Document : XML
 
 	virtual void Start(const char *name, const char **attributes) override;
 	virtual void End(const char *name) override;
-	virtual void CData(const char *string, int length) override;
 
   private:
 

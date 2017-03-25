@@ -36,7 +36,7 @@ void Model3ds::AddNode(Lib3dsFile *file, Lib3dsNode *node)
 	 case LIB3DS_OBJECT_NODE:
 	 {
 	  Lib3dsMesh *mesh = lib3ds_file_mesh_by_name(file, node->name);
-	  AddMesh(file, mesh);
+	  AddMesh(mesh);
 	 }
 	 break;
 	 case LIB3DS_UNKNOWN_NODE:
@@ -53,11 +53,11 @@ void Model3ds::AddNode(Lib3dsFile *file, Lib3dsNode *node)
 	AddChildNodes(file, node);
 }
 
-void Model3ds::AddMesh(Lib3dsFile *file, Lib3dsMesh *mesh)
+void Model3ds::AddMesh(Lib3dsMesh *mesh)
 {
 	std::vector<int> indexes;
 
-	for (int i = 0; i < mesh->points; ++i)
+	for (unsigned i = 0; i < mesh->points; ++i)
 	{
 		Lib3dsPoint *point = mesh->pointL + i;
 	
@@ -71,7 +71,7 @@ void Model3ds::AddMesh(Lib3dsFile *file, Lib3dsMesh *mesh)
 		indexes.push_back(index);
 	}
 	
-	for (int i = 0; i < mesh->faces; ++i)
+	for (unsigned i = 0; i < mesh->faces; ++i)
 	{
 		Lib3dsFace *face = mesh->faceL + i;
 

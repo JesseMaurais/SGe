@@ -10,9 +10,9 @@ namespace stl
 	{
 		using limits = std::numeric_limits<Dst>;
 		using source = std::numeric_limits<Src>;
-		static_assert(limits::is_exact == source::is_exact, "Exactness mismatch");
-		assert(limits::min() < value);
-		assert(value < limits::max());
+		static_assert(limits::is_exact == source::is_exact, "Exact mismatch");
+		//assert(limits::min() < value);
+		//assert(value < limits::max());
 		return static_cast<Dst>(value);
 	}
 
