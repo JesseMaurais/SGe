@@ -140,68 +140,65 @@ signed OpenCL_SetError(const char *string, cl_int error)
 }
 
 
-class Exception : public std::exception
+cl_platform_id *OpenCL_GetPlatformIDs()
 {
-public:
-
-	Exception(cl_int error)
+	static struct PlatformIDs : std::vector<cl_platform_id>
 	{
-		this->error = error;
-	}
-
-	virtual const char *what() const throw() override
-	{
-		return GetErrorString(error);
-	}
-
-private:
-
-	cl_int error = CL_SUCCESS;
-};
-
-
-class PlatformIDs : public std::vector<cl_platform_id>
-{
-public:
-
-	static PlatformIDs &Instance()
-	{
-		static PlatformIDs platformIDs;
-		return platformIDs;
-	}
-
-private:
-
-	PlatformIDs()
-	{
-		cl_uint num_platforms = 0;
-		do {
-			cl_platform_id *platforms = empty() ? nullptr : data();
-			cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
-			if (error) throw Exception(error);
-			reserve(num_platforms);
+		PlatformIDs()
+		{
+			cl_uint num_platforms = 0;
+			do {
+				cl_platform_id *platforms = empty() ? nullptr : data();
+				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
+				if (error)
+				{
+					OpenGL_SetError("clGetPlatformIDs", error);
+					break;
+				}
+				reserve(num_platforms);
+			}
+			while (size() < num_platforms);
+			push_back(nullptr);
 		}
-		while (size() < num_platforms);
-	}
-};
+
+	} singleton;
+	return singleton.front() ? singleton.data() : nullptr;
+}
 
 
-class DeviceIDs : public std::vector<cl_device_id>
+cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type, cl_platform_id platform)
 {
-public:
-
-	DeviceIDs(cl_device_type type, cl_platform_id platform = nullptr)
+	static struct DeviceIDs : std::vector<cl_device_id>
 	{
-		cl_uint num_devices = 0;
-		do {
-			cl_device_id *devices = empty() ? nullptr : data();
-			cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
-			if (error) throw Exception(error);
-			reserve(num_devices);
+		DeviceIDs() = default;
+		DeviceIDs(cl_device_type type, cl_platform_id platform)
+		{
+			cl_uint num_devices = 0;
+			do {
+				cl_device_id *devices = empty() ? nullptr : data();
+				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
+				if (error)
+				{
+					OpenCL_SetError("clGetDeviceIDs", error);
+					break;
+				}
+				reserve(num_devices);
+			}
+			while (size() < num_devices);
+			push_back(nullptr);
 		}
-		while (size() < num_devices);
+
+	} singleton;
+	if (not platform)
+	{
+		auto list = OpenCL_GetPlatformIDs();
 	}
-};
+	else
+	{
+		singleton = DeviceIDs(type, platform);
+	}
+	return singleton.front() ? singleton.data() : nullptr;
+}
 
 
 class Context : DeviceIDs
@@ -214,7 +211,6 @@ public:
 		cl_int error;
 		cl_context_properties properties[] = { CL_CONTEXT_PLATFORM, cl_context_properties(platform), 0 };
 		context = clCreateContext(platform ? properties : nullptr, size(), data(), NotifyCallback, this, &error);
-		if (error) throw Exception(error);
 	}
 
 	virtual ~Context() = default;

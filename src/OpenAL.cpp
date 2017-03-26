@@ -11,12 +11,21 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 		AudioDevice() = default;
 		AudioDevice(const char *name)
 		{
-			// Open the named device
-			device = alcOpenDevice(name);
-			if (not device)
+			if (name)
 			{
-				// Set the error string and return null
-				OpenAL_SetError(nullptr, "alcOpenDevice");
+				// No named device
+				if ('\0' == *name)
+				{
+					// Use default
+					name = nullptr;
+				}
+				// Open the named device
+				device = alcOpenDevice(name);
+				if (not device)
+				{
+					// Set the error string and return null
+					OpenAL_SetError(nullptr, "alcOpenDevice");
+				}
 			}
 		}
 		~AudioDevice()
@@ -47,25 +56,34 @@ ALCcontext *OpenAL_GetContext(const int *attributes)
 		AudioContext() = default;
 		AudioContext(const int *attributes)
 		{
-			// Get the singleton device first
-			ALCdevice *device = OpenAL_GetDevice();
-			if (device)
+			if (attributes)
 			{
-				// Create a context with the given attributes
-				context = alcCreateContext(device, attributes);
-				if (not context)
+				// No given attributes
+				if (0 == *attributes)
 				{
-					// Set the error string and return null
-					OpenAL_SetError(device, "alcCreateContext");
+					// Use defaults
+					attributes = nullptr;
 				}
-				else
+				// Get the singleton device first
+				ALCdevice *device = OpenAL_GetDevice();
+				if (device)
 				{
-					// Attach when creation succeeds
-					if (not alcMakeContextCurrent(context))
+					// Create a context with the given attributes
+					context = alcCreateContext(device, attributes);
+					if (not context)
 					{
-						OpenAL_LogError(device, "alcMakeContextCurrent");
+						// Set the error string and return null
+						OpenAL_SetError(device, "alcCreateContext");
 					}
-					alcProcessContext(context);
+					else
+					{
+						// Attach when creation succeeds
+						if (not alcMakeContextCurrent(context))
+						{
+							OpenAL_LogError(device, "alcMakeContextCurrent");
+						}
+						alcProcessContext(context);
+					}
 				}
 			}
 		}
@@ -97,7 +115,6 @@ ALCcontext *OpenAL_GetContext(const int *attributes)
 	}
 	return singleton.context;
 }
-
 
 // OpenAL error utility functions
 

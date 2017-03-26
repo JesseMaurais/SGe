@@ -1,3 +1,8 @@
+/** \file
+ * Utilities for working with OpenGL: error string report and graphics context
+ * singleton for resource management.
+ */
+
 #ifndef OpenGL_hpp
 #define OpenGL_hpp
 
@@ -15,9 +20,10 @@ signed OpenGL_SetError(const char *origin);
 signed OpenGL_LogError(const char *origin);
 
 /**
- * Update the graphics device singleton for compatibility with the given window.
- * @param window Window for which the context will be made compatible.
- * @return Context handle now current, or null and the error string is set.
+ * \brief Update the graphics device singleton for compatibility with the given window.
+ * \param window Window for which the singleton context will be made compatible.
+ * Provide null to delete the context. It will be deleted automatically at exit.
+ * \return Context handle now current, or null and the error string is set.
  */
 void *OpenGL_GetContext(SDL_Window *window);
 
