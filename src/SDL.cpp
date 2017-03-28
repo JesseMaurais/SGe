@@ -103,7 +103,7 @@ void ResetAssertHandler()
 signed SDL_perror(const char *origin, const char *error)
 {
 	SDL_Log("%s: %s", origin, error);
-	return 0;
+	return -1;
 }
 
 signed SDL_perror(const char *origin)
@@ -111,7 +111,7 @@ signed SDL_perror(const char *origin)
 	const char *error = SDL_GetError();
 	if (error)
 	{
-		SDL_Log("%s: %s", origin, error);
+		return SDL_perror(origin, error);
 	}
 	return 0;
 }

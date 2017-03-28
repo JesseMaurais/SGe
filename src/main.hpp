@@ -5,6 +5,7 @@
 
 // C Standard
 
+#include <ciso646>
 #include <cstring>
 #include <cinttypes>
 #include <climits>

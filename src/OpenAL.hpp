@@ -1,6 +1,7 @@
 /** \file
- * Utilities for working with OpenAL: error string report with audio device and
- * context singletons for resource management.
+ * Utilities for working with OpenAL:
+ * 		Reporting of errors through SDL
+ * 		Audio device and context singletons for automatic resource management
  */
 
 #ifndef OpenAL_hpp

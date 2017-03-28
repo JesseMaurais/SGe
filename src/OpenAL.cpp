@@ -30,6 +30,8 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 		}
 		~AudioDevice()
 		{
+			// Destroy the singleton context too
+			SDL_verify(not OpenAL_GetContext(nullptr));
 			// Close device if it was opened
 			if (device and not alcCloseDevice(device))
 			{
