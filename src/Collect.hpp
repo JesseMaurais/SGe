@@ -1,26 +1,45 @@
 #ifndef Collect_hpp
 #define Collect_hpp
 
+class Collected
+{
+	Collected() = delete;
+};
+
+class CollectionInterface : Collected
+{
+public:
+	CollectionInterface()
+	~CollectionInterface()
+	virtual bool Has(Collected *object) = 0;
+};
+
 #include <set>
 #include <cassert>
 
-template <typename Type> class Collect final
+template <typename Type> class Collection : CollectionInterface
 {
 private:
 
 	std::set<Type*> set;
-	Collect() = default;
+	Collection() = default;
+	
+	bool Has(Collected *object) override
+	{
+		auto upcast = dynamic_cast<Type*>(object);
+		return upcast and Has(upcast);
+	}
 
 public:
 
-	~Collect()
+	~Collection()
 	{
 		assert(Empty());
 	}
 
-	static Collect &Instance()
+	static Collection &Instance()
 	{
-		static Collect singleton;
+		static Collection singleton;
 		return singleton;
 	}
 
@@ -55,6 +74,22 @@ public:
 			(it->method)(args...);
 		}
 	}
+	
+	template <typename ...args>
+	unsigned Count(bool(Type::*method)(Args...), Args... args)
+	{
+		unsigned count = 0;
+		for (auto it : set)
+		{
+			if ((it->method)(args...))
+			{
+				++count;
+			}
+		}
+		return count;
+	}
 };
+
+using CollectionManager = Collection<CollectionInterface>;
 
 #endif // file
