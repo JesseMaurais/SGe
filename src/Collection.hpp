@@ -1,5 +1,5 @@
-#ifndef Collect_hpp
-#define Collect_hpp
+#ifndef Collection_hpp
+#define Collection_hpp
 
 class CollectionInterface;
 
