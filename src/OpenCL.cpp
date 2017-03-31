@@ -147,95 +147,159 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 		PlatformIDs()
 		{
 			cl_uint num_platforms = 0;
-			do {
+			do
+			{
+				resize(num_platforms);
 				cl_platform_id *platforms = empty() ? nullptr : data();
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
 				if (error)
 				{
 					OpenGL_SetError("clGetPlatformIDs", error);
-					break;
+					clear();
+					return;
 				}
-				reserve(num_platforms);
 			}
 			while (size() < num_platforms);
 			push_back(nullptr);
 		}
 
 	} singleton;
-	return singleton.front() ? singleton.data() : nullptr;
+
+	return singleton.empty() ? nullptr : singleton.data();
 }
 
 
-cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type, cl_platform_id platform)
+cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 {
 	static struct DeviceIDs : std::vector<cl_device_id>
 	{
 		DeviceIDs() = default;
-		DeviceIDs(cl_device_type type, cl_platform_id platform)
+		DeviceIDs(cl_platform_id platform, cl_device_type type)
 		{
 			cl_uint num_devices = 0;
-			do {
+			do
+			{
+				reserve(num_devices);
 				cl_device_id *devices = empty() ? nullptr : data();
 				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
 				if (error)
 				{
 					OpenCL_SetError("clGetDeviceIDs", error);
-					break;
+					clear();
+					return;
 				}
-				reserve(num_devices);
 			}
 			while (size() < num_devices);
 			push_back(nullptr);
 		}
 
 	} singleton;
-	if (not platform)
+
+	if (CL_DEVICE_TYPE_DEFAULT == type)
 	{
-		auto list = OpenCL_GetPlatformIDs();
+		cl_platform_id *platforms = OpenCL_GetPlatformIDs();
+		if (platforms)
+		{
+			for (unsigned it = 0; singleton.size() < 2 and platforms[it]; ++it)
+			{
+				singleton = DeviceIDs(platforms, type);
+			}
+		}
 	}
-	else
-	{
-		singleton = DeviceIDs(type, platform);
-	}
-	return singleton.front() ? singleton.data() : nullptr;
+
+	return singleton.empty() ? nullptr : singleton.data();
 }
 
 
-class Context : DeviceIDs
+cl_context OpenCL_GetContext(cl_context_properties *properties)
 {
-public:
-
-	Context(cl_device_type type, cl_platform_id platform = nullptr)
-		: DeviceIDs(type, platform)
+	struct ComputeContext
 	{
-		cl_int error;
-		cl_context_properties properties[] = { CL_CONTEXT_PLATFORM, cl_context_properties(platform), 0 };
-		context = clCreateContext(platform ? properties : nullptr, size(), data(), NotifyCallback, this, &error);
-	}
+		cl_context context = nullptr;
+		ComputeContext() = default;
+		ComputeContext(cl_context_properties *properties)
+		{
+			cl_device_id *devices = OpenCL_GetDeviceIDs();
+			if (devices)
+			{
+				cl_uint num_devices = 0;
+				while (devices[num_devices]) ++num_devices;
+				cl_int error;
+				context = clCreateContext(properties, num_devices, devices, OnNotify, this, &error);
+				if (error)
+				{
+					OpenCL_SetError("clCreateContext", error);
+				}
+			}
+		}
+		~ComputeContext()
+		{
+			if (context)
+			{
+				cl_int error = clReleaseContext(context);
+				if (error)
+				{
+					OpenCL_SetError("clReleaseContext", error);
+				}
+			}
+		}
+	private:
+		static void OnNotify(const char *error, const void *info, size_t size, void *that)
+		{
+			(void) info;
+			(void) size;
+			(void) that;
+			SDL_Log("OpenCL context notify error: ", error);
+		}
 
-	virtual ~Context() = default;
-
-	cl_context operator()()
+	} singleton;
+	if (properties or not singleton.context)
 	{
-		return context;
+		singleton = ComputeContext(properties);
 	}
+	return singleton.context;
+}
 
-protected:
-
-	virtual void Notify(const char *error)
+cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
+{
+	static struct CommandQueue
 	{
-		std::fprintf(stderr, "%s", error);
-	}
+		cl_command_queue queue = nullptr;
+		CommandQueue() = default;
+		CommandQueue(cl_command_queue_properties properties)
+		{
+			cl_device_id *devices = OpenCL_GetDeviceIDs();
+			if (devices)
+			{
+				cl_context context = OpenCL_GetContext();
+				if (context)
+				{
+					for (unsigned it = 0; not queue and devices[it]; ++it)
+					{
+						cl_int error;
+						queue = clCreateCommandQueue(context, devices[it], properties, &error);
+						if (error)
+						{
+							OpenCL_SetError("clCreateCommandQueue", error);
+						}
+					}
+				}
+			}
+		}
+		~CommandQueue()
+		{
+			cl_int error = clReleaseCommandQueue(queue);
+			if (error)
+			{
+				OpenCL_SetError("clReleaseCommandQueue", error);
+			}
+		}
 
-	cl_context context;
-
-private:
-
-	static void NotifyCallback(const char *error, const void *info, size_t cb, void *user)
+	} singleton;
+	if (properties or not singleton.queue)
 	{
-		(void) info;
-		(void) cb;
-		reinterpret_cast<Context*>(user)->Notify(error);
+		singleton = CommandQueue(properties);
 	}
-};
+	return singleton.queue;
+}
 
