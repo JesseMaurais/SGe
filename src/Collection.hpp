@@ -1,9 +1,18 @@
 #ifndef Collect_hpp
 #define Collect_hpp
 
+class CollectionInterface;
+
 class Collected
 {
-	Collected() = delete;
+private:
+	
+	CollectionInterface &collection;
+	
+public:
+	
+	Collected(CollectionInterface &collection);
+	virtual ~Collected();
 };
 
 class CollectionInterface : Collected
