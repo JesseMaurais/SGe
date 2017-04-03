@@ -45,8 +45,8 @@ struct Mesh
 	std::vector<Vector> colors;
 
 	void Clear();
-	void Swap(Mesh &mesh);
-	void Merge(Mesh const &mesh);
+	void Swap(Mesh &M);
+	void Append(Mesh const &M);
 
 	int AddSurface(Surface const &S);
 	int AddEdge(Edge const &E);
