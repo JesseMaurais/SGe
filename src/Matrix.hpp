@@ -14,15 +14,15 @@ struct Matrix
 	};
 
 	Matrix();
-	void Concatenate(Matrix M, Matrix N);
-	void Translate(Scalar x, Scalar y, Scalar z);
-	void Scale(Scalar x, Scalar y, Scalar z);
+	void Concatenate(Matrix const &M, Matrix const &N);
+	void Translate(Scalar const x, Scalar const y, Scalar const z);
+	void Scale(Scalar x, Scalar const y, Scalar const z);
 	void Rotate(Scalar radian, Scalar x, Scalar y, Scalar z);
-	Vector Direction();
-	Vector Position();
+	Vector Direction() const;
+	Vector Position() const;
 	void Transpose();
-	Vector Transform(Vector V);
-	void Tangent(Vector V [3], Vector C [3]);
+	Vector Transform(Vector const &V);
+	void Tangent(Vector const V [3], Vector const C [3]);
 };
 
 #endif // file

@@ -1,14 +1,14 @@
 #ifndef Mesh_hpp
 #define Mesh_hpp
 
-#include "Matrix.hpp"
-#include "Plane.hpp"
-#include <vector>
 #include <map>
+#include <vector>
+#include "Plane.hpp"
+#include "Matrix.hpp"
 
 struct Mesh
 {
-	static constexpr int Knot = -1;
+	static constexpr int Knot = ~0;
 
 	struct Triangle
 	{
@@ -45,15 +45,16 @@ struct Mesh
 	std::vector<Vector> colors;
 
 	void Clear();
-	void Swap(Mesh &);
+	void Swap(Mesh &mesh);
+	void Merge(Mesh const &mesh);
 
-	int AddSurface(Surface);
-	int AddEdge(Edge);
-	int AddPoint(Point);
-	int AddVertex(Vector);
-	int AddTexCoord(Vector);
-	int AddNormal(Vector);
-	int AddColor(Vector);
+	int AddSurface(Surface const &S);
+	int AddEdge(Edge const &E);
+	int AddPoint(Point const &P);
+	int AddVertex(Vector const &V);
+	int AddTexCoord(Vector const &T);
+	int AddNormal(Vector const &N);
+	int AddColor(Vector const &C);
 
 	int NewPoint(int a, int b, Scalar cut);
 	int NewVertex(int a, int b, Scalar cut);
@@ -69,15 +70,15 @@ struct Mesh
 
 	void GetPoints(int *indexes, Point *P, int n=3);
 	void GetVertexes(int *indexes, Vector *V, int n=3);
-	void GetTexCoords(int *indexes, Vector *V, int n=3);
-	void GetNormals(int *indexes, Vector *V, int n=3);
-	void GetColors(int *indexes, Vector *V, int n=3);
+	void GetTexCoords(int *indexes, Vector *T, int n=3);
+	void GetNormals(int *indexes, Vector *N, int n=3);
+	void GetColors(int *indexes, Vector *C, int n=3);
 
 	void GetPoints(int index, Point *P);
 	void GetVertexes(int index, Vector *V);
-	void GetTexCoords(int index, Vector *V);
-	void GetNormals(int index, Vector *V);
-	void GetColors(int index, Vector *V);
+	void GetTexCoords(int index, Vector *T);
+	void GetNormals(int index, Vector *N);
+	void GetColors(int index, Vector *C);
 
 	Plane GetPlane(int index);
 	Matrix GetTangentSpace(int index);
@@ -99,7 +100,7 @@ struct MeshComposer : virtual Mesh
 	int Normal(Scalar x, Scalar y, Scalar z);
 	int Color(Scalar x, Scalar y, Scalar z);
 
-	int Next(Point P);
+	int Next(Point const &P);
 	int Next(int point);
 	
  private:

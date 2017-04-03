@@ -12,7 +12,7 @@ Matrix::Matrix()
 	}
 }
 
-void Matrix::Concatenate(Matrix M, Matrix N)
+void Matrix::Concatenate(Matrix const &M, Matrix const &N)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -77,7 +77,7 @@ void Matrix::Rotate(Scalar radian, Scalar x, Scalar y, Scalar z)
 	Z.z = a * zz + c;
 }
 
-Vector Matrix::Direction()
+Vector Matrix::Direction() const
 {
 	Vector U;
 
@@ -89,7 +89,7 @@ Vector Matrix::Direction()
 	return U;
 }
 
-Vector Matrix::Position()
+Vector Matrix::Position() const
 {
 	Vector U;
 
@@ -115,7 +115,7 @@ void Matrix::Transpose()
 	}
 }
 
-Vector Matrix::Transform(Vector V)
+Vector Matrix::Transform(Vector const &V)
 {
 	Vector U;
 	
@@ -130,7 +130,7 @@ Vector Matrix::Transform(Vector V)
 	return U;
 }
 
-void Matrix::Tangent(Vector V [3], Vector C [3])
+void Matrix::Tangent(Vector const V [3], Vector const C [3])
 {
 	// Distances
 

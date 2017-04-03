@@ -1,5 +1,5 @@
-#ifndef __Quaternion__
-#define __Quaternion__
+#ifndef Quaternion_hpp
+#define Quaternion_hpp
 
 #include "Number.hpp"
 #include "Vector.hpp"
@@ -13,11 +13,11 @@ struct Quaternion
 	 };
 	};
 	Quaternion();
-	void Concatenate(Quaternion Q, Quaternion R);
+	void Concatenate(Quaternion const &Q, Quaternion const &R);
 	void Rotate(Scalar radian, Scalar x, Scalar y, Scalar z);
 	Scalar Normalize();
-	void Convert(Scalar matrix []);
-	Vector Direction();
+	void Convert(Scalar matrix []) const;
+	Vector Direction() const;
 };
 
 #endif // file

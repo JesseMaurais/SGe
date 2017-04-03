@@ -51,14 +51,14 @@ int BSP::Sort(Brush &brush)
 int BSP::Sort(Brush &brush, Brush &front, Brush &back)
 {
 	std::size_t size = brush.size();
-	int divider = Select(brush);
+	int const divider = Select(brush);
 	Plane &space = spaces[divider];
 
 	for (std::size_t it = 0; it < size; ++it)
 	{
 		Polygon &polygon = brush[it];
 
-		if (polygon.face == divider) continue;
+		if (divider == polygon.face) continue;
 
 		switch (Classify(space, polygon))
 		{
@@ -67,9 +67,13 @@ int BSP::Sort(Brush &brush, Brush &front, Brush &back)
 			break;
 		case Plane::Planar:
 			if (spaces[polygon.face].Agree(space.normal))
-			  front.push_back(polygon);
+			{
+				front.push_back(polygon);
+			}
 			else
-			  back.push_back(polygon);
+			{
+				back.push_back(polygon);
+			}
 			break;
 		case Plane::Front:
 			front.push_back(polygon);
@@ -107,9 +111,13 @@ int BSP::Select(Brush &brush)
 				break;
 			case Plane::Planar:
 				if (spaces[polygon.face].Agree(space.normal))
-				  ++front;
+				{
+					++front;
+				}
 				else
-				  ++back;
+				{
+					++back;
+				}
 				break;
 			case Plane::Front:
 				++front;
@@ -124,11 +132,11 @@ int BSP::Select(Brush &brush)
 
 		if (score < bestScore)
 		{
-		 bestScore = score;
-		 bestDivider = divider;
+			bestDivider = divider;
+			bestScore = score;
 		}
 
-		if (!bestScore) break;
+		if (not bestScore) break;
 	}
 
 	return bestDivider;

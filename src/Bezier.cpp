@@ -1,6 +1,6 @@
 #include "Bezier.hpp"
 
-void Bezier::Cone(Vector A, Vector Z, Vector B)
+void Bezier::Cone(Vector const &A, Vector const &Z, Vector const &B)
 {
 	Vector X = (A + Z * 2.0) / 3.0;
 	Vector Y = (B + Z * 2.0) / 3.0;
@@ -8,7 +8,7 @@ void Bezier::Cone(Vector A, Vector Z, Vector B)
 	Cube(A, X, Y, B);
 }
 
-void Bezier::Cube(Vector A, Vector X, Vector Y, Vector B)
+void Bezier::Cube(Vector const &A, Vector const &X, Vector const &Y, Vector const &B)
 {
 	Ax = A; Ay = X; By = Y; Bx = B;
 }
@@ -27,27 +27,27 @@ Vector Bezier::Tangent(Scalar u)
 	
 // Smoothing, control point calculators
 
-Vector Bezier::Smoothing(Vector A, Vector B)
+Vector Bezier::Smoothing(Vector const &A, Vector const &B)
 {
 	return A*2.0 - B;
 }
 
-Vector Bezier::Cone2Cube(Vector A, Vector B)
+Vector Bezier::Cone2Cube(Vector const &A, Vector const &B)
 {
 	return (A*5.0 - B*2.0) / 3.0;
 }
 
-Vector Bezier::Cube2Cone(Vector A, Vector B)
+Vector Bezier::Cube2Cone(Vector const &A, Vector const &B)
 {
 	return (A*5.0 - B*3.0) / 2.0;
 }
 
-Vector Bezier::Cone2Cube(Vector A, Vector B, Vector C)
+Vector Bezier::Cone2Cube(Vector const &A, Vector const &B, Vector const &C)
 {
 	return (A*8.0 - B*6.0 + C) / 3.0;
 }
 
-Vector Bezier::Cube2Cone(Vector A, Vector B, Vector C)
+Vector Bezier::Cube2Cone(Vector const &A, Vector const &B, Vector const &C)
 {
 	return (A - B)*4.0 + C;
 }

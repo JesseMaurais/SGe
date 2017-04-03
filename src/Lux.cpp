@@ -438,7 +438,7 @@ static int window(lua_State *state)
 	}
 	lua_pop(state, 1);
 
-	lux_push(state, CreateWindow(title, x, y, w, h, m));
+	new (state) Window(title, x, y, w, h, m);
 	const int value = lua_gettop(state);
 	if (luaL_newmetatable(state, "Window"))
 	{

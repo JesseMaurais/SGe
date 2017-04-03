@@ -6,16 +6,16 @@ struct XML_ParserStruct;
 
 struct XML
 {
-	XML(const char *encoding=nullptr);
+	XML(char const *encoding = nullptr);
 	virtual ~XML();
 
 	bool Load(SDL_RWops *ops);
-	bool Load(const char *path);
+	bool Load(char const *path);
 
   protected:
 
-	virtual void Start(const char *name, const char **attributes) = 0;
-	virtual void End(const char *name) = 0;
+	virtual void Start(char const *name, char const **attributes) = 0;
+	virtual void End(char const *name) = 0;
 
   private:
 

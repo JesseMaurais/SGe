@@ -1,10 +1,12 @@
 #ifndef Tree_hpp
 #define Tree_hpp
 
-#include "Plane.hpp"
-#include "Mesh.hpp"
 #include <vector>
 #include <queue>
+#include "Number.hpp"
+#include "Plane.hpp"
+#include "Mesh.hpp"
+
 
 struct Tree : virtual Mesh
 {
@@ -18,13 +20,13 @@ struct Tree : virtual Mesh
 	std::vector<Branch> nodes;
 	std::vector<Plane> spaces;
 
-	double iris;
+	Scalar iris;
 	int root;
 
 	std::vector<int> view;
 	std::queue<int> visit;
 	
-	bool Traverse(Vector eye, Vector at);
+	bool Traverse(Vector const &eye, Vector const &at);
 	void Perspective(Scalar fov, Scalar aspect);
 
 	int AddNode(Branch node);

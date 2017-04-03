@@ -15,60 +15,78 @@ void Mesh::Clear()
 
 void Mesh::Swap(Mesh &M)
 {
-	groups.swap(M.groups);
-	edges.swap(M.edges);
-	points.swap(M.points);
-	faces.swap(M.faces);
-	colors.swap(M.colors);
-	normals.swap(M.normals);
-	vertexes.swap(M.vertexes);
-	texCoords.swap(M.texCoords);
+	M.groups.swap(groups);
+	M.edges.swap(edges);
+	M.points.swap(points);
+	M.faces.swap(faces);
+	M.colors.swap(colors);
+	M.normals.swap(normals);
+	M.vertexes.swap(vertexes);
+	M.texCoords.swap(texCoords);
 }
 
-int Mesh::AddSurface(Surface S)
+void Mesh::Merge(Mesh const &M)
 {
-	using namespace stl;
+	std::size_t size = faces.size();
+	const auto end = M.groups.end();
+	for (const auto it = M.groups.begin(); it != end; ++it)
+	{
+		it->second.first += stl::as_int(size);
+		groups[it->first] = it->second;
+	}
+
+	stl::merge(M.edges, edges);
+	stl::merge(M.points, points);
+	stl::merge(M.faces, faces);
+	stl::merge(M.colors, colors);
+	stl::merge(M.normals, normals);
+	stl::merge(M.vertexes, vertexes);
+	stl::merge(M.texCoords, texCoords);
+}
+
+int Mesh::AddSurface(Surface const &S)
+{
 	std::size_t index = faces.size();
 	faces.push_back(S);
-	return as<int>(index);
+	return stl::as_int(index);
 }
 
-int Mesh::AddEdge(Edge E)
+int Mesh::AddEdge(Edge const &E)
 {
 	std::size_t index = edges.size();
 	edges.push_back(E);
 	return stl::as_int(index);
 }
 
-int Mesh::AddPoint(Point P)
+int Mesh::AddPoint(Point const &P)
 {
 	std::size_t index = points.size();
 	points.push_back(P);
 	return ~ stl::as_int(index);
 }
 
-int Mesh::AddVertex(Vector V)
+int Mesh::AddVertex(Vector const &V)
 {
 	std::size_t index = vertexes.size();
 	vertexes.push_back(V);
 	return stl::as_int(index);
 }
 
-int Mesh::AddTexCoord(Vector T)
+int Mesh::AddTexCoord(Vector const &T)
 {
 	std::size_t index = texCoords.size();
 	texCoords.push_back(T);
 	return stl::as_int(index);
 }
 
-int Mesh::AddNormal(Vector N)
+int Mesh::AddNormal(Vector const &N)
 {
 	std::size_t index = normals.size();
 	normals.push_back(N);
 	return stl::as_int(index);
 }
 
-int Mesh::AddColor(Vector C)
+int Mesh::AddColor(Vector const &C)
 {
 	std::size_t index = colors.size();
 	colors.push_back(C);
@@ -233,14 +251,16 @@ int MeshComposer::BeginGroup(int id)
 {
 	group = id;
 	Group &G = Mesh::groups[group];
-	G.first = Mesh::faces.size();
+	std::size_t size = Mesh::faces.size();
+	G.first = stl::as_int(size);
 	return G.first;
 }
 
 int MeshComposer::EndGroup()
 {
 	Group &G = Mesh::groups[group];
-	G.count = Mesh::faces.size() - G.first;
+	std::size_t size = Mesh::faces.size();
+	G.count = stl::as_int(size) - G.first;
 	return G.count;
 }
 
@@ -276,7 +296,7 @@ int MeshComposer::Color(Scalar x, Scalar y, Scalar z)
 	return Mesh::AddColor(Vector(x, y, z));
 }
 
-int MeshComposer::Next(Point P)
+int MeshComposer::Next(Point const &P)
 {
 	return Next(~ Mesh::AddPoint(P));
 }

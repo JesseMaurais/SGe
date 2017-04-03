@@ -17,7 +17,7 @@ namespace Option
 struct CommandLineOption
 {
 	int opt;
-	const char *arg;
+	char const *arg;
 };
 
 CommandLineOption ParseCommandLine(int argc, char **argv);

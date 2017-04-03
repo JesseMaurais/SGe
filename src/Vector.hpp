@@ -21,26 +21,26 @@ struct Vector
 	Vector(Scalar a, Scalar b);
 	Vector(Scalar a, Scalar b, Scalar c);
 
-	Scalar Dot(Vector V);
-	void Cross(Vector U, Vector V);
-	Scalar Square();
-	Scalar Magnitude();
+	Scalar Dot(Vector const &V) const;
+	void Cross(Vector const &U, Vector const &V);
+	Scalar Square() const;
+	Scalar Magnitude() const;
 	Scalar Normalize();
-	void Right(Vector A, Vector B, Vector C);
-	Vector Project(Vector V);
-	Scalar Quadratic(Scalar t);
-	Scalar Linear(Scalar t);
+	Scalar Right(Vector const &A, Vector const &B, Vector const &C);
+	Vector Project(Vector const &V) const;
+	Scalar Quadratic(Scalar t) const;
+	Scalar Linear(Scalar t) const;
 
-	Vector operator - ();
-	Vector operator + (Vector V);
-	Vector operator - (Vector V);
-	Vector operator * (Vector V);
-	Vector operator / (Vector V);
-	Vector operator + (Scalar t);
-	Vector operator - (Scalar t);
-	Vector operator * (Scalar s);
-	Vector operator / (Scalar s);
-	bool operator == (Vector V);
+	Vector operator - () const;
+	Vector operator + (Vector const &V) const;
+	Vector operator - (Vector const &V) const;
+	Vector operator * (Vector const &V) const;
+	Vector operator / (Vector const &V) const;
+	Vector operator + (Scalar t) const;
+	Vector operator - (Scalar t) const;
+	Vector operator * (Scalar s) const;
+	Vector operator / (Scalar s) const;
+	bool operator == (Vector const &V) const;
 };
 
 #endif // file

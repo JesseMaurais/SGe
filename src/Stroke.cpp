@@ -14,7 +14,7 @@ void Stroke::Curve(Scalar n)
 {
 	if (step) n /= step;
 	
-	for (Scalar i = 1; i < n; ++i)
+	for (Scalar i = 1.0; i < n; ++i)
 	{
 		Vector V;
 		Scalar t = i/n;
@@ -23,9 +23,9 @@ void Stroke::Curve(Scalar n)
 	}
 }
 
-void Stroke::Move(Vector to)
+void Stroke::Move(Vector const &to)
 {
-	if (!moving)
+	if (not moving)
 	{
 		moving = true;
 		Tessel::Contour();
@@ -34,7 +34,7 @@ void Stroke::Move(Vector to)
 	from = to;
 }
 
-void Stroke::Line(Vector to)
+void Stroke::Line(Vector const &to)
 {
 	if (moving)
 	{
@@ -46,7 +46,7 @@ void Stroke::Line(Vector to)
 	from = to;
 }
 
-void Stroke::Cone(Vector X, Vector to)
+void Stroke::Cone(Vector const &X, Vector const &to)
 {
 	if (moving)
 	{
@@ -60,7 +60,7 @@ void Stroke::Cone(Vector X, Vector to)
 	from = to;
 }
 
-void Stroke::Cube(Vector X, Vector Y, Vector to)
+void Stroke::Cube(Vector const &X, Vector const &Y, Vector const &to)
 {
 	if (moving)
 	{

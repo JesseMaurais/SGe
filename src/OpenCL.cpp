@@ -134,9 +134,9 @@ static const char *GetErrorString(cl_int error)
 }
 
 
-signed OpenCL_SetError(const char *string, cl_int error)
+signed OpenCL_SetError(const char *origin, cl_int error)
 {
-	return SDL_SetError("%s: %s", string, GetErrorString(error));
+	return SDL_SetError("%s: %s", origin, GetErrorString(error));
 }
 
 
@@ -154,7 +154,7 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
 				if (error)
 				{
-					OpenGL_SetError("clGetPlatformIDs", error);
+					OpenCL_SetError("clGetPlatformIDs", error);
 					clear();
 					return;
 				}
@@ -202,7 +202,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 		{
 			for (unsigned it = 0; singleton.size() < 2 and platforms[it]; ++it)
 			{
-				singleton = DeviceIDs(platforms, type);
+				singleton = DeviceIDs(platforms[it], type);
 			}
 		}
 	}
@@ -249,7 +249,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 			(void) info;
 			(void) size;
 			(void) that;
-			SDL_Log("OpenCL context notify error: ", error);
+			SDL_perror(__func__, error);
 		}
 
 	} singleton;

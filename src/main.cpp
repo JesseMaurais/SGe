@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	SetAssertHandler(nullptr);
 	{
 		unsigned media = SDL_INIT_EVENTS;
-		const char *script = ConfigScript;
+		char const *script = ConfigScript;
 
 		if (argc > 1)
 		{

@@ -1,10 +1,18 @@
 #ifndef Window_hpp
 #define Window_hpp
 
-struct Window
+struct SDL_Window;
+
+class Window
 {
-	Window();
+public:
+
+	Window(char const *title, int x, int y, int w, int h, unsigned mode);
 	virtual ~Window();
+
+protected:
+
+	SDL_Window *window;
 };
 
 #endif // file

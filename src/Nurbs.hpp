@@ -19,7 +19,9 @@ struct Nurbs : virtual MeshComposer
 	void EndTrim();
 
 	void BeginSurface();
-	void NurbsSurface(int n, float *nknots, int nstride, int norder, int m, float *mknots, int mstride, int morder, float *points, int type);
+	void NurbsSurface(int n, float *nknots, int nstride, int norder,
+	                  int m, float *mknots, int mstride, int morder,
+					  float *points, int type);
 	void EndSurface();
 
  protected:

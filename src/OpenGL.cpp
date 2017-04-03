@@ -95,7 +95,7 @@ signed OpenGL_SetError(const char *origin)
 
 signed OpenGL_LogError(const char *origin)
 {
-	ALenum error = glGetError();
+	GLenum error = glGetError();
 	if (error)
 	{
 		union {

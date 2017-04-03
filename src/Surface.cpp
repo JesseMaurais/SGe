@@ -169,7 +169,7 @@ signed LoadTexture(SDL_Surface *surface, unsigned level, unsigned internal)
 	, type
 	, surface->pixels
 	);
-	return OpenGL_CheckError("glTexImage2D");
+	return OpenGL_SetError("glTexImage2D");
 }
 
 signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
@@ -190,5 +190,5 @@ signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
 	, type
 	, surface->pixels
 	);
-	return OpenGL_CheckError("glTexImage2D");
+	return OpenGL_SetError("glTexImage2D");
 }

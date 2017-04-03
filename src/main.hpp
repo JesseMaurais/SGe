@@ -3,7 +3,7 @@
 
 // PRECOMPILED HEADER
 
-// C Standard
+// Standard C
 
 #include <ciso646>
 #include <cstring>

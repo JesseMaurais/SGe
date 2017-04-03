@@ -6,7 +6,7 @@ Quaternion::Quaternion()
 	w = 1.0; x = y = z = 0.0;
 }
 
-void Quaternion::Concatenate(Quaternion Q, Quaternion R)
+void Quaternion::Concatenate(Quaternion const &Q, Quaternion const &R)
 {
 	w = Q.w*R.w - Q.x*R.x - Q.y*R.y - Q.z*R.z;
 	x = Q.w*R.x + Q.x*R.w + Q.y*R.z - Q.z*R.y;
@@ -17,8 +17,8 @@ void Quaternion::Concatenate(Quaternion Q, Quaternion R)
 void Quaternion::Rotate(Scalar radian, Scalar X, Scalar Y, Scalar Z)
 {
 	Scalar s;
-	s = sin(radian/2);
-	w = cos(radian/2);
+	s = std::sin(radian/2);
+	w = std::cos(radian/2);
 	x = X*s;
 	y = Y*s;
 	z = Z*s;
@@ -26,7 +26,7 @@ void Quaternion::Rotate(Scalar radian, Scalar X, Scalar Y, Scalar Z)
 
 Scalar Quaternion::Normalize()
 {
-	Scalar m = sqrt(w*w + x*x + y*y + z*z);
+	Scalar m = std::sqrt(w*w + x*x + y*y + z*z);
 	
 	w /= m;
 	x /= m;
@@ -36,12 +36,10 @@ Scalar Quaternion::Normalize()
 	return m;
 }
 
-void Quaternion::Convert(Scalar matrix [])
+void Quaternion::Convert(Scalar matrix []) const
 {
 	Scalar xx, yy, zz, xy, wz, xz, wy, yz, wx;
-	
-	Normalize();
-	
+
 	xx = x*x;
 	yy = y*y;
 	zz = z*z;
@@ -70,7 +68,7 @@ void Quaternion::Convert(Scalar matrix [])
 	matrix[ 15 ] = 1.0;
 }
 
-Vector Quaternion::Direction()
+Vector Quaternion::Direction() const
 {
 	Vector V;
 	

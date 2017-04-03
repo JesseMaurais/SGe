@@ -1,5 +1,5 @@
-#ifndef __Plane__
-#define __Plane__
+#ifndef Plane_hpp
+#define Plane_hpp
 
 #include "Number.hpp"
 #include "Vector.hpp"
@@ -12,12 +12,12 @@ struct Plane
 	Scalar distance;
 
 	Plane();
-	Plane(Vector N, Vector V);
-	Scalar Dot(Vector V);
-	Scalar Equate(Vector V);
-	Scalar Cut(Vector U, Vector V);
-	bool Agree(Vector N);
-	Crossing Classify(Vector V[], int n=3);
+	Plane(Vector const &N, Vector const &V);
+	Scalar Dot(Vector const &V) const;
+	Scalar Equate(Vector const &V) const;
+	Scalar Cut(Vector const &U, Vector const &V) const;
+	bool Agree(Vector const &N) const;
+	Crossing Classify(Vector const *V, int n=3) const;
 };
 
 #endif // file

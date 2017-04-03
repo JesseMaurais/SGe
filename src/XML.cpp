@@ -6,7 +6,7 @@
 
 XML::XML(const char *encoding)
 {
-	auto start = [](void *user, const char *name, const char **attributes)
+	auto start = [](void *user, char const *name, char const **attributes)
 	{
 		union {
 		 void *addr;
@@ -16,7 +16,7 @@ XML::XML(const char *encoding)
 		obj->Start(name, attributes);
 	};
 
-	auto end = [](void *user, const char *name)
+	auto end = [](void *user, char const *name)
 	{
 		union {
 		 void *addr;
@@ -59,7 +59,7 @@ bool XML::Load(SDL_RWops *ops)
 	return true;
 }
 
-bool XML::Load(const char *path)
+bool XML::Load(char const *path)
 {
 	SDL_RWops *ops = SDL_RWFromFile(path, "r");
 	if (ops)

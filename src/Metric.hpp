@@ -3,8 +3,8 @@
 
 #include "Number.hpp"
 
-const double Radian = Pi / 180.0;
-const double Degree = 180.0 / Pi;
+Scalar const Radian = Pi / 180.0;
+Scalar const Degree = 180.0 / Pi;
 
 #endif // file
 

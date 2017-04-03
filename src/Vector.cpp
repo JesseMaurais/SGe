@@ -3,7 +3,7 @@
 
 Vector::Vector()
 {
-	x = y = z = 0;
+	x = y = z = Scalar(0);
 }
 
 Vector::Vector(Scalar *v)
@@ -26,84 +26,29 @@ Vector::Vector(Scalar a, Scalar b, Scalar c)
 	x = a; y = b; z = c;
 }
 
-Scalar Vector::Quadratic(Scalar t)
-{
-	return x*t*t + y*t + z;
-}
-
-Scalar Vector::Linear(Scalar t)
-{
-	return x*t + y;
-}
-
-Vector Vector::operator - (void)
-{
-	return Vector(-x, -y, -z);
-}
-
-Vector Vector::operator + (Vector V)
-{
-	return Vector(x+V.x, y+V.y, z+V.z);
-}
-
-Vector Vector::operator - (Vector V)
-{
-	return Vector(x-V.x, y-V.y, z-V.z);
-}
-
-Vector Vector::operator * (Vector V)
-{
-	return Vector(x*V.x, y*V.y, z*V.z);
-}
-
-Vector Vector::operator / (Vector V)
-{
-	return Vector(x/V.x, y/V.y, z/V.z);
-}
-
-Vector Vector::operator + (Scalar t)
-{
-	return Vector(x+t, y+t, z+t);
-}
-
-Vector Vector::operator - (Scalar t)
-{
-	return Vector(x-t, y-t, z-t);
-}
-
-Vector Vector::operator * (Scalar s)
-{
-	return Vector(x*s, y*s, z*s);
-}
-
-Vector Vector::operator / (Scalar s)
-{
-	return Vector(x/s, y/s, z/s);
-}
-
-Scalar Vector::Dot(Vector V)
+Scalar Vector::Dot(Vector const &V) const
 {
 	return x*V.x + y*V.y + z*V.z;
 }
 
-void Vector::Cross(Vector U, Vector V)
+void Vector::Cross(Vector const &U, Vector const &V)
 {
 	x = U.y*V.z - U.z*V.y;
 	y = U.z*V.x - U.x*V.z;
 	z = U.x*V.y - U.y*V.x;
 }
 
-Scalar Vector::Square(void)
+Scalar Vector::Square() const
 {
 	return Dot(*this);
 }
 
-Scalar Vector::Magnitude(void)
+Scalar Vector::Magnitude() const
 {
-	return sqrt(Square());
+	return std::sqrt(Square());
 }
 
-Scalar Vector::Normalize(void)
+Scalar Vector::Normalize()
 {
 	Scalar m = Magnitude();
 
@@ -114,21 +59,76 @@ Scalar Vector::Normalize(void)
 	return m;
 }
 
-void Vector::Right(Vector A, Vector B, Vector C)
+Scalar Vector::Right(Vector const &A, Vector const &B, Vector const &C)
 {
 	Cross(A - B, A - C);
-	Normalize();
+	return Normalize();
 }
 
-Vector Vector::Project(Vector V)
+Vector Vector::Project(Vector const &V) const
 {
 	Vector U = V;
 	U.Normalize();
 	return V*Dot(U);
 }
 
-bool Vector::operator == (Vector V)
+Scalar Vector::Quadratic(Scalar t) const
 {
-	return (x == V.x) && (y == V.y) && (z == V.z);
+	return std::fma(Linear(t), t, z);
+}
+
+Scalar Vector::Linear(Scalar t) const
+{
+	return std::fma(x, t, y);
+}
+
+Vector Vector::operator - () const
+{
+	return Vector(-x, -y, -z);
+}
+
+Vector Vector::operator + (Vector const &V) const
+{
+	return Vector(x+V.x, y+V.y, z+V.z);
+}
+
+Vector Vector::operator - (Vector const &V) const
+{
+	return Vector(x-V.x, y-V.y, z-V.z);
+}
+
+Vector Vector::operator * (Vector const &V) const
+{
+	return Vector(x*V.x, y*V.y, z*V.z);
+}
+
+Vector Vector::operator / (Vector const &V) const
+{
+	return Vector(x/V.x, y/V.y, z/V.z);
+}
+
+Vector Vector::operator + (Scalar t) const
+{
+	return Vector(x+t, y+t, z+t);
+}
+
+Vector Vector::operator - (Scalar t) const
+{
+	return Vector(x-t, y-t, z-t);
+}
+
+Vector Vector::operator * (Scalar s) const
+{
+	return Vector(x*s, y*s, z*s);
+}
+
+Vector Vector::operator / (Scalar s) const
+{
+	return Vector(x/s, y/s, z/s);
+}
+
+bool Vector::operator == (Vector const &V) const
+{
+	return (x == V.x) and (y == V.y) and (z == V.z);
 }
 

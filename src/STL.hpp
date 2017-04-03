@@ -29,6 +29,14 @@ namespace stl
 		static_assert(source::is_integer, "Value must be an integer type");
 		return as<int>(val);
 	}
+
+	template <typename Type> inline void merge(std::vector<Type> const &from, std::vector<Type> &to)
+	{
+		std::size_t from_size = from.size();
+		std::size_t to_size = from.size();
+		to.reserve(from_size + to_size);
+		to.insert(to.end(), from.begin(), from.end());
+	}
 }
 
 #endif // file
