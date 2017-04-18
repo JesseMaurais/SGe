@@ -1,81 +1,117 @@
 /** \file
  * Collect objects belonging to a specified class for joint execution of any
- * class methods. Used to update the resources of objects after state changes.
+ * class methods.
  */
 
 #ifndef Collection_hpp
 #define Collection_hpp
 
 #include <set>
-#include "SDL.hpp"
-
-/// Basic interface used for CollectionManager
-class CollectionInterface
-{
-public:
-	CollectionInterface();
-	virtual ~CollectionInterface();
-};
+#include <cassert>
 
 /// Collection of objects belonging to a specified class Type
-template <typename Type> class Collection final : CollectionInterface
+template <typename Type> class Collection
 {
 private:
 
-	std::set<Type*> set;
-
-	Collection() = default;
-
-	~Collection()
-	{
-		SDL_assert(set.empty() and "Some objects were not deleted");
-	}
+	typedef Type *Pointer;
+	std::set<Pointer> set;
 
 public:
 
-	/// Access the singleton
-	static Collection &Instance()
-	{
-		static Collection singleton;
-		return singleton;
-	}
-
 	/// Add object to collection
-	bool Add(Type *object)
+	bool Add(Pointer that)
 	{
-		SDL_assert(object and "Cannot add null object to collection");
-		return set.insert(object).second;
+		assert(that and "Cannot add null object to collection");
+		return set.insert(that).second;
 	}
 
-	// Remove object from collection
-	bool Remove(Type *object)
+	/// Remove object from collection
+	bool Remove(Pointer that)
 	{
-		SDL_assert(object and "Cannot remove null object from collection");
-		return set.erase(object) == 1;
+		assert(that and "Cannot remove null object from collection");
+		return set.erase(that) == 1;
 	}
 
 	/// True if object is in collection
-	bool Has(Type *object)
+	bool Has(Pointer that) const
 	{
-		return set.find(object) != set.end();
+		return set.find(that) != set.end();
+	}
+
+	/// True if collection is empty
+	bool Empty() const
+	{
+		return set.empty();
 	}
 
 	/// Call the given method with given arguments on all objects in collection
 	template <typename ...Args>	void Call(void(Type::*method)(Args...), Args... args)
 	{
-		for (auto item : set)
+		for (auto that : set)
 		{
-			item->method(args...);
+			that->method(args...);
 		}
 	}
 	
-	/// Call the given method with given arguments on all objects and count those returning true
+	/// Call the given constant method with given arguments on all objects in collection
+	template <typename ...Args>	void Call(void(Type::*method)(Args...) const, Args... args) const
+	{
+		for (auto that : set)
+		{
+			that->method(args...);
+		}
+	}
+
+	/// Call the given method on all objects and count those return true
+	unsigned Count(bool(Type::*method)(void))
+	{
+		unsigned count = 0;
+		for (auto that : set)
+		{
+			if (that->method())
+			{
+				++count;
+			}
+		}
+		return count;
+	}
+
+	/// Call the given constant method on all objects and count those that return true
+	unsigned Count(bool(Type::*method)(void) const) const
+	{
+		unsigned count = 0;
+		for (auto that : set)
+		{
+			if (that->method())
+			{
+				++count;
+			}
+		}
+		return count;
+	}
+
+	/// Call the given method with given arguments on all objects and count those that return true
 	template <typename ...Args>	unsigned Count(bool(Type::*method)(Args...), Args... args)
 	{
 		unsigned count = 0;
-		for (auto item : set)
+		for (auto that : set)
 		{
-			if (item->method(args...))
+			if (that->method(args...))
+			{
+				++count;
+			}
+		}
+		return count;
+	}
+
+	/// Call the given constant method with given arguments on all objects and count those that return true
+	template <typename ...Args>	unsigned Count(bool(Type::*method)(Args...) const, Args... args) const
+	{
+		unsigned count = 0;
+		for (auto that : set)
+		{
+			if (that->method(args...))
 			{
 				++count;
 			}
@@ -83,14 +119,5 @@ public:
 		return count;
 	}
 };
-
-/// Collection of all other collections
-using Collections = Collection<CollectionInterface>;
-
-template <> Collections::Collection()
-{
-	// Specialize so we do not reenter Collections::Instance
-	SDL_verify(Add(this));
-}
 
 #endif // file

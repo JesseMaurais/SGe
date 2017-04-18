@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	SetAssertHandler(nullptr);
 	{
 		unsigned media = SDL_INIT_EVENTS;
-		char const *script = ConfigScript;
+		char const *script = nullptr;
 
 		if (argc > 1)
 		{
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 		else
 		if (std::atexit(SDL_Quit))
 		{
-			SDL_Log(CannotMakeExit, "SDL_Quit");
+			SDL_Log(String(CannotMakeExit), "SDL_Quit");
 			return EXIT_FAILURE;
 		}
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 		else
 		if (std::atexit(Lua_Quit))
 		{
-			SDL_Log(CannotMakeExit, "Lua_Quit");
+			SDL_Log(String(CannotMakeExit), "Lua_Quit");
 			return EXIT_FAILURE;
 		}
 
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 		else
 		if (std::atexit(CommandQuit))
 		{
-			SDL_Log(CannotMakeExit, "CommandQuit");
+			SDL_Log(String(CannotMakeExit), "CommandQuit");
 			return EXIT_FAILURE;
 		}
 	}

@@ -25,6 +25,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <iterator>
 
 // C++ Numerics
 
@@ -39,6 +40,11 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+
+// RTTI
+
+#include <typeinfo>
+#include <type_traits>
 
 // OpenGL
 

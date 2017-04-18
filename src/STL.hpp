@@ -2,6 +2,7 @@
 #define STL_hpp
 
 #include <limits>
+#include <string>
 #include <cassert>
 
 namespace stl
@@ -32,10 +33,22 @@ namespace stl
 
 	template <typename Type> inline void merge(std::vector<Type> const &from, std::vector<Type> &to)
 	{
-		std::size_t from_size = from.size();
-		std::size_t to_size = from.size();
+		std::vector<Type>::size_type from_size = from.size();
+		std::vector<Type>::size_type to_size = from.size();
 		to.reserve(from_size + to_size);
 		to.insert(to.end(), from.begin(), from.end());
+	}
+
+	inline std::string replace(std::string string, std::string const &search, std::string const &replace)
+	{
+		std::string::size_type const length = search.length();
+		std::string::size_type index = string.find(search);
+		while (std::string::npos != index)
+		{
+			string.replace(index, length, replace);
+			index = string.find(search, index + length);
+		}
+		return string;
 	}
 }
 

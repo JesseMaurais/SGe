@@ -29,10 +29,11 @@ void Mesh::Merge(Mesh const &M)
 {
 	std::size_t size = faces.size();
 	const auto end = M.groups.end();
-	for (const auto it = M.groups.begin(); it != end; ++it)
+	for (auto it = M.groups.begin(); it != end; ++it)
 	{
-		it->second.first += stl::as_int(size);
-		groups[it->first] = it->second;
+		Group &G = groups[it->first];
+		G.first = it->second.first + stl::as_int(size);
+		G.count = it->second.count;
 	}
 
 	stl::merge(M.edges, edges);

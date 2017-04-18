@@ -2,9 +2,10 @@
 #include "Collection.hpp"
 #include "Strings.hpp"
 #include "SDL.hpp"
+#include <typeinfo>
 
 using WindowSet = Collection<Window>;
-constexpr auto WindowName = typeid(Window).name();
+const auto WindowName = typeid(Window).name();
 
 Window::Window(char const *title, int x, int y, int w, int h, unsigned mode)
 {

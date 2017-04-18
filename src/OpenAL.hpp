@@ -24,6 +24,11 @@ signed OpenAL_SetError(ALCdevice *device, const char *origin);
 /// Log the current device error with SDL
 signed OpenAL_LogError(ALCdevice *device, const char *origin);
 
+// Buffer id at the given index from within the singleton.
+ALuint OpenAL_GetBuffer(unsigned index);
+// Source id at the given index from within the singleton.
+ALuint OpenAL_GetSource(unsigned index);
+
 /**
  * \brief Update the audio device singleton for the given device name.
  * \param name The name of the device to be opened or none for the default.

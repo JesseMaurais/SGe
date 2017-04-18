@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cmath>
 
-bool Tree::Traverse(Vector eye, Vector at)
+bool Tree::Traverse(Vector const &eye, Vector const &at)
 {
 	if (visit.empty())
 	{
@@ -113,7 +113,7 @@ bool Tree::Load(char const *path)
 	{
 	case 1:
 		break;
-	case std::EOF:
+	case EOF:
 		if (std::ferror(file))
 		{
 			std::perror(path);
@@ -134,7 +134,7 @@ bool Tree::Load(char const *path)
 
 	nodes.resize(size);
 
-	for (std::size_t it = 0; it < size; ++it)
+	for (int it = 0; it < size; ++it)
 	{
 		Branch &N = nodes[it];
 
@@ -142,7 +142,7 @@ bool Tree::Load(char const *path)
 		{
 		case 3:
 			break;
-		case std::EOF:
+		case EOF:
 			if (std::ferror(file))
 			{
 				std::perror(path);
