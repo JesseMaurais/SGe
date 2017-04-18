@@ -25,7 +25,7 @@ void Mesh::Swap(Mesh &M)
 	M.texCoords.swap(texCoords);
 }
 
-void Mesh::Merge(Mesh const &M)
+void Mesh::Append(Mesh const &M)
 {
 	std::size_t size = faces.size();
 	const auto end = M.groups.end();
