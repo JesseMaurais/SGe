@@ -4,6 +4,12 @@
 enum Strings
 {
 	 None
+	,Config
+	,CommandPrompt
+	,CmdHelp
+	,CmdConfigs
+	,CmdMedia
+	,CmdQuit
 	,Retry
 	,Break
 	,Abort
@@ -39,5 +45,6 @@ enum Strings
 };
 
 char const *String(enum Strings);
+signed SetError(enum Strings);
 
 #endif // file

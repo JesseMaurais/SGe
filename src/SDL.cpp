@@ -28,12 +28,12 @@ class AssertMessageBox : SDL_MessageBoxData
 		if (SDL_ShowMessageBox(this, &id))
 		{
 			auto error = SDL_GetError();
-			SDL_Log("%s: %s", CannotShowMessageBox, error);
+			SDL_Log("%s: %s", String(CannotShowMessageBox), error);
 
-			if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, CannotShowMessageBox, error, window))
+			if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, String(CannotShowMessageBox), error, window))
 			{
 				error = SDL_GetError();
-				SDL_Log("%s: %s", CannotShowMessageBox, error);
+				SDL_Log("%s: %s", String(CannotShowMessageBox), error);
 				SDL_Log("%s: %s", title, message);
 			}
 		}
@@ -43,11 +43,11 @@ class AssertMessageBox : SDL_MessageBoxData
 
 const SDL_MessageBoxButtonData AssertMessageBox::Buttons[AssertMessageBox::ButtonCount] =
 {
-		{ 0, SDL_ASSERTION_RETRY, ErrorMessageBox::Retry },
-		{ 0, SDL_ASSERTION_BREAK, ErrorMessageBox::Break },
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, SDL_ASSERTION_ABORT, ErrorMessageBox::Abort },
-		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, SDL_ASSERTION_IGNORE, ErrorMessageBox::Ignore },
-		{ 0, SDL_ASSERTION_ALWAYS_IGNORE, ErrorMessageBox::AlwaysIgnore }
+		{ 0, SDL_ASSERTION_RETRY, String(Retry) },
+		{ 0, SDL_ASSERTION_BREAK, String(Break) },
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, SDL_ASSERTION_ABORT, String(Abort) },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, SDL_ASSERTION_IGNORE, String(Ignore) },
+		{ 0, SDL_ASSERTION_ALWAYS_IGNORE, String(AlwaysIgnore) }
 };
 
 const SDL_MessageBoxColorScheme AssertMessageBox::ColorScheme =

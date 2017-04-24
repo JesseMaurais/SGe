@@ -60,7 +60,7 @@ void Document::Start(const char *name, const char **attributes)
 	// Using named meta-table from the schema
 	if (luaL_getsubtable(state, schema, name))
 	{
-		SDL_Log(CannotFindSchema, name);
+		SDL_Log(String(CannotFindSchema), name);
 	}
 	lua_setmetatable(state, table);
 	// Set all key/value pairs as fields in this table
@@ -72,7 +72,7 @@ void Document::Start(const char *name, const char **attributes)
 			// Check that name is not already being used
 			if (lua_getfield(state, root, attributes[value]))
 			{
-				SDL_Log(NameNotUnique, attributes[value]);
+				SDL_Log(String(NameNotUnique), attributes[value]);
 			}
 			lua_pop(state, 1);
 			// Make root.value = table

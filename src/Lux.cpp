@@ -2,7 +2,6 @@
 #include "Lua.hpp"
 #include "SDL.hpp"
 #include "XML.hpp"
-#include "Window.hpp"
 #include "Strings.hpp"
 #include "Document.hpp"
 #include <lux/lux.hpp>
@@ -227,7 +226,7 @@ static int setattributes(lua_State *state)
 		}
 		else
 		{
-			return luaL_error(state, BadArgument, key);
+			return luaL_error(state, String(InvalidArgument), key);
 		}
 		lua_pop(state, 1);
 	}
@@ -287,7 +286,7 @@ static int renderer(lua_State *state)
 		}
 		else
 		{
-			return luaL_error(state, BadArgument, key);
+			return luaL_error(state, String(InvalidArgument), key);
 		}
 		lua_pop(state, 1);
 	}
@@ -432,13 +431,13 @@ static int window(lua_State *state)
 		}
 		else
 		{
-			return luaL_error(state, BadArgument, key);
+			return luaL_error(state, String(InvalidArgument), key);
 		}
 		lua_pop(state, 1);
 	}
 	lua_pop(state, 1);
 
-	new (state) Window(title, x, y, w, h, m);
+	SDL_CreateWindow(title, x, y, w, h, m);
 	const int value = lua_gettop(state);
 	if (luaL_newmetatable(state, "Window"))
 	{
@@ -459,13 +458,13 @@ static int document(lua_State *state)
 		Document doc(encoding);
 		if (not doc.Load(state, schema, path))
 		{
-			return luaL_error(state, CannotLoadDocument, path);
+			return luaL_error(state, String(CannotLoadDocument), path);
 		}
 	}
 	catch (std::exception &exception)
 	{
 		const auto error = exception.what();
-		return luaL_error(state, CaughtException, error);
+		return luaL_error(state, String(CaughtException), error);
 	}
 	return 1;
 }

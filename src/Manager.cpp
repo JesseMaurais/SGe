@@ -1,6 +1,7 @@
 #include "Manager.hpp"
+
+#include "stl.hpp"
 #include "SDL.hpp"
-#include "STL.hpp"
 
 unsigned Manager::Add(Source *that)
 {
@@ -40,5 +41,5 @@ unsigned Manager::Update()
 
 unsigned Manager::Size()
 {
-	return stl::as_unsigned(sources.size());
+	return to_unsigned(sources.size());
 }

@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		if (CommandInit(CommandPrompt))
+		if (CommandInit(String(CommandPrompt)))
 		{
 			SDL_perror("CommandInit");
 			return EXIT_FAILURE;

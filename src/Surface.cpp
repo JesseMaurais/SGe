@@ -109,7 +109,7 @@ static signed FindFormat(SDL_PixelFormat *pixmap, GLenum *format, GLenum *type)
 		*type = GL_UNSIGNED_INT_2_10_10_10_REV; // ?
 		break;
 	default:
-		return SDL_SetError(CannotFindFormat);
+		return SDL_SetError(String(CannotFindFormat));
 	}
 	return 0;
 }

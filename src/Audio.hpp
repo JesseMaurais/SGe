@@ -9,13 +9,6 @@ protected:
 
 	unsigned id;
 
-private:
-
-	void Rename(unsigned id) override
-	{
-		this->id = id;
-	}
-
 public:
 
 	AudioBuffer();
@@ -27,13 +20,6 @@ class AudioSource : public Source
 protected:
 
 	unsigned id;
-
-private:
-
-	void Rename(unsigned id) override
-	{
-		this->id = id;
-	}
 
 public:
 

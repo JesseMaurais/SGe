@@ -6,11 +6,11 @@ CommandLineOption ParseCommandLine(int argc, char **argv)
 {
 	const struct option options[] =
 	{
-	{ CommandLine::Help    , no_argument       , nullptr , Option::Help    },
-	{ CommandLine::Configs , required_argument , nullptr , Option::Configs },
-	{ CommandLine::Media   , optional_argument , nullptr , Option::Media   },
-	{ CommandLine::Quit    , no_argument       , nullptr , Option::Quit    },
-	{ nullptr              , 0                 , nullptr , Option::End     }
+	{ String(CmdHelp)    , no_argument       , nullptr , Option::Help    },
+	{ String(CmdConfigs) , required_argument , nullptr , Option::Configs },
+	{ String(CmdMedia)   , optional_argument , nullptr , Option::Media   },
+	{ String(CmdQuit)    , no_argument       , nullptr , Option::Quit    },
+	{ nullptr         , 0                 , nullptr , Option::End     }
 	};
 
 	CommandLineOption cmd;

@@ -2,7 +2,7 @@
 #include "Hedron.hpp"
 #include <cassert>
 
-void Sphere::AddNode(Surface N)
+int Sphere::AddNode(Surface N)
 {
 	int index = nodes.size();
 	nodes.push_back(N);
@@ -11,14 +11,13 @@ void Sphere::AddNode(Surface N)
 
 int Sphere::NewVertex(Edge E)
 {
-	Vector &A = GetVertex(E.child[0]);
-	Vector &B = GetVertex(E.child[1]);
+	Vector &A = GetVertex(E.points[0]);
+	Vector &B = GetVertex(E.points[1]);
 	return AddVertex((A + B)/2.0);
 }
 
 Sphere::Sphere(int depth)
 {
-	vertexes.reserve(icos::nVertexes);
 	faces.reserve(icos::nFaces);
 	edges.reserve(icos::nEdges);
 	nodes.reserve(icos::nFaces);
@@ -43,7 +42,7 @@ Sphere::Sphere(int depth)
 	BeginGroup(0); // depth = 0
 	for (int i = 0; i < icos::nFaces; ++i)
 	{
-		Surface N, S:
+		Surface N, S;
 		for (int j = 0; j < 3; ++j)
 		{
 			S.points[j] = icos::PFaces[i][j];
@@ -97,47 +96,48 @@ void Sphere::Divide(int depth)
 	EndGroup();
 
 	// Divide each edge by the new vertex
-
-	int splits[nEdges][2];
-	std::vector<Edge> prior;
-	prior.swap(edges);
-	for (int i = 0; i < prior.size(); ++i)
 	{
-		Edge E, F;
-		E.points[1] = F.points[0] = indexes[i];
-		E.points[0] = prior[i].points[0];
-		F.points[1] = prior[i].points[1];
-		splits[i][0] = AddEdge(E);
-		splits[i][1] = AddEdge(F);
+		int splits[nEdges][2];
+		std::vector<Edge> prior;
+		prior.swap(edges);
+		for (int i = 0; i < prior.size(); ++i)
+		{
+			Edge E, F;
+			E.points[1] = F.points[0] = indexes[i];
+			E.points[0] = prior[i].points[0];
+			F.points[1] = prior[i].points[1];
+			splits[i][0] = AddEdge(E);
+			splits[i][1] = AddEdge(F);
+		}
 	}
-	prior.clear();
 
 	// Create the nodes and interior edges
-
-	std::vector<Surface> prior;
-	prior.swap(nodes);
-	for (int i = 0; i < prior.size(); ++i)
 	{
-		Edge E;
-		Surface R, S;
-		int edge;
-		for (int j = 0, k = 2; j < 3; k = j++)
+		int splits[nEdges][2];
+		std::vector<Surface> prior;
+		prior.swap(nodes);
+		for (int i = 0; i < prior.size(); ++i)
 		{
-			edge = prior[i].edges[k];
-			E.points[0] = indexes[edge];
-			edge = prior[i].edges[j];
-			E.points[1] = indexes[edge];
-			edge = AddEdge(E);
-			R.edges[j] = edge;
-			S.edges[0] = edge;
-			edge = nodes[i].edges[k];
-			S.edges[1] = splits[edge][0];
-			edge = nodes[i].edges[j];
-			S.edges[2] = splits[edge][1];
-			AddNode(S);
+			Edge E;
+			Surface R, S;
+			int edge;
+			for (int j = 0, k = 2; j < 3; k = j++)
+			{
+				edge = prior[i].edges[k];
+				E.points[0] = indexes[edge];
+				edge = prior[i].edges[j];
+				E.points[1] = indexes[edge];
+				edge = AddEdge(E);
+				R.edges[j] = edge;
+				S.edges[0] = edge;
+				edge = nodes[i].edges[k];
+				S.edges[1] = splits[edge][0];
+				edge = nodes[i].edges[j];
+				S.edges[2] = splits[edge][1];
+				AddNode(S);
+			}
+			AddNode(R);
 		}
-		AddNode(R):
 	}
-	prior.clear();
 }
 

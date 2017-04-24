@@ -45,7 +45,7 @@ void *OpenGL_GetContext(SDL_Window *window)
 				{
 					// Set error string and return null
 					SDL_perror("SDL_GL_CreateContext");
-					SDL_SetError(CannotCreateContext);
+					SDL_SetError(String(CannotCreateContext));
 				}
 			}
 		}

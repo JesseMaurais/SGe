@@ -1,8 +1,8 @@
 #include "Metric.hpp"
 #include "Tree.hpp"
-#include "STL.hpp"
 #include <cstdio>
 #include <cmath>
+#include "stl.hpp"
 
 bool Tree::Traverse(Vector const &eye, Vector const &at)
 {
@@ -68,7 +68,7 @@ int Tree::AddNode(Branch node)
 {
 	std::size_t index = nodes.size();
 	nodes.push_back(node);
-	return stl::as_int(index);
+	return to_int(index);
 }
 
 bool Tree::Save(char const *path)
@@ -81,7 +81,7 @@ bool Tree::Save(char const *path)
 	}
 
 	std::size_t size = nodes.size();
-	if (std::fprintf(file, "nodes=%d\n", stl::as_int(size)) < 0)
+	if (std::fprintf(file, "nodes=%d\n", to_int(size)) < 0)
 	{
 		std::fputs("Error writing to stream", stderr);
 	}

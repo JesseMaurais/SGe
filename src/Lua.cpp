@@ -31,7 +31,7 @@ signed Lua_Init(const char *path)
 	State = luaL_newstate();
 	if (not State)
 	{
-		return SDL_SetError(OutOfMemory);
+		return SDL_SetError(String(OutOfMemory));
 	}
 
 	luaL_checkversion(State);
@@ -45,15 +45,15 @@ signed Lua_Init(const char *path)
 	CoState = lua_newthread(State);
 	if (not CoState)
 	{
-		return SDL_SetError(OutOfMemory);
+		return SDL_SetError(String(OutOfMemory));
 	}
 
 	if (luaL_dofile(CoState, path))
 	{
-		if (SDL_strcasecmp(path, ConfigScript))
+		if (SDL_strcasecmp(path, String(Config)))
 		{
 			Lua_perror(CoState, "luaL_dofile");
-			return SDL_SetError(CannotLoadScript, path);
+			return SDL_SetError(String(CannotLoadScript), path);
 		}
 	}
 

@@ -98,14 +98,14 @@ signed CommandInit(const char *prompt)
 	if (not Cond)
 	{
 	 SDL_perror("SDL_CreateCond");
-	 return SDL_SetError(CannotCreateCommandQueue);
+	 return SetError(CannotCreateCommandQueue);
 	}
 	Mutex = SDL_CreateMutex();
 	if (not Mutex)
 	{
 	 SDL_DestroyCond(Cond);
 	 SDL_perror("SDL_CreateMutex");
-	 return SDL_SetError(CannotCreateCommandQueue);
+	 return SetError(CannotCreateCommandQueue);
 	}
 	Thread = SDL_CreateThread(CommandThread, "Command", nullptr);
 	if (not Thread)
@@ -113,7 +113,7 @@ signed CommandInit(const char *prompt)
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
 	 SDL_perror("SDL_CreateThread");
-	 return SDL_SetError(CannotCreateCommandQueue);
+	 return SetError(CannotCreateCommandQueue);
 	}
 	PushEventHandler(UserEvent(ExecuteCommand), CommandExec);
 	Prompt = prompt;

@@ -27,7 +27,7 @@ XML::XML(const char *encoding)
 	};
 
 	parser = XML_ParserCreate(encoding);
-	if (not parser) throw std::runtime_error(CannotCreateParser);
+	if (not parser) throw std::runtime_error(String(CannotCreateParser));
 	XML_SetElementHandler(parser, start, end);
 	XML_SetUserData(parser, this);
 }

@@ -13,6 +13,7 @@ bool Shader::LoadFragment(const char **paths)
 		LoadShader(fragment, paths);
 		glCompileShader(fragment);
 		LogShader(__func__, fragment);
+		return true;
 	}
 	else
 	{
@@ -139,7 +140,7 @@ void Shader::LogShader(const char *type, GLuint shader)
 {
 	int n;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &n);
-	if (OpenGL_CheckError("GL_INFO_LOG_LENGTH"))
+	if (OpenGL_SetError("GL_INFO_LOG_LENGTH"))
 	{
 		ShowError(CannotUseShader);
 	}
@@ -148,7 +149,7 @@ void Shader::LogShader(const char *type, GLuint shader)
 	{
 		char *data = new char [n];
 		glGetShaderInfoLog(shader, n, &n, data);
-		if (OpenGL_CheckError("glGetShaderInfoLog"))
+		if (OpenGL_SetError("glGetShaderInfoLog"))
 		{
 			ShowError(CannotUseShader);
 		}
@@ -164,7 +165,7 @@ void Shader::LogProgram(unsigned program)
 {
 	int n;
 	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &n);
-	if (OpenGL_CheckError("GL_INFO_LOG_LENGTH"))
+	if (OpenGL_SetError("GL_INFO_LOG_LENGTH"))
 	{
 		ShowError(CannotUseShaderProgram);
 	}
@@ -173,7 +174,7 @@ void Shader::LogProgram(unsigned program)
 	{
 		char *data = new char [n];
 		glGetProgramInfoLog(program, n, &n, data);
-		if (OpenGL_CheckError("glGetProgramInfoLog"))
+		if (OpenGL_SetError("glGetProgramInfoLog"))
 		{
 			ShowError(CannotUseShaderProgram);
 		}
