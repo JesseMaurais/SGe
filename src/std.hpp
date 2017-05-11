@@ -8,7 +8,8 @@
 
 namespace
 {
-	template <typename Dst, typename Src> inline Dst to(const Src &value)
+	template <typename Dst, typename Src>
+	Dst to(const Src &value)
 	{
 		using dst = std::numeric_limits<Dst>;
 		using src = std::numeric_limits<Src>;
@@ -20,14 +21,16 @@ namespace
 		return static_cast<Dst>(value);
 	}
 
-	template <typename Src> inline unsigned to_unsigned(const Src &value)
+	template <typename Src>
+	unsigned to_unsigned(const Src &value)
 	{
 		using source = std::numeric_limits<Src>;
 		static_assert(source::is_integer, "Value must be an integer type");
 		return to<unsigned>(value);
 	}
 
-	template <typename Src> inline int to_int(const Src &val)
+	template <typename Src>
+	int to_int(const Src &val)
 	{
 		using source = std::numeric_limits<Src>;
 		static_assert(source::is_integer, "Value must be an integer type");
@@ -37,12 +40,31 @@ namespace
 
 namespace stl
 {
-	template <typename Type> inline void merge(std::vector<Type> const &from, std::vector<Type> &to)
+	template <typename Type>
+	void merge(std::vector<Type> const &from, std::vector<Type> &to)
 	{
 		std::size_t from_size = from.size();
 		std::size_t to_size = to.size();
 		to.reserve(from_size + to_size);
 		to.insert(to.end(), from.begin(), from.end());
+	}
+
+	template <typename Container>
+	Container &max(Container &a, Container &b)
+	{
+		return a.size() > b.size() ? a : b;
+	}
+
+	template <typename Container>
+	Container &min(Container &a, Container &b)
+	{
+		return a.size() < b.size() ? a : b;
+	}
+
+	template <typename Container>
+	std::pair<Container&, Container&> minmax(Container &a, Container &b)
+	{
+		return std::make_pair(stl::min(a, b), stl::max(a, b));
 	}
 }
 
