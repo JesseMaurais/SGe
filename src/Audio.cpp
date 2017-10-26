@@ -2,27 +2,23 @@
 #include "Source.hpp"
 #include "SDL.hpp"
 
-Resource &AudioBufferResource();
-
 AudioBuffer::AudioBuffer()
 {
-	id = AudioBufferResource().Add(this);
+	id = Manager().Add(this);
 }
 
 AudioBuffer::~AudioBuffer()
 {
-	SDL_verify(AudioBufferResource().Remove(id) == this);
+	SDL_verify(Manager().Remove(id) == this);
 }
-
-Resource &AudioSourceResource();
 
 AudioSource::AudioSource()
 {
-	id = AudioSourceResource().Add(this);
+	id = Manager().Add(this);
 }
 
 AudioSource::~AudioSource()
 {
-	SDL_verify(AudioSourceResource().Remove(id) == this);
+	SDL_verify(Manager().Remove(id) == this);
 }
 

@@ -5,38 +5,22 @@
 #include "SDL.hpp"
 #include <vector>
 
-// Common audio resource manager
-
-namespace
-{
-	class AudioManager : public Manager
-	{
-	protected:
-
-		std::vector<ALuint> ids;
-
-		bool Enabled() override
-		{
-			return not ids.empty();
-		}
-	};
-}
-
 // OpenAL buffer management
 
 namespace
 {
-	class AudioBufferManager final : public AudioManager
+	class AudioBufferManager final : public Manager
 	{
 	private:
 
 		AudioBufferManager() = default;
+		std::vector<ALuint> ids;
 
 	public:
 
 		void Init()
 		{
-			unsigned const size = Manager::Size();
+			auto const size = Manager::Size();
 			ids.resize(size);
 			if (size > 0)
 			{
@@ -48,7 +32,7 @@ namespace
 
 		void Free()
 		{
-			unsigned const size = Manager::Size();
+			auto const size = Manager::Size();
 			if (not ids.empty())
 			{
 				SDL_assert(ids.size() == size);
@@ -71,7 +55,7 @@ namespace
 	};
 }
 
-Resource &AudioBufferResource()
+Resource &AudioBuffer::Manager()
 {
 	return AudioBufferManager::Instance();
 }
@@ -85,17 +69,18 @@ ALuint OpenAL_GetBuffer(unsigned index)
 
 namespace
 {
-	class AudioSourceManager final : public AudioManager
+	class AudioSourceManager final : public Manager
 	{
 	public:
 
 		AudioSourceManager() = default;
+		std::vector<ALuint> ids;
 
 	public:
 
 		void Init()
 		{
-			unsigned const size = Manager::Size();
+			auto const size = Manager::Size();
 			ids.resize(size);
 			if (size > 0)
 			{
@@ -107,7 +92,7 @@ namespace
 
 		void Free()
 		{
-			unsigned const size = Manager::Size();
+			auto const size = Manager::Size();
 			if (not ids.empty())
 			{
 				SDL_assert(ids.size() == size);
@@ -129,7 +114,7 @@ namespace
 	};
 }
 
-Resource &AudioSourceResource()
+Resource &AudioSource::Manager()
 {
 	return AudioSourceManager::Instance();
 }
@@ -146,6 +131,7 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 	static struct AudioDevice
 	{
 		ALCdevice *device = nullptr;
+
 		AudioDevice() = default;
 		AudioDevice(const char *name)
 		{
@@ -194,6 +180,7 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 	static struct AudioContext
 	{
 		ALCcontext *context = nullptr;
+
 		AudioContext() = default;
 		AudioContext(int const *attributes)
 		{

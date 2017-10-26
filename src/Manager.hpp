@@ -12,9 +12,10 @@ private:
 
 public:
 
+	unsigned Update() override;
 	unsigned Add(Source *that) override;
 	Source *Remove(unsigned id) override;
-	unsigned Update() override;
+	bool Has(unsigned id) override;
 	unsigned Size();
 };
 

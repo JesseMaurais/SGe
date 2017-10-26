@@ -1,6 +1,7 @@
 /** \file
- * Utilities for working with OpenGL: error string report and graphics context
- * singleton for resource management.
+ * Utilities for working with OpenGL:
+ * 		Reporting of errors through SDL
+ *		Graphics context singleton for resource management.
  */
 
 #ifndef OpenGL_hpp

@@ -1,7 +1,19 @@
 #include "Manager.hpp"
-
 #include "std.hpp"
 #include "SDL.hpp"
+
+unsigned Manager::Update()
+{
+	unsigned count = 0;
+	for (auto const it : sources)
+	{
+		if (not it or it->Update())
+		{
+			++count;
+		}
+	}
+	return count;
+}
 
 unsigned Manager::Add(Source *that)
 {
@@ -11,6 +23,7 @@ unsigned Manager::Add(Source *that)
 	{
 		if (not sources[index])
 		{
+			sources[index] = that;
 			return index;
 		}
 	}
@@ -21,22 +34,15 @@ unsigned Manager::Add(Source *that)
 
 Source *Manager::Remove(unsigned index)
 {
-	Source *that = sources.at(index);
+	SDL_assert(Has(index));
+	auto const that = sources.at(index);
 	sources.at(index) = nullptr;
 	return that;
 }
 
-unsigned Manager::Update()
+bool Manager::Has(unsigned index)
 {
-	unsigned count = 0;
-	for (Source *it : sources)
-	{
-		if (not it or it->Update())
-		{
-			++count;
-		}
-	}
-	return count;
+	return index < sources.size() and sources[index];
 }
 
 unsigned Manager::Size()

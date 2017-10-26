@@ -14,10 +14,10 @@ class Resource
 public:
 
 	virtual ~Resource() = default;
-	virtual bool Enabled() = 0;
 	virtual unsigned Update() = 0;
 	virtual unsigned Add(Source *that) = 0;
 	virtual Source *Remove(unsigned id) = 0;
+	virtual bool Has(unsigned id) = 0;
 };
 
 #endif // file

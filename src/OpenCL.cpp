@@ -144,13 +144,18 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 {
 	static struct PlatformIDs : std::vector<cl_platform_id>
 	{
+		cl_platform_id *Pointer()
+		{
+			return empty() ? nullptr : data();
+		}
+
 		PlatformIDs()
 		{
 			cl_uint num_platforms = 0;
 			do
 			{
 				resize(num_platforms);
-				cl_platform_id *platforms = empty() ? nullptr : data();
+				cl_platform_id *platforms = Pointer();
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
 				if (error)
 				{
@@ -165,7 +170,7 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 
 	} singleton;
 
-	return singleton.empty() ? nullptr : singleton.data();
+	return singleton.Pointer();
 }
 
 
@@ -173,6 +178,11 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 {
 	static struct DeviceIDs : std::vector<cl_device_id>
 	{
+		cl_platform_id *Pointer()
+		{
+			return empty() ? nullptr : data();
+		}
+
 		DeviceIDs() = default;
 		DeviceIDs(cl_platform_id platform, cl_device_type type)
 		{
@@ -180,7 +190,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 			do
 			{
 				reserve(num_devices);
-				cl_device_id *devices = empty() ? nullptr : data();
+				cl_device_id *devices = Pointer();
 				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
 				if (error)
 				{
@@ -200,14 +210,14 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 		cl_platform_id *platforms = OpenCL_GetPlatformIDs();
 		if (platforms)
 		{
-			for (unsigned it = 0; singleton.size() < 2 and platforms[it]; ++it)
+			for (std::size_t it = 0; singleton.size() < 2 and platforms[it]; ++it)
 			{
 				singleton = DeviceIDs(platforms[it], type);
 			}
 		}
 	}
 
-	return singleton.empty() ? nullptr : singleton.data();
+	return singleton.Pointer();
 }
 
 
@@ -216,6 +226,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 	struct ComputeContext
 	{
 		cl_context context = nullptr;
+
 		ComputeContext() = default;
 		ComputeContext(cl_context_properties *properties)
 		{
@@ -223,7 +234,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 			if (devices)
 			{
 				cl_uint num_devices = 0;
-				while (devices[num_devices]) ++num_devices;
+				while (devices[num_devices++]);
 				cl_int error;
 				context = clCreateContext(properties, num_devices, devices, OnNotify, this, &error);
 				if (error)
@@ -243,8 +254,10 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 				}
 			}
 		}
+
 	private:
-		static void OnNotify(const char *error, const void *info, size_t size, void *that)
+
+		static void OnNotify(const char *error, const void *info, std::size_t size, void *that)
 		{
 			(void) info;
 			(void) size;
@@ -253,8 +266,10 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 		}
 
 	} singleton;
+	// Either new or not initialized
 	if (properties or not singleton.context)
 	{
+		// Update for compatibility with given properties
 		singleton = ComputeContext(properties);
 	}
 	return singleton.context;
@@ -265,6 +280,7 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 	static struct CommandQueue
 	{
 		cl_command_queue queue = nullptr;
+
 		CommandQueue() = default;
 		CommandQueue(cl_command_queue_properties properties)
 		{
@@ -274,7 +290,7 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 				cl_context context = OpenCL_GetContext();
 				if (context)
 				{
-					for (unsigned it = 0; not queue and devices[it]; ++it)
+					for (std::size_t it = 0; not queue and devices[it]; ++it)
 					{
 						cl_int error;
 						queue = clCreateCommandQueue(context, devices[it], properties, &error);
@@ -296,8 +312,10 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 		}
 
 	} singleton;
+	// Either new or not initialized
 	if (properties or not singleton.queue)
 	{
+		// Update for compatibility with given properties
 		singleton = CommandQueue(properties);
 	}
 	return singleton.queue;

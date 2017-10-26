@@ -8,6 +8,7 @@ void *OpenGL_GetContext(SDL_Window *window)
 	static struct VideoContext
 	{
 		SDL_GLContext context = nullptr;
+
 		VideoContext() = default;
 		VideoContext(SDL_Window *window)
 		{
