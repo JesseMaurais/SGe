@@ -3,10 +3,16 @@
 
 class Source
 {
+	friend class Manager;
+
 public:
 
 	virtual ~Source() = default;
 	virtual bool Update() = 0;
+
+protected:
+
+	unsigned id;
 };
 
 class Resource
@@ -14,10 +20,8 @@ class Resource
 public:
 
 	virtual ~Resource() = default;
-	virtual unsigned Update() = 0;
 	virtual unsigned Add(Source *that) = 0;
 	virtual Source *Remove(unsigned id) = 0;
-	virtual bool Has(unsigned id) = 0;
 };
 
 #endif // file

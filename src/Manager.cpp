@@ -1,13 +1,35 @@
 #include "Manager.hpp"
 #include "std.hpp"
-#include "SDL.hpp"
+
+unsigned Manager::Add(Source *that)
+{
+	assert(that);
+	unsigned id = Size();
+	sources.push_back(that);
+	return id;
+}
+
+Source *Manager::Remove(unsigned id)
+{
+	assert(Has(id));
+	auto const that = sources.at(id);
+	sources.at(id) = sources.back();
+	sources.at(id)->id = id;
+	sources.pop_back();
+	return that;
+}
 
 unsigned Manager::Update()
 {
+	return Update(sources);
+}
+
+unsigned Manager::Update(std::vector<Source*> &sources)
+{
 	unsigned count = 0;
-	for (auto const it : sources)
+	for (auto const that : sources)
 	{
-		if (not it or it->Update())
+		if (not that or that->Update())
 		{
 			++count;
 		}
@@ -15,34 +37,23 @@ unsigned Manager::Update()
 	return count;
 }
 
-unsigned Manager::Add(Source *that)
+unsigned Manager::Update(std::vector<unsigned> &ids)
 {
-	unsigned index;
-	auto const size = sources.size();
-	for (index = 0; index < size; ++index)
+	unsigned count = 0;
+	for (auto const id : ids)
 	{
-		if (not sources[index])
+		auto const that = sources.at(id);
+		if (not that or that->Update())
 		{
-			sources[index] = that;
-			return index;
+			++count;
 		}
 	}
-	SDL_assert(size == index);
-	sources.push_back(that);
-	return index;
-}
-
-Source *Manager::Remove(unsigned index)
-{
-	SDL_assert(Has(index));
-	auto const that = sources.at(index);
-	sources.at(index) = nullptr;
-	return that;
+	return count;
 }
 
 bool Manager::Has(unsigned index)
 {
-	return index < sources.size() and sources[index];
+	return index < sources.size() and sources.at(index);
 }
 
 unsigned Manager::Size()

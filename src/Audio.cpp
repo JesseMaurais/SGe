@@ -1,5 +1,6 @@
 #include "Audio.hpp"
 #include "Source.hpp"
+#include "Assert.hpp"
 #include "SDL.hpp"
 
 AudioBuffer::AudioBuffer()
@@ -9,7 +10,7 @@ AudioBuffer::AudioBuffer()
 
 AudioBuffer::~AudioBuffer()
 {
-	SDL_verify(Manager().Remove(id) == this);
+	verify(Manager().Remove(id) == this);
 }
 
 AudioSource::AudioSource()
@@ -19,6 +20,6 @@ AudioSource::AudioSource()
 
 AudioSource::~AudioSource()
 {
-	SDL_verify(Manager().Remove(id) == this);
+	verify(Manager().Remove(id) == this);
 }
 

@@ -26,6 +26,7 @@ signed OpenAL_LogError(ALCdevice *device, const char *origin);
 
 // Buffer id at the given index from within the singleton.
 ALuint OpenAL_GetBuffer(unsigned index);
+
 // Source id at the given index from within the singleton.
 ALuint OpenAL_GetSource(unsigned index);
 

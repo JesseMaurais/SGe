@@ -1,59 +1,85 @@
+#include "Audio.hpp"
 #include "OpenAL.hpp"
 #include "Manager.hpp"
-#include "Source.hpp"
-#include "Audio.hpp"
+#include "Event.hpp"
 #include "SDL.hpp"
-#include <vector>
+#include "std.hpp"
 
-// OpenAL buffer management
+// Resource management implementation
 
 namespace
 {
-	class AudioBufferManager final : public Manager
+	// User event codes to queue updates for buffers and sources
+	enum AudioEventCode : Uint32 { UpdateBuffers, UpdateSources };
+
+	// Generic resource manager for any ALuint based id type
+	template <AudioEventCode UpdateCode>
+	class AudioManager : public ResourceManager<ALuint>
 	{
 	private:
 
-		AudioBufferManager() = default;
-		std::vector<ALuint> ids;
+		bool SendUpdate() override
+		{
+			return SendUserEvent(UpdateAudio, UpdateCode);
+		}
+	};
 
+	class AudioBufferManager final : public AudioManager<UpdateBuffers>
+	{
 	public:
-
-		void Init()
-		{
-			auto const size = Manager::Size();
-			ids.resize(size);
-			if (size > 0)
-			{
-				alGenBuffers(size, ids.data());
-				OpenAL_LogError("alGenBuffers");
-			}
-			SDL_verify(Update() == size);
-		}
-
-		void Free()
-		{
-			auto const size = Manager::Size();
-			if (not ids.empty())
-			{
-				SDL_assert(ids.size() == size);
-				alDeleteBuffers(size, ids.data());
-				OpenAL_LogError("alDeleteBuffers");
-				ids.clear();
-			}
-		}
-
-		ALuint ID(unsigned index) const
-		{
-			return ids.at(index);
-		}
 
 		static AudioBufferManager &Instance()
 		{
 			static AudioBufferManager singleton;
 			return singleton;
 		}
+
+	private:
+
+		AudioBufferManager() = default;
+
+		void Generate(std::vector<ALuint> &ids) override
+		{
+			alGenBuffers(ids.size(), ids.data());
+			OpenAL_LogError("alGenBuffers");
+		}
+
+		void Destroy(std::vector<ALuint> &ids) override
+		{
+			alDeleteBuffers(ids.size(), ids.data());
+			OpenAL_LogError("alDeleteBuffers");
+		}
+	};
+
+	class AudioSourceManager final : public AudioManager<UpdateSources>
+	{
+	public:
+
+		static AudioSourceManager &Instance()
+		{
+			static AudioSourceManager singleton;
+			return singleton;
+		}
+
+	private:
+
+		AudioSourceManager() = default;
+
+		void Generate(std::vector<ALuint> &ids) override
+		{
+			alGenSources(ids.size(), ids.data());
+			OpenAL_LogError("alGenSources");
+		}
+
+		void Destroy(std::vector<ALuint> &ids) override
+		{
+			alDeleteSources(ids.size(), ids.data());
+			OpenAL_LogError("alDeleteSources");
+		}
 	};
 }
+
+// OpenAL buffer management
 
 Resource &AudioBuffer::Manager()
 {
@@ -66,53 +92,6 @@ ALuint OpenAL_GetBuffer(unsigned index)
 }
 
 // OpenAL source management
-
-namespace
-{
-	class AudioSourceManager final : public Manager
-	{
-	public:
-
-		AudioSourceManager() = default;
-		std::vector<ALuint> ids;
-
-	public:
-
-		void Init()
-		{
-			auto const size = Manager::Size();
-			ids.resize(size);
-			if (size > 0)
-			{
-				alGenSources(size, ids.data());
-				OpenAL_LogError("alGenSources");
-			}
-			SDL_verify(Update() == size);
-		}
-
-		void Free()
-		{
-			auto const size = Manager::Size();
-			if (not ids.empty())
-			{
-				SDL_assert(ids.size() == size);
-				alDeleteSources(size, ids.data());
-				OpenAL_LogError("alDeleteSources");
-			}
-		}
-
-		ALuint ID(unsigned index) const
-		{
-			return ids.at(index);
-		}
-
-		static AudioSourceManager &Instance()
-		{
-			static AudioSourceManager singleton;
-			return singleton;
-		}
-	};
-}
 
 Resource &AudioSource::Manager()
 {
@@ -128,8 +107,10 @@ ALuint OpenAL_GetSource(unsigned index)
 
 ALCdevice *OpenAL_GetDevice(const char *name)
 {
-	static struct AudioDevice
+	static class AudioDevice
 	{
+	public:
+
 		ALCdevice *device = nullptr;
 
 		AudioDevice() = default;
@@ -155,7 +136,7 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 		~AudioDevice()
 		{
 			// Destroy the singleton context too
-			SDL_verify(not OpenAL_GetContext(nullptr));
+			verify(not OpenAL_GetContext(nullptr));
 			// Close device if it was opened
 			if (device and not alcCloseDevice(device))
 			{
@@ -177,8 +158,10 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 
 ALCcontext *OpenAL_GetContext(int const *attributes)
 {
-	static struct AudioContext
+	static class AudioContext
 	{
+	public:
+
 		ALCcontext *context = nullptr;
 
 		AudioContext() = default;
@@ -211,11 +194,13 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 							OpenAL_LogError(device, "alcMakeContextCurrent");
 						}
 						// Generate audio buffers
-						AudioBufferManager::Instance().Init();
+						AudioBufferManager::Instance().Initialize();
 						// Generate audio sources
-						AudioSourceManager::Instance().Init();
+						AudioSourceManager::Instance().Initialize();
 						// Begin processing input
 						alcProcessContext(context);
+						// Register update handler
+						PushEventHandler(UpdateAudio, UpdateAudioHandler);
 					}
 				}
 			}
@@ -225,12 +210,14 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 			// Destroy if it was created
 			if (context)
 			{
+				// Unregister update handler
+				PopEventHandler(UpdateAudio);
 				// Stop processing input
 				alcSuspendContext(context);
 				// Delete audio sources
-				AudioSourceManager::Instance().Free();
+				AudioSourceManager::Instance().Release();
 				// Delete audio buffers
-				AudioBufferManager::Instance().Free();
+				AudioBufferManager::Instance().Release();
 				// Detach before we destroy it
 				if (alcGetCurrentContext() == context)
 				{
@@ -243,6 +230,26 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 				// Now safe to destroy
 				alcDestroyContext(context);
 			}
+		}
+
+	private:
+
+		static bool UpdateAudioHandler(SDL_Event const &event)
+		{
+			assert(UserEventType::UpdateAudio == event.user.type);
+			switch (event.user.code)
+			{
+			case AudioEventCode::UpdateBuffers:
+				AudioBufferManager::Instance().Update();
+				break;
+			case AudioEventCode::UpdateSources:
+				AudioSourceManager::Instance().Update();
+				break;
+			default:
+				assert(not "AudioEventCode");
+				return false;
+			}
+			return true;
 		}
 
 	} singleton;

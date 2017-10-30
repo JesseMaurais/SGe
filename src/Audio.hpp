@@ -9,8 +9,6 @@ protected:
 
 	static Resource &Manager();
 
-	unsigned id;
-
 public:
 
 	AudioBuffer();
@@ -22,8 +20,6 @@ class AudioSource : public Source
 protected:
 
 	static Resource &Manager();
-
-	unsigned id;
 
 public:
 

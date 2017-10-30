@@ -1,7 +1,60 @@
 #include "OpenGL.hpp"
 #include "Strings.hpp"
+#include "Manager.hpp"
 #include "SDL.hpp"
 
+namespace
+{
+	class TextureManager final : public Manager
+	{
+	private:
+
+		TextureManager() = default;
+		std::vector<GLuint> ids;
+
+	public:
+
+		void Init()
+		{
+			auto const size = Manager::Size();
+			ids.resize(size);
+			if (size > 0)
+			{
+				glGenTextures(size, ids.data());
+				OpenGL_LogError("glGenTexture");
+			}
+			SDL_verify(Update() == size);
+		}
+
+		void Free()
+		{
+			auto const size = Manager::Size();
+			if (not ids.empty())
+			{
+				SDL_assert(ids.size() == size);
+				glDeleteTextures(size, ids.data());
+				OpenGL_LogError("glDeleteTextures");
+				ids.clear();
+			}
+		}
+
+		GLuint ID(unsigned index) const
+		{
+			return ids.at(index);
+		}
+
+		static TextureManager &Instance()
+		{
+			static TextureManager singleton;
+			return singleton;
+		}
+	};
+}
+
+GLuint OpenGL_GetTexture(unsigned index)
+{
+	return TextureManager::Instance().ID(index);
+}
 
 void *OpenGL_GetContext(SDL_Window *window)
 {

@@ -3,6 +3,14 @@
 #include <stack>
 #include <map>
 
+bool SendUserEvent(enum UserEventType type, unsigned code)
+{
+	SDL_Event event;
+	event.user.type = UserEvent(type);
+	event.user.code = code;
+	return 0 == SDL_PushEvent(&event);
+}
+
 unsigned UserEvent(enum UserEventType type)
 {
 	static const auto base = SDL_RegisterEvents(UserEventCount);
@@ -16,6 +24,16 @@ static Stack &HandlerStack(Uint32 eventCode)
 {
 	static StackMap eventStacks;
 	return eventStacks[eventCode];
+}
+
+void PushEventHandler(unsigned eventCode, EventHandler function)
+{
+	HandlerStack(eventCode).push(function);
+}
+
+void PopEventHandler(unsigned eventCode)
+{
+	HandlerStack(eventCode).pop();
 }
 
 void Dispatch(const SDL_Event &event)
@@ -38,14 +56,4 @@ void Dispatch(const SDL_Event &event)
 		stack.push(handler);
 		store.pop();
 	}
-}
-
-void PushEventHandler(unsigned eventCode, EventHandler function)
-{
-	HandlerStack(eventCode).push(function);
-}
-
-void PopEventHandler(unsigned eventCode)
-{
-	HandlerStack(eventCode).pop();
 }

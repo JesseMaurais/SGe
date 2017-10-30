@@ -1,5 +1,5 @@
-
 #include "OpenCL.hpp"
+#include "Manager.hpp"
 #include "SDL.hpp"
 #include <cstdio>
 #include <vector>
@@ -178,7 +178,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 {
 	static struct DeviceIDs : std::vector<cl_device_id>
 	{
-		cl_platform_id *Pointer()
+		cl_device_id *Pointer()
 		{
 			return empty() ? nullptr : data();
 		}

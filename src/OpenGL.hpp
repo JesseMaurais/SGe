@@ -20,6 +20,9 @@ signed OpenGL_SetError(const char *origin);
 /// Log the current error with SDL
 signed OpenGL_LogError(const char *origin);
 
+// Texture id at the given index from within the singleton.
+GLuint OpenGL_GetTexture(unsigned index);
+
 /**
  * \brief Update the graphics device singleton for compatibility with the given window.
  * \param window Window for which the singleton context will be made compatible.

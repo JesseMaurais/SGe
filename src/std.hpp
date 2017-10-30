@@ -1,10 +1,17 @@
 #ifndef STL_hpp
 #define STL_hpp
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <cassert>
+
+#ifndef NDEBUG
+#define verify(condition) assert(condition)
+#else
+#define verify(condtiion) condition
+#endif
 
 namespace
 {
@@ -43,8 +50,8 @@ namespace stl
 	template <typename Type>
 	void merge(std::vector<Type> const &from, std::vector<Type> &to)
 	{
-		std::size_t from_size = from.size();
-		std::size_t to_size = to.size();
+		auto from_size = from.size();
+		auto to_size = to.size();
 		to.reserve(from_size + to_size);
 		to.insert(to.end(), from.begin(), from.end());
 	}
@@ -65,6 +72,12 @@ namespace stl
 	std::pair<Container&, Container&> minmax(Container &a, Container &b)
 	{
 		return std::make_pair(stl::min(a, b), stl::max(a, b));
+	}
+
+	template <typename Container, typename Predicate>
+	auto count_if(Container& c, Predicate& p)
+	{
+		return std::count_if(c.begin(), c.end(), p);
 	}
 }
 
