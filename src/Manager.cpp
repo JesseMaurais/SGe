@@ -29,7 +29,7 @@ unsigned Manager::Update(std::vector<Source*> &sources)
 	unsigned count = 0;
 	for (auto const that : sources)
 	{
-		if (not that or that->Update())
+		if (not that or that->UpdateSource())
 		{
 			++count;
 		}
@@ -43,7 +43,7 @@ unsigned Manager::Update(std::vector<unsigned> &ids)
 	for (auto const id : ids)
 	{
 		auto const that = sources.at(id);
-		if (not that or that->Update())
+		if (not that or that->UpdateSource())
 		{
 			++count;
 		}

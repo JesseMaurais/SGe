@@ -14,7 +14,7 @@ namespace
 
 	// Generic resource manager for any ALuint based id type
 	template <AudioEventCode UpdateCode>
-	class AudioManager : public ResourceManager<ALuint>
+	class AudioManager : public UpdateManager<ALuint>
 	{
 	private:
 
@@ -81,7 +81,7 @@ namespace
 
 // OpenAL buffer management
 
-Resource &AudioBuffer::Manager()
+Resources &AudioBuffer::Manager()
 {
 	return AudioBufferManager::Instance();
 }
@@ -93,7 +93,7 @@ ALuint OpenAL_GetBuffer(unsigned index)
 
 // OpenAL source management
 
-Resource &AudioSource::Manager()
+Resources &AudioSource::Manager()
 {
 	return AudioSourceManager::Instance();
 }

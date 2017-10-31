@@ -43,16 +43,22 @@ namespace
 		static_assert(source::is_integer, "Value must be an integer type");
 		return to<int>(val);
 	}
+
+	template  <typename Src>
+	std::string to_string(const Src &val)
+	{
+		return std::to_string(val);
+	}
 }
 
 namespace stl
 {
 	template <typename Type>
-	void merge(std::vector<Type> const &from, std::vector<Type> &to)
+	void append(std::vector<Type> &to, std::vector<Type> const &from)
 	{
-		auto from_size = from.size();
-		auto to_size = to.size();
-		to.reserve(from_size + to_size);
+		auto const size_from = from.size();
+		auto const size_to = to.size();
+		to.reserve(size_from + size_to);
 		to.insert(to.end(), from.begin(), from.end());
 	}
 

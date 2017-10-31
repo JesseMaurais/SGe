@@ -4,12 +4,8 @@
 #include "Source.hpp"
 #include <vector>
 
-class Manager : public Resource
+class Manager : public Resources
 {
-private:
-
-	std::vector<Source*> sources;
-
 public:
 
 	unsigned Add(Source *that) override;
@@ -22,9 +18,13 @@ protected:
 
 	unsigned Update(std::vector<Source*> &sources);
 	unsigned Update(std::vector<unsigned> &ids);
+
+private:
+
+	std::vector<Source*> sources;
 };
 
-template <typename Type> class ResourceManager : Manager
+template <typename Type> class UpdateManager : Manager
 {
 public:
 
@@ -51,7 +51,7 @@ public:
 		auto const size = Manager::Size();
 		bool ok = ids.size() == size;
 		// Destroy current and removed
-		stl::merge(removed, ids);
+		stl::append(removed, ids);
 		if (not ids.empty())
 		{
 			Destroy(ids);
@@ -71,7 +71,7 @@ public:
 		std::vector<Type> newids(size);
 		// Generate new for added
 		Generate(newids);
-		stl::merge(newids, ids);
+		stl::append(ids, newids);
 		// Update the new from their sources
 		bool ok = Manager::Update(added) == size;
 		added.clear();
@@ -79,7 +79,7 @@ public:
 	}
 
 	// Get the internal resource id
-	ALuint ID(unsigned index) const
+	Type ID(unsigned index) const
 	{
 		return ids.at(index);
 	}

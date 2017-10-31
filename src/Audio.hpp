@@ -7,7 +7,7 @@ class AudioBuffer : public Source
 {
 protected:
 
-	static Resource &Manager();
+	static Resources &Manager();
 
 public:
 
@@ -19,7 +19,7 @@ class AudioSource : public Source
 {
 protected:
 
-	static Resource &Manager();
+	static Resources &Manager();
 
 public:
 

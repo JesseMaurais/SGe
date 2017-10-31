@@ -8,18 +8,18 @@ class Source
 public:
 
 	virtual ~Source() = default;
-	virtual bool Update() = 0;
+	virtual bool UpdateSource() = 0;
 
 protected:
 
 	unsigned id;
 };
 
-class Resource
+class Resources
 {
 public:
 
-	virtual ~Resource() = default;
+	virtual ~Resources() = default;
 	virtual unsigned Add(Source *that) = 0;
 	virtual Source *Remove(unsigned id) = 0;
 };
