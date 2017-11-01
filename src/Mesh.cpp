@@ -37,13 +37,13 @@ void Mesh::Append(Mesh const &M)
 		G.count = it->second.count;
 	}
 
-	stl::merge(M.edges, edges);
-	stl::merge(M.points, points);
-	stl::merge(M.faces, faces);
-	stl::merge(M.colors, colors);
-	stl::merge(M.normals, normals);
-	stl::merge(M.vertexes, vertexes);
-	stl::merge(M.texCoords, texCoords);
+	stl::append(edges, M.edges);
+	stl::append(points, M.points);
+	stl::append(faces, M.faces);
+	stl::append(colors, M.colors);
+	stl::append(normals, M.normals);
+	stl::append(vertexes, M.vertexes);
+	stl::append(texCoords, M.texCoords);
 }
 
 int Mesh::AddSurface(Surface const &S)

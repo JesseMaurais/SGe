@@ -3,7 +3,7 @@
 
 class Source
 {
-	friend class Manager;
+	friend class ManagerCommon;
 
 public:
 

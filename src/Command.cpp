@@ -37,22 +37,22 @@ static int CommandThread(void *unused)
 		// Send the event, wait on processing
 		if (not SDL_PushEvent(&event))
 		{
-			SDL_perror("SDL_PushEvent");
+			SDL::perror("SDL_PushEvent");
 		}
 		else
 		if (not Quit)
 		{
 			if (SDL_LockMutex(Mutex))
 			{
-				SDL_perror("SDL_LockMutex");
+				SDL::perror("SDL_LockMutex");
 			}
 			if (SDL_CondWait(Cond, Mutex))
 			{
-				SDL_perror("SDL_CondWait");
+				SDL::perror("SDL_CondWait");
 			}
 			if (SDL_UnlockMutex(Mutex))
 			{
-				SDL_perror("SDL_UnlockMutex");
+				SDL::perror("SDL_UnlockMutex");
 			}
 		}
 	}
@@ -63,7 +63,7 @@ bool CommandExec(const SDL_Event &event)
 {
 	if (SDL_LockMutex(Mutex))
 	{
-		SDL_perror("SDL_LockMutex");
+		SDL::perror("SDL_LockMutex");
 	}
 
 	union {
@@ -83,11 +83,11 @@ bool CommandExec(const SDL_Event &event)
 
 	if (SDL_CondSignal(Cond))
 	{
-		SDL_perror("SDL_CondSignal");
+		SDL::perror("SDL_CondSignal");
 	}
 	if (SDL_UnlockMutex(Mutex))
 	{
-		SDL_perror("SDL_UnlockMutex");
+		SDL::perror("SDL_UnlockMutex");
 	}
 	return true;
 }
@@ -97,14 +97,14 @@ signed CommandInit(const char *prompt)
 	Cond = SDL_CreateCond();
 	if (not Cond)
 	{
-	 SDL_perror("SDL_CreateCond");
+	 SDL::perror("SDL_CreateCond");
 	 return SetError(CannotCreateCommandQueue);
 	}
 	Mutex = SDL_CreateMutex();
 	if (not Mutex)
 	{
 	 SDL_DestroyCond(Cond);
-	 SDL_perror("SDL_CreateMutex");
+	 SDL::perror("SDL_CreateMutex");
 	 return SetError(CannotCreateCommandQueue);
 	}
 	Thread = SDL_CreateThread(CommandThread, "Command", nullptr);
@@ -112,7 +112,7 @@ signed CommandInit(const char *prompt)
 	{
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL_perror("SDL_CreateThread");
+	 SDL::perror("SDL_CreateThread");
 	 return SetError(CannotCreateCommandQueue);
 	}
 	PushEventHandler(UserEvent(ExecuteCommand), CommandExec);

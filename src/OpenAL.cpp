@@ -14,7 +14,7 @@ namespace
 
 	// Generic resource manager for any ALuint based id type
 	template <AudioEventCode UpdateCode>
-	class AudioManager : public UpdateManager<ALuint>
+	class AudioManager : public Manager<ALuint>
 	{
 	private:
 
@@ -41,13 +41,13 @@ namespace
 		void Generate(std::vector<ALuint> &ids) override
 		{
 			alGenBuffers(ids.size(), ids.data());
-			OpenAL_LogError("alGenBuffers");
+			OpenAL::LogError("alGenBuffers");
 		}
 
-		void Destroy(std::vector<ALuint> &ids) override
+		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteBuffers(ids.size(), ids.data());
-			OpenAL_LogError("alDeleteBuffers");
+			OpenAL::LogError("alDeleteBuffers");
 		}
 	};
 
@@ -68,13 +68,13 @@ namespace
 		void Generate(std::vector<ALuint> &ids) override
 		{
 			alGenSources(ids.size(), ids.data());
-			OpenAL_LogError("alGenSources");
+			OpenAL::LogError("alGenSources");
 		}
 
-		void Destroy(std::vector<ALuint> &ids) override
+		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteSources(ids.size(), ids.data());
-			OpenAL_LogError("alDeleteSources");
+			OpenAL::LogError("alDeleteSources");
 		}
 	};
 }
@@ -86,9 +86,9 @@ Resources &AudioBuffer::Manager()
 	return AudioBufferManager::Instance();
 }
 
-ALuint OpenAL_GetBuffer(unsigned index)
+ALuint OpenAL::GetBuffer(unsigned index)
 {
-	return AudioBufferManager::Instance().ID(index);
+	return AudioBufferManager::Instance().Data(index);
 }
 
 // OpenAL source management
@@ -98,14 +98,14 @@ Resources &AudioSource::Manager()
 	return AudioSourceManager::Instance();
 }
 
-ALuint OpenAL_GetSource(unsigned index)
+ALuint OpenAL::GetSource(unsigned index)
 {
-	return AudioSourceManager::Instance().ID(index);
+	return AudioSourceManager::Instance().Data(index);
 }
 
 // OpenAL device management
 
-ALCdevice *OpenAL_GetDevice(const char *name)
+ALCdevice *OpenAL::GetDevice(const char *name)
 {
 	static class AudioDevice
 	{
@@ -129,18 +129,18 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 				if (not device)
 				{
 					// Set the error string and return null
-					OpenAL_SetError(nullptr, "alcOpenDevice");
+					OpenAL::CheckError(nullptr, "alcOpenDevice");
 				}
 			}
 		}
 		~AudioDevice()
 		{
 			// Destroy the singleton context too
-			verify(not OpenAL_GetContext(nullptr));
+			verify(not OpenAL::GetContext(nullptr));
 			// Close device if it was opened
 			if (device and not alcCloseDevice(device))
 			{
-				OpenAL_LogError(nullptr, "alcCloseDevice");
+				OpenAL::LogError(nullptr, "alcCloseDevice");
 			}
 		}
 
@@ -156,7 +156,7 @@ ALCdevice *OpenAL_GetDevice(const char *name)
 
 // OpenAL context management
 
-ALCcontext *OpenAL_GetContext(int const *attributes)
+ALCcontext *OpenAL::GetContext(int const *attributes)
 {
 	static class AudioContext
 	{
@@ -176,7 +176,7 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 					attributes = nullptr;
 				}
 				// Get the singleton device first
-				ALCdevice *device = OpenAL_GetDevice();
+				ALCdevice *device = OpenAL::GetDevice();
 				if (device)
 				{
 					// Create a context with the given attributes
@@ -184,14 +184,14 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 					if (not context)
 					{
 						// Set the error string and return null
-						OpenAL_SetError(device, "alcCreateContext");
+						OpenAL::CheckError(device, "alcCreateContext");
 					}
 					else
 					{
 						// Attach when creation succeeds
 						if (not alcMakeContextCurrent(context))
 						{
-							OpenAL_LogError(device, "alcMakeContextCurrent");
+							OpenAL::LogError(device, "alcMakeContextCurrent");
 						}
 						// Generate audio buffers
 						AudioBufferManager::Instance().Initialize();
@@ -224,7 +224,7 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 					if (not alcMakeContextCurrent(nullptr))
 					{
 						ALCdevice *device = alcGetContextsDevice(context);
-						OpenAL_LogError(device, "alcMakeContextCurrent");
+						OpenAL::LogError(device, "alcMakeContextCurrent");
 					}
 				}
 				// Now safe to destroy
@@ -237,6 +237,7 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 		static bool UpdateAudioHandler(SDL_Event const &event)
 		{
 			assert(UserEventType::UpdateAudio == event.user.type);
+			// Update method by code
 			switch (event.user.code)
 			{
 			case AudioEventCode::UpdateBuffers:
@@ -264,54 +265,54 @@ ALCcontext *OpenAL_GetContext(int const *attributes)
 
 // OpenAL error utility functions
 
-signed OpenAL_SetError(char const *origin, ALenum error)
+signed OpenAL::SetError(char const *origin, ALenum error)
 {
 	return SDL_SetError("%s: %s", origin, alGetString(error));
 }
 
-signed OpenAL_SetError(char const *origin)
+signed OpenAL::CheckError(char const *origin)
 {
 	ALenum error = alGetError();
 	if (error)
 	{
-		return OpenAL_SetError(origin, error);
+		return OpenAL::SetError(origin, error);
 	}
 	return 0;
 }
 
-signed OpenAL_LogError(char const *origin)
+signed OpenAL::LogError(char const *origin)
 {
 	ALenum error = alGetError();
 	if (error)
 	{
-		return SDL_perror(origin, alGetString(error));
+		return SDL::perror(origin, alGetString(error));
 	}
 	return 0;
 }
 
 // ALC error utility functions
 
-signed OpenAL_SetError(ALCdevice *device, char const *origin, ALenum error)
+signed OpenAL::SetError(ALCdevice *device, char const *origin, ALenum error)
 {
 	return SDL_SetError("%s: %s", origin, alcGetString(device, error));
 }
 
-signed OpenAL_SetError(ALCdevice *device, char const *origin)
+signed OpenAL::CheckError(ALCdevice *device, char const *origin)
 {
 	ALCenum error = alcGetError(device);
 	if (error)
 	{
-		return OpenAL_SetError(device, origin, error);
+		return OpenAL::SetError(device, origin, error);
 	}
 	return 0;
 }
 
-signed OpenAL_LogError(ALCdevice *device, char const *origin)
+signed OpenAL::LogError(ALCdevice *device, char const *origin)
 {
 	ALCenum error = alcGetError(device);
 	if (error)
 	{
-		return SDL_perror(origin, alcGetString(device, error));
+		return SDL::perror(origin, alcGetString(device, error));
 	}
 	return 0;
 }

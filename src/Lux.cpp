@@ -26,7 +26,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_RED_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_RED_SIZE");
+			 SDL::perror("SDL_GL_RED_SIZE");
 		 }
 		}
 		else
@@ -34,7 +34,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_GREEN_SIZE");
+			 SDL::perror("SDL_GL_GREEN_SIZE");
 		 }
 		}
 		else
@@ -42,7 +42,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_BLUE_SIZE");
+			 SDL::perror("SDL_GL_BLUE_SIZE");
 		 }
 		}
 		else
@@ -50,7 +50,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_ALPHA_SIZE");
+			 SDL::perror("SDL_GL_ALPHA_SIZE");
 		 }
 		}
 		else
@@ -58,7 +58,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_BUFFER_SIZE");
+			 SDL::perror("SDL_GL_BUFFER_SIZE");
 		 }
 		}
 		else
@@ -66,7 +66,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, toboolean))
 		 {
-		  SDL_perror("SDL_GL_DOUBLEBUFFER");
+			 SDL::perror("SDL_GL_DOUBLEBUFFER");
 		 }
 		}
 		else
@@ -74,7 +74,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_DEPTH_SIZE");
+			 SDL::perror("SDL_GL_DEPTH_SIZE");
 		 }
 		}
 		else
@@ -82,7 +82,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_STENCIL_SIZE");
+			 SDL::perror("SDL_GL_STENCIL_SIZE");
 		 }
 		}
 		else
@@ -90,7 +90,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_ACCUM_RED_SIZE");
+			 SDL::perror("SDL_GL_ACCUM_RED_SIZE");
 		 }
 		}
 		else
@@ -98,7 +98,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_ACCUM_GREEN_SIZE");
+			 SDL::perror("SDL_GL_ACCUM_GREEN_SIZE");
 		 }
 		}
 		else
@@ -106,7 +106,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_ACCUM_RED_SIZE");
+			 SDL::perror("SDL_GL_ACCUM_RED_SIZE");
 		 }
 		}
 		else
@@ -114,7 +114,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, tointeger))
 		 {
-		  SDL_perror("SDL_GL_ACCUM_GREEN_SIZE");
+			 SDL::perror("SDL_GL_ACCUM_GREEN_SIZE");
 		 }
 		}
 		else
@@ -122,7 +122,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_STEREO, toboolean))
 		 {
-		  SDL_perror("SDL_GL_STEREO");
+			 SDL::perror("SDL_GL_STEREO");
 		 }
 		}
 		else
@@ -130,7 +130,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, tointeger))
 		 {
-		  SDL_perror("SDL_GL_MULTISAMPLEBUFFERS");
+			 SDL::perror("SDL_GL_MULTISAMPLEBUFFERS");
 		 }
 		}
 		else
@@ -138,7 +138,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, tointeger))
 		 {
-		  SDL_perror("SDL_GL_MULTISAMPLESAMPLES");
+			 SDL::perror("SDL_GL_MULTISAMPLESAMPLES");
 		 }
 		}
 		else
@@ -146,7 +146,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, toboolean))
 		 {
-		  SDL_perror("SDL_GL_ACCELERATED_VISUAL");
+			 SDL::perror("SDL_GL_ACCELERATED_VISUAL");
 		 }
 		}
 		else
@@ -154,7 +154,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, tointeger))
 		 {
-		  SDL_perror("SDL_GL_CONTEXT_MAJOR_VERSION");
+			 SDL::perror("SDL_GL_CONTEXT_MAJOR_VERSION");
 		 }
 		}
 		else
@@ -162,7 +162,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, tointeger))
 		 {
-		  SDL_perror("SDL_GL_CONTEXT_MINOR_VERSION");
+			 SDL::perror("SDL_GL_CONTEXT_MINOR_VERSION");
 		 }
 		}
 		else
@@ -170,14 +170,14 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, toboolean))
 		 {
-		  SDL_perror("SDL_GL_SHARE_WITH_CURRENT_CONTEXT");
+			 SDL::perror("SDL_GL_SHARE_WITH_CURRENT_CONTEXT");
 		 }
 		}
 		if (not SDL_strcasecmp(key, "SRGB"))
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, toboolean))
 		 {
-		  SDL_perror("SDL_GL_FRAMEBUFFER_SRGB_CAPABLE");
+			 SDL::perror("SDL_GL_FRAMEBUFFER_SRGB_CAPABLE");
 		 }
 		}
 		else
@@ -205,7 +205,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE))
 		 {
-		  SDL_perror("SDL_GL_CONTEXT_PROFILE_CORE");
+			 SDL::perror("SDL_GL_CONTEXT_PROFILE_CORE");
 		 }
 		}
 		else
@@ -213,7 +213,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY))
 		 {
-		  SDL_perror("SDL_GL_CONTEXT_PROFILE_COMPATIBILITY");
+			 SDL::perror("SDL_GL_CONTEXT_PROFILE_COMPATIBILITY");
 		 }
 		}
 		else
@@ -221,7 +221,7 @@ static int setattributes(lua_State *state)
 		{
 		 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES))
 		 {
-		  SDL_perror("SDL_GL_CONTEXT_PROFILE_ES");
+			 SDL::perror("SDL_GL_CONTEXT_PROFILE_ES");
 		 }
 		}
 		else
@@ -234,7 +234,7 @@ static int setattributes(lua_State *state)
 
 	if (m and not SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, m))
 	{
-	 SDL_perror("SDL_GL_CONTEXT_FLAGS");
+		SDL::perror("SDL_GL_CONTEXT_FLAGS");
 	}
 
 	return 0;

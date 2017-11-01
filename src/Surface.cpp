@@ -3,6 +3,8 @@
 #include "OpenGL.hpp"
 #include "SDL.hpp"
 
+#include <SDL2/SDL_image.h>
+
 
 static signed FindFormat(SDL_PixelFormat *pixmap, GLenum *format, GLenum *type)
 {
@@ -119,14 +121,14 @@ SDL_Surface *LoadSurface(const char *path, unsigned format)
 	SDL_Surface *image = IMG_Load(path);
 	if (not image)
 	{
-		SDL_perror("IMG_Load");
+		SDL::perror("IMG_Load");
 		return nullptr;
 	}
 	SDL_Surface *convert = SDL_ConvertSurfaceFormat(image, format, 0);
 	SDL_FreeSurface(image);
 	if (not convert)
 	{
-		SDL_perror("SDL_ConvertSurfaceFormat");
+		SDL::perror("SDL_ConvertSurfaceFormat");
 		return nullptr;
 	}
 	return convert;
@@ -137,7 +139,7 @@ signed LoadMipmaps(SDL_Surface *surface, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL_perror("FindFormat");
+		return SDL::perror("FindFormat");
 	}
 	GLint error = gluBuild2DMipmaps
 	( GL_TEXTURE_2D
@@ -148,7 +150,7 @@ signed LoadMipmaps(SDL_Surface *surface, unsigned internal)
 	, type
 	, surface->pixels
 	);
-	return OpenGL_SetError("gluBuild2DMipmaps", error);
+	return OpenGL::SetError("gluBuild2DMipmaps", error);
 }
 
 signed LoadTexture(SDL_Surface *surface, unsigned level, unsigned internal)
@@ -156,7 +158,7 @@ signed LoadTexture(SDL_Surface *surface, unsigned level, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL_perror("FindFormat");
+		return SDL::perror("FindFormat");
 	}
 	glTexImage2D
 	( GL_TEXTURE_2D
@@ -169,7 +171,7 @@ signed LoadTexture(SDL_Surface *surface, unsigned level, unsigned internal)
 	, type
 	, surface->pixels
 	);
-	return OpenGL_SetError("glTexImage2D");
+	return OpenGL::CheckError("glTexImage2D");
 }
 
 signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
@@ -177,7 +179,7 @@ signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL_perror("FindFormat");
+		return SDL::perror("FindFormat");
 	}
 	glTexImage2D
 	( face
@@ -190,5 +192,5 @@ signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
 	, type
 	, surface->pixels
 	);
-	return OpenGL_SetError("glTexImage2D");
+	return OpenGL::CheckError("glTexImage2D");
 }

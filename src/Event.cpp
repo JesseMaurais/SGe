@@ -1,5 +1,6 @@
 #include "Event.hpp"
 #include "SDL.hpp"
+#include <cassert>
 #include <stack>
 #include <map>
 
@@ -13,6 +14,7 @@ bool SendUserEvent(enum UserEventType type, unsigned code)
 
 unsigned UserEvent(enum UserEventType type)
 {
+	assert(type < UserEventCount);
 	static const auto base = SDL_RegisterEvents(UserEventCount);
 	return static_cast<unsigned>(base + type);
 }

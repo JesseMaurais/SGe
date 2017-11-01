@@ -17,7 +17,7 @@ static bool OnQuit(const SDL_Event &event)
 int main(int argc, char **argv)
 {
 	PushEventHandler(SDL_QUIT, OnQuit);
-	SetAssertHandler(nullptr);
+	SDL::SetAssertHandler(nullptr);
 	{
 		unsigned media = SDL_INIT_EVENTS;
 		char const *script = nullptr;
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 
 		if (SDL_Init(media))
 		{
-			SDL_perror("SDL_Init");
+			SDL::perror("SDL_Init");
 			return EXIT_FAILURE;
 		}
 		else
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
 		if (Lua_Init(script))
 		{
-			SDL_perror("Lua_Init");
+			SDL::perror("Lua_Init");
 			return EXIT_FAILURE;
 		}
 		else
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
 		if (CommandInit(String(CommandPrompt)))
 		{
-			SDL_perror("CommandInit");
+			SDL::perror("CommandInit");
 			return EXIT_FAILURE;
 		}
 		else
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			SDL_perror("SDL_WaitEvent");
+			SDL::perror("SDL_WaitEvent");
 		}
 	}
 	return EXIT_SUCCESS;

@@ -134,13 +134,13 @@ static const char *GetErrorString(cl_int error)
 }
 
 
-signed OpenCL_SetError(const char *origin, cl_int error)
+signed OpenCL::SetError(const char *origin, cl_int error)
 {
 	return SDL_SetError("%s: %s", origin, GetErrorString(error));
 }
 
 
-cl_platform_id *OpenCL_GetPlatformIDs()
+cl_platform_id *OpenCL::GetPlatformIDs()
 {
 	static struct PlatformIDs : std::vector<cl_platform_id>
 	{
@@ -159,7 +159,7 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
 				if (error)
 				{
-					OpenCL_SetError("clGetPlatformIDs", error);
+					OpenCL::SetError("clGetPlatformIDs", error);
 					clear();
 					return;
 				}
@@ -174,7 +174,7 @@ cl_platform_id *OpenCL_GetPlatformIDs()
 }
 
 
-cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
+cl_device_id *OpenCL::GetDeviceIDs(cl_device_type type)
 {
 	static struct DeviceIDs : std::vector<cl_device_id>
 	{
@@ -194,7 +194,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
 				if (error)
 				{
-					OpenCL_SetError("clGetDeviceIDs", error);
+					OpenCL::SetError("clGetDeviceIDs", error);
 					clear();
 					return;
 				}
@@ -207,7 +207,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 
 	if (CL_DEVICE_TYPE_DEFAULT == type)
 	{
-		cl_platform_id *platforms = OpenCL_GetPlatformIDs();
+		cl_platform_id *platforms = OpenCL::GetPlatformIDs();
 		if (platforms)
 		{
 			for (std::size_t it = 0; singleton.size() < 2 and platforms[it]; ++it)
@@ -221,7 +221,7 @@ cl_device_id *OpenCL_GetDeviceIDs(cl_device_type type)
 }
 
 
-cl_context OpenCL_GetContext(cl_context_properties *properties)
+cl_context OpenCL::GetContext(cl_context_properties *properties)
 {
 	struct ComputeContext
 	{
@@ -230,7 +230,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 		ComputeContext() = default;
 		ComputeContext(cl_context_properties *properties)
 		{
-			cl_device_id *devices = OpenCL_GetDeviceIDs();
+			cl_device_id *devices = OpenCL::GetDeviceIDs();
 			if (devices)
 			{
 				cl_uint num_devices = 0;
@@ -239,7 +239,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 				context = clCreateContext(properties, num_devices, devices, OnNotify, this, &error);
 				if (error)
 				{
-					OpenCL_SetError("clCreateContext", error);
+					OpenCL::SetError("clCreateContext", error);
 				}
 			}
 		}
@@ -250,7 +250,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 				cl_int error = clReleaseContext(context);
 				if (error)
 				{
-					OpenCL_SetError("clReleaseContext", error);
+					OpenCL::SetError("clReleaseContext", error);
 				}
 			}
 		}
@@ -262,7 +262,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 			(void) info;
 			(void) size;
 			(void) that;
-			SDL_perror(__func__, error);
+			SDL::perror(__func__, error);
 		}
 
 	} singleton;
@@ -275,7 +275,7 @@ cl_context OpenCL_GetContext(cl_context_properties *properties)
 	return singleton.context;
 }
 
-cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
+cl_command_queue OpenCL::GetCommandQueue(cl_command_queue_properties properties)
 {
 	static struct CommandQueue
 	{
@@ -284,10 +284,10 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 		CommandQueue() = default;
 		CommandQueue(cl_command_queue_properties properties)
 		{
-			cl_device_id *devices = OpenCL_GetDeviceIDs();
+			cl_device_id *devices = OpenCL::GetDeviceIDs();
 			if (devices)
 			{
-				cl_context context = OpenCL_GetContext();
+				cl_context context = OpenCL::GetContext();
 				if (context)
 				{
 					for (std::size_t it = 0; not queue and devices[it]; ++it)
@@ -296,7 +296,7 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 						queue = clCreateCommandQueue(context, devices[it], properties, &error);
 						if (error)
 						{
-							OpenCL_SetError("clCreateCommandQueue", error);
+							OpenCL::SetError("clCreateCommandQueue", error);
 						}
 					}
 				}
@@ -307,7 +307,7 @@ cl_command_queue OpenCL_GetCommandQueue(cl_command_queue_properties properties)
 			cl_int error = clReleaseCommandQueue(queue);
 			if (error)
 			{
-				OpenCL_SetError("clReleaseCommandQueue", error);
+				OpenCL::SetError("clReleaseCommandQueue", error);
 			}
 		}
 

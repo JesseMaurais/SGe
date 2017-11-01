@@ -88,30 +88,30 @@ static SDL_AssertState AssertionHandler(const SDL_AssertData *data, void *user)
 	return AssertMessageBox(message, title, window).Choose();
 }
 
-void SetAssertHandler(SDL_Window *window)
+void SDL::SetAssertHandler(SDL_Window *window)
 {
 	SDL_SetAssertionHandler(AssertionHandler, window);
 }
 
-void ResetAssertHandler()
+void SDL::ResetAssertHandler()
 {
 	SDL_ResetAssertionReport();
 	SDL_AssertionHandler handler = SDL_GetDefaultAssertionHandler();
 	SDL_SetAssertionHandler(handler, nullptr);
 }
 
-signed SDL_perror(const char *origin, const char *error)
+signed SDL::perror(const char *origin, const char *error)
 {
 	SDL_Log("%s: %s", origin, error);
 	return -1;
 }
 
-signed SDL_perror(const char *origin)
+signed SDL::perror(const char *origin)
 {
 	const char *error = SDL_GetError();
 	if (error)
 	{
-		return SDL_perror(origin, error);
+		return SDL::perror(origin, error);
 	}
 	return 0;
 }

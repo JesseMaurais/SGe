@@ -67,11 +67,11 @@ bool XML::Load(char const *path)
 		bool okay = Load(ops);
 		if (SDL_RWclose(ops))
 		{
-			SDL_perror(path);
+			SDL::perror(path);
 		}
 		return okay;
 	}
-	SDL_perror(path);
+	SDL::perror(path);
 	return false;
 }
 

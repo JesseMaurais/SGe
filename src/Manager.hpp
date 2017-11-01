@@ -1,30 +1,31 @@
 #ifndef Manager_hpp
 #define Manager_hpp
 
+#include "std.hpp"
 #include "Source.hpp"
 #include <vector>
 
-class Manager : public Resources
+class ManagerCommon : public Resources
 {
 public:
 
 	unsigned Add(Source *that) override;
 	Source *Remove(unsigned id) override;
 	bool Has(unsigned id);
-	unsigned Update();
+	unsigned UpdateSources();
 	unsigned Size();
 
 protected:
 
-	unsigned Update(std::vector<Source*> &sources);
-	unsigned Update(std::vector<unsigned> &ids);
+	unsigned UpdateSources(std::vector<Source*> const &sources);
+	unsigned UpdateSources(std::vector<unsigned> const &ids);
 
 private:
 
 	std::vector<Source*> sources;
 };
 
-template <typename Type> class UpdateManager : Manager
+template <typename Type> class Manager : public ManagerCommon
 {
 public:
 
@@ -33,13 +34,13 @@ public:
 	{
 		bool ok = true;
 		// Current will match data sources
-		auto const size = Manager::Size();
+		auto const size = Size();
 		ids.resize(size);
 		if (size > 0)
 		{
 			Generate(ids);
 			// Update from data sources
-			ok = Manager::Update() == size;
+			ok = UpdateSources() == size;
 		}
 		return ok;
 	}
@@ -48,10 +49,10 @@ public:
 	bool Release()
 	{
 		// Current should match data sources
-		auto const size = Manager::Size();
+		auto const size = Size();
 		bool ok = ids.size() == size;
 		// Destroy current and removed
-		stl::append(removed, ids);
+		stl::append(ids, removed);
 		if (not ids.empty())
 		{
 			Destroy(ids);
@@ -73,13 +74,13 @@ public:
 		Generate(newids);
 		stl::append(ids, newids);
 		// Update the new from their sources
-		bool ok = Manager::Update(added) == size;
+		bool ok = UpdateSources(added) == size;
 		added.clear();
 		return ok;
 	}
 
-	// Get the internal resource id
-	Type ID(unsigned index) const
+	// Get the internal resource data
+	Type const &Data(unsigned index) const
 	{
 		return ids.at(index);
 	}
@@ -87,8 +88,8 @@ public:
 protected:
 
 	virtual void Generate(std::vector<Type> &ids) = 0;
-	virtual void Destroy(std::vector<Type> &ids) = 0;
-	virtual void SendUpdate() = 0;
+	virtual void Destroy(std::vector<Type> const &ids) = 0;
+	virtual bool SendUpdate() = 0;
 
 private:
 

@@ -1,7 +1,7 @@
 #include "Manager.hpp"
 #include "std.hpp"
 
-unsigned Manager::Add(Source *that)
+unsigned ManagerCommon::Add(Source *that)
 {
 	assert(that);
 	unsigned id = Size();
@@ -9,7 +9,7 @@ unsigned Manager::Add(Source *that)
 	return id;
 }
 
-Source *Manager::Remove(unsigned id)
+Source *ManagerCommon::Remove(unsigned id)
 {
 	assert(Has(id));
 	auto const that = sources.at(id);
@@ -19,12 +19,7 @@ Source *Manager::Remove(unsigned id)
 	return that;
 }
 
-unsigned Manager::Update()
-{
-	return Update(sources);
-}
-
-unsigned Manager::Update(std::vector<Source*> &sources)
+unsigned ManagerCommon::UpdateSources(std::vector<Source*> const &sources)
 {
 	unsigned count = 0;
 	for (auto const that : sources)
@@ -37,7 +32,7 @@ unsigned Manager::Update(std::vector<Source*> &sources)
 	return count;
 }
 
-unsigned Manager::Update(std::vector<unsigned> &ids)
+unsigned ManagerCommon::UpdateSources(std::vector<unsigned> const &ids)
 {
 	unsigned count = 0;
 	for (auto const id : ids)
@@ -51,12 +46,17 @@ unsigned Manager::Update(std::vector<unsigned> &ids)
 	return count;
 }
 
-bool Manager::Has(unsigned index)
+unsigned ManagerCommon::UpdateSources()
+{
+	return UpdateSources(sources);
+}
+
+bool ManagerCommon::Has(unsigned index)
 {
 	return index < sources.size() and sources.at(index);
 }
 
-unsigned Manager::Size()
+unsigned ManagerCommon::Size()
 {
 	return to_unsigned(sources.size());
 }

@@ -1,7 +1,15 @@
 #ifndef Event_hpp
 #define Event_hpp
 
-enum UserEventType { UpdateSpace, UpdateAudio, ExecuteCommand, UserEventCount };
+enum UserEventType
+{
+	UpdateSpace,
+	UpdateAudio,
+	UpdateVideo,
+	ExecuteCommand,
+	UserEventCount
+};
+
 bool SendUserEvent(enum UserEventType type, unsigned code);
 unsigned UserEvent(enum UserEventType type);
 
