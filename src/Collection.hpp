@@ -12,7 +12,7 @@
 /// Collection of objects belonging to a specified class Type
 template <class Type> class Collection
 {
-	friend class Type;
+	friend Type;
 
 private:
 

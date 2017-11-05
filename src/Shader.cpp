@@ -6,6 +6,25 @@
 
 #include "stl/algorithm.hpp"
 
+class Shader::SourceCode : public Source, public std::enable_shared_from_this<SourceCode>
+{
+public:
+
+	bool Attach(GLuint const program);
+	bool Detach(GLuint const program);
+
+protected:
+
+	SourceCode()
+	{
+		id = Shader::SourceManager().Add(this);
+	}
+	virtual ~SourceCode()
+	{
+		verify(this == Shader::SourceManager().Remove(id));
+	}
+};
+
 namespace
 {
 	// Get the shader info log and set it as the SDL error string.
@@ -19,7 +38,7 @@ namespace
 		}
 		else if (length > 1)
 		{
-			std::string info(length);
+			std::vector<char> info(length);
 			glGetShaderInfoLog(shader, length, &length, info.data());
 			if (OpenGL::CheckError("glGetShaderInfoLog"))
 			{
@@ -27,7 +46,7 @@ namespace
 			}
 			else
 			{
-				return SDL::SetError(info);
+				return SDL::SetError(info.data());
 			}
 		}
 		return false;
@@ -44,7 +63,7 @@ namespace
 		}
 		else if (length > 1)
 		{
-			std::string info(length);
+			std::vector<char> info(length);
 			glGetProgramInfoLog(program, length, &length, info.data());
 			if (OpenGL::CheckError("glGetProgramInfoLog"))
 			{
@@ -52,7 +71,7 @@ namespace
 			}
 			else
 			{
-				return SDL::SetError(info);
+				return SDL::SetError(info.data());
 			}
 		}
 		return false;
@@ -94,7 +113,7 @@ namespace
 	GLenum GuessShaderType(std::string const &sourceCode)
 	{
 		// Inspect the first line (usually a comment) for a keyword.
-		auto const line = sourceCode.substr(0, sourceCode.find("\n"));
+		auto line = sourceCode.substr(0, sourceCode.find("\n"));
 		line = str::to_upper(line); // case insensitive match
 
 		if (std::string::npos != line.find("FRAGMENT"))
@@ -129,25 +148,6 @@ namespace
 		return 0;
 	}
 
-	class Shader::SourceCode : public Source, std::enable_shared_from_this<SourceCode>
-	{
-	public:
-
-		bool Attach(GLuint const program);
-		bool Detach(GLuint const program);
-
-	protected:
-
-		SourceCode()
-		{
-			id = Shader::SourceManager().Add(this);
-		}
-		~SourceCode()
-		{
-			verify(this == Shader::SourceManager().Remove(id));
-		}
-	};
-
 	class SourceString : public Shader::SourceCode
 	{
 	public:
@@ -165,7 +165,8 @@ namespace
 			}
 			else
 			{
-				return it->shared_from_this();
+				auto const &that = *it;
+				return that->shared_from_this();
 			}
 		}
 
@@ -206,7 +207,8 @@ namespace
 			}
 			else
 			{
-				return it->shared_from_this();
+				auto const &that = *it;
+				return that->shared_from_this();
 			}
 		}
 
@@ -238,7 +240,7 @@ bool SourceString::UpdateSource()
 		// Compile the source code lines into a shader.
 		GLuint const shader = OpenGL::GetShader(Source::id);
 		bool const ok = CompileShaderSource(shader, lines);
-		if (not ok)
+		if (not ok and SetShaderError(shader))
 		{
 			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
@@ -266,7 +268,7 @@ bool SourceFile::UpdateSource()
 		// Compile the source code lines into a shader.
 		GLuint const shader = OpenGL::GetShader(Source::id);
 		bool const ok = CompileShaderSource(shader, lines);
-		if (not ok)
+		if (not ok and SetShaderError(shader))
 		{
 			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{

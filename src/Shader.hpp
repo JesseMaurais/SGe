@@ -17,6 +17,8 @@ public:
 	bool Link();
 	bool Use();
 
+	class SourceCode;
+
 protected:
 
 	static Resources &SourceManager();
@@ -24,7 +26,6 @@ protected:
 
 private:
 
-	class SourceCode;
 	std::vector<std::shared_ptr<SourceCode>> shaderSources;
 	bool UpdateSource() override;
 };
