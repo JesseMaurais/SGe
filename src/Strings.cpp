@@ -12,11 +12,12 @@ char const *String(enum Strings id)
 
 	case Strings::None: return "";
 	case Strings::ColonSeparator: return "%1: %2";
-	case Strings::UnknownError: return "Unknown error";
 	case Strings::NoError: return "Error reported without information";
+	case Strings::UnknownError: return "Unknown error";
 	case Strings::OutOfMemory: return "Out of memory";
-	case Strings::NameNotUnique: return "The name \"%1\" is not unique";
 	case Strings::EncodingError: return "Encoding error";
+	case Strings::NameNotUnique: return "The name \"%1\" is not unique";
+	case Strings::CaughtException: return "C++ exception was caught";
 	case Strings::InvalidArgument: return "Invalid argument \"%1\" to function";
 	case Strings::InvalidName: return "Invalid name";
 	case Strings::InvalidEnum: return "Invalid enumeration";
@@ -43,13 +44,13 @@ char const *String(enum Strings id)
 	case Strings::CannotFindSchema: return "Cannot find \"%1\" in schema";
 	case Strings::CannotLoadScript: return "Cannot load script \"%1\"";
 	case Strings::CannotLoadDocument: return "Cannot load document \"%1\"";
+	case Strings::CannotCreateResource: return "Cannot create resource";
+	case Strings::CannotDeleteResource: return "Cannot delete resource";
 	case Strings::CannotCompileShader: return "Cannot compile shader";
 	case Strings::CannotQueryShader: return "Cannot query shader value";
 	case Strings::CannotUseShader: return "Cannot use shader for program";
 	case Strings::CannotQueryProgram: return "Cannot query shader program value";
 	case Strings::CannotLinkProgram: return "Cannot link shader program";
 	case Strings::CannotUseProgram: return "Cannot use shader program";
-	case Strings::CannotCreateCommandQueue: return "Cannot create command queue";
-	case Strings::CaughtException: return "C++ exception: %1";
 	}
 }

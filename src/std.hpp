@@ -53,11 +53,6 @@ namespace
 		return std::to_string(val);
 	}
 
-	inline std::string to_string(const unsigned char *val)
-	{
-		return std::string(reinterpret_cast<const char*>(val));
-	}
-
 	inline std::string to_string(const char *val)
 	{
 		return std::string(val);

@@ -9,11 +9,22 @@
 
 namespace
 {
+	char const *ErrorString(GLenum error)
+	{
+		union
+		{
+		 const GLubyte *bytes;
+		 const char *string;
+		};
+		bytes = gluErrorString(error);
+		return string;
+	}
+
 	enum UpdateEventCode : Uint32
 	{
 		UpdateTextures,
-		UpdatePrograms,
 		UpdateShaders,
+		UpdatePrograms,
 	};
 
 	template <UpdateEventCode UpdateCode>
@@ -44,13 +55,19 @@ namespace
 		void Generate(std::vector<GLuint> &ids) override
 		{
 			glGenTextures(ids.size(), ids.data());
-			OpenGL::CheckError("glGenTextures");
+			if (OpenGL::CheckError("glGenTextures"))
+			{
+				SDL::perror(CannotCreateResource);
+			}
 		}
 
 		void Destroy(std::vector<GLuint> const &ids) override
 		{
 			glDeleteTextures(ids.size(), ids.data());
-			OpenGL::CheckError("glDeleteTextures");
+			if (OpenGL::CheckError("glDeleteTextures"))
+			{
+				SDL::perror(CannotDeleteResource);
+			}
 		}
 	};
 
@@ -73,7 +90,10 @@ namespace
 			stl::generate(ids, []()
 			{
 				auto const id = glCreateProgram();
-				OpenGL::CheckError("glCreateProgram");
+				if (OpenGL::CheckError("glCreateProgram"))
+				{
+					SDL::perror(CannotCreateResource);
+				}
 				return id;
 			});
 		}
@@ -83,12 +103,15 @@ namespace
 			stl::for_each(ids, [](GLuint id)
 			{
 				glDeleteProgram(id);
-				OpenGL::CheckError("glDeleteProgram");
+				if (OpenGL::CheckError("glDeleteProgram"))
+				{
+					SDL::perror(CannotDeleteResource);
+				}
 			});
 		}
 	};
 
-	struct ShaderPair { GLenum type; GLuint id; };
+	struct ShaderPair { GLenum type; GLuint shader; };
 	class ShaderManager final : public Manager<ShaderPair>
 	{
 	private:
@@ -112,8 +135,11 @@ namespace
 		{
 			stl::for_each(pairs, [](ShaderPair &pair)
 			{
-				pair.id = glCreateShader(pair.type);
-				OpenGL::CheckError("glCreateShader");
+				pair.shader = glCreateShader(pair.type);
+				if (OpenGL::CheckError("glCreateShader"))
+				{
+					SDL::perror(CannotCreateResource);
+				}
 			});
 		}
 
@@ -121,11 +147,33 @@ namespace
 		{
 			stl::for_each(pairs, [](ShaderPair const &pair)
 			{
-				glDeleteShader(pair.id);
-				OpenGL::CheckError("glDeleteShader");
+				glDeleteShader(pair.shader);
+				if (OpenGL::CheckError("glDeleteShader"))
+				{
+					SDL::perror(CannotDeleteResource);
+				}
 			});
 		}
 	};
+}
+
+// OpenGL error utility functions
+
+bool OpenGL::SetError(const char *origin, GLenum error)
+{
+	return SDL::SetError(ColonSeparator, origin, ErrorString(error));
+}
+
+bool OpenGL::CheckError(const char *origin)
+{
+	GLenum const error = glGetError();
+	return error and OpenGL::SetError(origin, error);
+}
+
+bool OpenGL::LogError(const char *origin)
+{
+	GLenum const error = glGetError();
+	return error and SDL::perror(origin, ErrorString(error));
 }
 
 GLuint OpenGL::GetTexture(unsigned index)
@@ -150,7 +198,7 @@ Resources &Shader::SourceManager()
 
 GLuint OpenGL::GetShader(unsigned index)
 {
-	return ShaderManager::Instance().Data(index).id;
+	return ShaderManager::Instance().Data(index).shader;
 }
 
 void OpenGL::SetShaderType(unsigned index, GLenum type)
@@ -268,38 +316,4 @@ void *OpenGL::GetContext(SDL_Window *window)
 		singleton = Context(window);
 	}
 	return singleton.context;
-}
-
-// OpenGL error utility functions
-
-bool OpenGL::SetError(const char *origin, GLenum error)
-{
-	return SDL::SetError(ColonSeparator, origin, gluErrorString(error));
-}
-
-bool OpenGL::CheckError(const char *origin)
-{
-	GLenum error = glGetError();
-	if (error)
-	{
-		OpenGL::SetError(origin, error);
-		return true;
-	}
-	return false;
-}
-
-bool OpenGL::LogError(const char *origin)
-{
-	GLenum error = glGetError();
-	if (error)
-	{
-		union {
-			const GLubyte *bytes;
-			const char *string;
-		};
-		bytes = gluErrorString(error);
-		SDL::perror(origin, string);
-		return true;
-	}
-	return false;
 }

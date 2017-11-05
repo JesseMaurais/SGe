@@ -10,7 +10,7 @@
 #include <cassert>
 
 /// Collection of objects belonging to a specified class Type
-template <typename Type> class Collection
+template <class Type> class Collection
 {
 	friend class Type;
 

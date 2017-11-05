@@ -12,8 +12,8 @@ public:
 
 	Shader();
 	~Shader();
-	bool Include(std::string const &sourceCode);
-	bool Import(std::string const &sourcePath);
+	bool LoadString(std::string const &code);
+	bool LoadFile(std::string const &path);
 	bool Link();
 	bool Use();
 
@@ -24,8 +24,8 @@ protected:
 
 private:
 
-	class Source;
-	std::vector<std::shared_ptr<Source>> shaderSources;
+	class SourceCode;
+	std::vector<std::shared_ptr<SourceCode>> shaderSources;
 	bool UpdateSource() override;
 };
 

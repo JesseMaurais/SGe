@@ -5,11 +5,12 @@ enum Strings
 {
 	 None
 	,ColonSeparator
-	,UnknownError
 	,NoError
+	,UnknownError
 	,OutOfMemory
 	,EncodingError
 	,NameNotUnique
+	,CaughtException
 	,InvalidArgument
 	,InvalidName
 	,InvalidEnum
@@ -36,14 +37,14 @@ enum Strings
 	,CannotFindSchema
 	,CannotLoadScript
 	,CannotLoadDocument
+	,CannotCreateResource
+	,CannotDeleteResource
 	,CannotCompileShader
 	,CannotQueryShader
 	,CannotUseShader
 	,CannotQueryProgram
 	,CannotLinkProgram
 	,CannotUseProgram
-	,CannotCreateCommandQueue
-	,CaughtException
 };
 
 char const *String(enum Strings);
