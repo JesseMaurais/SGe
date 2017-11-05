@@ -15,15 +15,21 @@ struct SDL_Window;
 
 namespace OpenGL
 {
-	/// Set the SDL error string to the given error code
-	signed SetError(const char *origin, GLenum error);
-	/// Set the SDL error string to the current error code
-	signed CheckError(const char *origin);
-	/// Log the current error with SDL
-	signed LogError(const char *origin);
+	/// Set the SDL error string to the given error code. Always returns false.
+	bool SetError(const char *origin, GLenum error);
+	/// Set the SDL error string for the current error code. Returns true when an error exists.
+	bool CheckError(const char *origin);
+	/// Log the current error with SDL. Returns true when an error exists.
+	bool LogError(const char *origin);
 
-	// Texture id at the given index from within the singleton.
+	/// Texture id at the given index from within the singleton.
 	GLuint GetTexture(unsigned index);
+	/// Program id at the given index from within the singleton.
+	GLuint GetProgram(unsigned index);
+	/// Shader id at the given index from within the singleton.
+	GLuint GetShader(unsigned index);
+	/// Set the shader type that will be generated on update.
+	void SetShaderType(unsigned index, GLenum type);
 
 	/**
 	 * \brief Update the graphics device singleton for compatibility with the

@@ -3,6 +3,9 @@
 
 #include "Lua.hpp"
 
-signed Lux_Init(lua_State *state);
+namespace Lux
+{
+	signed Init(lua_State *state);
+}
 
 #endif // file

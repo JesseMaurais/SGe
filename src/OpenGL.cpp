@@ -1,25 +1,33 @@
 #include "OpenGL.hpp"
+#include "Shader.hpp"
 #include "Manager.hpp"
-#include "Strings.hpp"
+#include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
 
+#include "stl/algorithm.hpp"
+
 namespace
 {
-	enum VideoEventCode : Uint32 { UpdateTextures };
+	enum UpdateEventCode : Uint32
+	{
+		UpdateTextures,
+		UpdatePrograms,
+		UpdateShaders,
+	};
 
-	template <VideoEventCode UpdateCode>
-	class VideoManager : public Manager<GLuint>
+	template <UpdateEventCode UpdateCode>
+	class UpdateManager : public Manager<GLuint>
 	{
 	private:
 
 		bool SendUpdate() override
 		{
-			return SendUserEvent(UpdateVideo, UpdateCode);
+			return SDL::SendUserEvent(UpdateOpenGL, UpdateCode);
 		}
 	};
 
-	class TextureManager final : public VideoManager<UpdateTextures>
+	class TextureManager final : public UpdateManager<UpdateTextures>
 	{
 	private:
 
@@ -45,6 +53,79 @@ namespace
 			OpenGL::CheckError("glDeleteTextures");
 		}
 	};
+
+	class ProgramManager final : public UpdateManager<UpdatePrograms>
+	{
+	private:
+
+		ProgramManager() = default;
+
+	public:
+
+		static ProgramManager &Instance()
+		{
+			static ProgramManager singleton;
+			return singleton;
+		}
+
+		void Generate(std::vector<GLuint> &ids) override
+		{
+			stl::generate(ids, []()
+			{
+				auto const id = glCreateProgram();
+				OpenGL::CheckError("glCreateProgram");
+				return id;
+			});
+		}
+
+		void Destroy(std::vector<GLuint> const &ids) override
+		{
+			stl::for_each(ids, [](GLuint id)
+			{
+				glDeleteProgram(id);
+				OpenGL::CheckError("glDeleteProgram");
+			});
+		}
+	};
+
+	struct ShaderPair { GLenum type; GLuint id; };
+	class ShaderManager final : public Manager<ShaderPair>
+	{
+	private:
+
+		ShaderManager() = default;
+
+		bool SendUpdate() override
+		{
+			return SDL::SendUserEvent(UpdateOpenAL, UpdateShaders);
+		}
+
+	public:
+
+		static ShaderManager &Instance()
+		{
+			static ShaderManager singleton;
+			return singleton;
+		}
+
+		void Generate(std::vector<ShaderPair> &pairs) override
+		{
+			stl::for_each(pairs, [](ShaderPair &pair)
+			{
+				pair.id = glCreateShader(pair.type);
+				OpenGL::CheckError("glCreateShader");
+			});
+		}
+
+		void Destroy(std::vector<ShaderPair> const &pairs) override
+		{
+			stl::for_each(pairs, [](ShaderPair const &pair)
+			{
+				glDeleteShader(pair.id);
+				OpenGL::CheckError("glDeleteShader");
+			});
+		}
+	};
 }
 
 GLuint OpenGL::GetTexture(unsigned index)
@@ -52,14 +133,39 @@ GLuint OpenGL::GetTexture(unsigned index)
 	return TextureManager::Instance().Data(index);
 }
 
+Resources &Shader::ProgramManager()
+{
+	return ProgramManager::Instance();
+}
+
+GLuint OpenGL::GetProgram(unsigned index)
+{
+	return ProgramManager::Instance().Data(index);
+}
+
+Resources &Shader::SourceManager()
+{
+	return ShaderManager::Instance();
+}
+
+GLuint OpenGL::GetShader(unsigned index)
+{
+	return ShaderManager::Instance().Data(index).id;
+}
+
+void OpenGL::SetShaderType(unsigned index, GLenum type)
+{
+	ShaderManager::Instance().Data(index).type = type;
+}
+
 void *OpenGL::GetContext(SDL_Window *window)
 {
-	static struct VideoContext
+	static struct Context
 	{
 		SDL_GLContext context = nullptr;
 
-		VideoContext() = default;
-		VideoContext(SDL_Window *window)
+		Context() = default;
+		Context(SDL_Window *window)
 		{
 			if (window)
 			{
@@ -76,7 +182,6 @@ void *OpenGL::GetContext(SDL_Window *window)
 					static bool init = false;
 					if (not init)
 					{
-						init = true;
 						// Initialize extensions
 						GLenum error = glewInit();
 						if (error)
@@ -89,28 +194,37 @@ void *OpenGL::GetContext(SDL_Window *window)
 							bytes = glewGetErrorString(error);
 							SDL::perror("glewInit", string);
 						}
-						else
-						{
-							// Register update handler
-							PushEventHandler(UpdateVideo, UpdateVideoHandler);
-						}
+						else init = true;
 					}
+					// Generate textures
+					TextureManager::Instance().Initialize();
+					// Create shaders
+					ShaderManager::Instance().Initialize();
+					// Create programs
+					ProgramManager::Instance().Initialize();
+					// Register update handler
+					SDL::PushEventHandler(UpdateOpenGL, UpdateHandler);
 				}
 				else
 				{
 					// Set error string and return null
 					SDL::perror("SDL_GL_CreateContext");
-					SDL_SetError(String(CannotCreateContext));
 				}
 			}
 		}
-		~VideoContext()
+		~Context()
 		{
 			// Free if it was created
 			if (context)
 			{
 				// Unregister event handler
-				PopEventHandler(UpdateVideo);
+				SDL::PopEventHandler(UpdateOpenGL);
+				// Delete textures
+				TextureManager::Instance().Release();
+				// Delete shaders
+				ShaderManager::Instance().Release();
+				// Delete programs
+				ProgramManager::Instance().Release();
 				// Detach before deletion
 				if (SDL_GL_GetCurrentContext() == context)
 				{
@@ -125,16 +239,22 @@ void *OpenGL::GetContext(SDL_Window *window)
 
 	private:
 
-		static bool UpdateVideoHandler(SDL_Event const &event)
+		static bool UpdateHandler(SDL_Event const &event)
 		{
-			assert(UserEventType::UpdateVideo == event.user.type);
+			assert(UserEventType::UpdateOpenGL == event.user.type);
 			switch (event.user.code)
 			{
-			case VideoEventCode::UpdateTextures:
+			case UpdateEventCode::UpdateTextures:
 				TextureManager::Instance().Update();
 				break;
+			case UpdateEventCode::UpdateShaders:
+				ShaderManager::Instance().Update();
+				break;
+			case UpdateEventCode::UpdatePrograms:
+				ProgramManager::Instance().Update();
+				break;
 			default:
-				assert(not "VideoEventCode");
+				assert(not "OpenGL event code");
 				return false;
 			}
 			return true;
@@ -145,29 +265,30 @@ void *OpenGL::GetContext(SDL_Window *window)
 	if (window or not singleton.context)
 	{
 		// Update for compatibility with given window
-		singleton = VideoContext(window);
+		singleton = Context(window);
 	}
 	return singleton.context;
 }
 
 // OpenGL error utility functions
 
-signed OpenGL::SetError(const char *origin, GLenum error)
+bool OpenGL::SetError(const char *origin, GLenum error)
 {
-	return SDL_SetError("%s: %s", origin, gluErrorString(error));
+	return SDL::SetError(ColonSeparator, origin, gluErrorString(error));
 }
 
-signed OpenGL::CheckError(const char *origin)
+bool OpenGL::CheckError(const char *origin)
 {
 	GLenum error = glGetError();
 	if (error)
 	{
-		return OpenGL::SetError(origin, error);
+		OpenGL::SetError(origin, error);
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-signed OpenGL::LogError(const char *origin)
+bool OpenGL::LogError(const char *origin)
 {
 	GLenum error = glGetError();
 	if (error)
@@ -177,7 +298,8 @@ signed OpenGL::LogError(const char *origin)
 			const char *string;
 		};
 		bytes = gluErrorString(error);
-		return SDL::perror(origin, string);
+		SDL::perror(origin, string);
+		return true;
 	}
-	return 0;
+	return false;
 }

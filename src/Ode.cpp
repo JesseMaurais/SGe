@@ -67,18 +67,18 @@ static int SimulationThread(void *unused)
 	{
 		if (SDL_LockMutex(Mutex))
 		{
-		 SDL_perror("SDL_LockMutex");
-		 break;
+			SDL::perror("SDL_LockMutex");
+			break;
 		}
 		if (SDL_CondWait(Cond, Mutex))
 		{
-		 SDL_perror("SDL_CondWait");
-		 break;
+			SDL::perror("SDL_CondWait");
+			break;
 		}
-		if (PushEvent(UpdateSpace))
+		if (not SDL::SendUserEvent(UpdateSpace))
 		{
-		 SDL_perror("UpdateSpace");
-		 break;
+			SDL::perror("UpdateSpace");
+			break;
 		}
 		dSpaceCollide(Space, 0, &Near);
 		dWorldStep(World, Step);
@@ -93,16 +93,16 @@ static Uint32 SimulationTimer(Uint32 interval, void *unused)
 {
 	if (SDL_LockMutex(Mutex))
 	{
-	 SDL_perror("SDL_LockMutex");
+		SDL::perror("SDL_LockMutex");
 	}
 	else
 	if (SDL_CondSignal(Cond))
 	{
-	 SDL_perror("SDL_CondSignal");
+		SDL::perror("SDL_CondSignal");
 	}
 	else
 	{
-	 SDL_UnlockMutex(Mutex);
+		SDL_UnlockMutex(Mutex);
 	}
 
 	double elapsed = interval;
@@ -236,7 +236,7 @@ signed Ode_Init()
 	 dWorldDestroy(World);
 	 dSpaceDestroy(Space);
 	 dJointGroupDestroy(Group);
-	 SDL_perror("SDL_CreateCond");
+	 SDL::perror("SDL_CreateCond");
 	 return SDL_SetError("cannot create simulation signal");
 	}
 	Mutex = SDL_CreateMutex();
@@ -246,7 +246,7 @@ signed Ode_Init()
 	 dSpaceDestroy(Space);
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
-	 SDL_perror("SDL_CreateMutex");
+	 SDL::perror("SDL_CreateMutex");
 	 return SDL_SetError("cannot create simulation mutex");
 	}
 	Thread = SDL_CreateThread(SimulationThread, "ODE", NULL);
@@ -257,7 +257,7 @@ signed Ode_Init()
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL_perror("SDL_CreateThread");
+	 SDL::perror("SDL_CreateThread");
 	 return SDL_SetError("cannot create simulation thread");
 	}
 	TimerID = SDL_AddTimer(Uint32(1000*Step), SimulationTimer, NULL);
@@ -268,7 +268,7 @@ signed Ode_Init()
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL_perror("SDL_AddTimer");
+	 SDL::perror("SDL_AddTimer");
 	 return SDL_SetError("cannot create simulation timer");
 	}
 	return 0;
@@ -287,46 +287,46 @@ void Ode_Quit()
 	dCloseODE();
 }
 
-signed Ode_Lock()
+signed Ode::Lock()
 {
 	if (SDL_LockMutex(Mutex))
 	{
-	 SDL_perror("SDL_LockMutex");
-	 return -1;
+		SDL::perror("SDL_LockMutex");
+		return -1;
 	}
 	return 0;
 }
 
-signed Ode_Unlock()
+signed Ode::Unlock()
 {
 	if (SDL_UnlockMutex(Mutex))
 	{
-	 SDL_perror("SDL_UnlockMutex");
-	 return -1;
+		SDL::perror("SDL_UnlockMutex");
+		return -1;
 	}
 	return 0;
 }
 
-void Update(dGeomID geom)
+void Ode::Update(dGeomID geom)
 {
 	union {
 	 void *data;
 	 Geom *obj;
 	};
 	data = dGeomGetData(geom);
-	if (obj) obj->Update();
+	if (obj) obj->UpdateSource();
 	if (dGeomIsSpace(geom))
 	{
-	 Update(dSpaceID(geom));
+		Ode::Update(dSpaceID(geom));
 	}
 }
 
-void Update(dSpaceID space)
+void Ode::Update(dSpaceID space)
 {
 	int n = dSpaceGetNumGeoms(space);
 	for (int item = 0; item < n; ++item)
 	{
-	 Update(dSpaceGetGeom(space, item));
+		Ode::Update(dSpaceGetGeom(space, item));
 	}
 }
 

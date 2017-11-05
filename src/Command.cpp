@@ -1,6 +1,7 @@
 #include "Command.hpp"
 #include "Strings.hpp"
 #include "Event.hpp"
+#include "Error.hpp"
 #include "SDL.hpp"
 #include "Lua.hpp"
 
@@ -22,7 +23,7 @@ static int CommandThread(void *unused)
 	(void) unused;
 	SDL_Event event;
 	Sint32 sequence = 0;
-	event.type = UserEvent(ExecuteCommand);
+	event.type = SDL::UserEvent(ExecuteCommand);
 	while (not Quit)
 	{
 		auto line = readline(Prompt);
@@ -76,7 +77,7 @@ bool CommandExec(const SDL_Event &event)
 	{
 		char message[64];
 		std::sprintf(message, "[%d]", sequence);
-		Lua_perror(CoState, message);
+		Lua::perror(CoState, message);
 	}
 	add_history(string);
 	std::free(address);
@@ -98,14 +99,14 @@ signed CommandInit(const char *prompt)
 	if (not Cond)
 	{
 	 SDL::perror("SDL_CreateCond");
-	 return SetError(CannotCreateCommandQueue);
+	 return SDL::SetError(CannotCreateCommandQueue);
 	}
 	Mutex = SDL_CreateMutex();
 	if (not Mutex)
 	{
 	 SDL_DestroyCond(Cond);
 	 SDL::perror("SDL_CreateMutex");
-	 return SetError(CannotCreateCommandQueue);
+	 return SDL::SetError(CannotCreateCommandQueue);
 	}
 	Thread = SDL_CreateThread(CommandThread, "Command", nullptr);
 	if (not Thread)
@@ -113,16 +114,16 @@ signed CommandInit(const char *prompt)
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
 	 SDL::perror("SDL_CreateThread");
-	 return SetError(CannotCreateCommandQueue);
+	 return SDL::SetError(CannotCreateCommandQueue);
 	}
-	PushEventHandler(UserEvent(ExecuteCommand), CommandExec);
+	SDL::PushEventHandler(ExecuteCommand, CommandExec);
 	Prompt = prompt;
 	return 0;
 }
 
 void CommandQuit()
 {
-	PopEventHandler(UserEvent(ExecuteCommand));
+	SDL::PopEventHandler(ExecuteCommand);
 	Quit = true;
 	SDL_WaitThread(Thread, nullptr);
 	SDL_DestroyMutex(Mutex);

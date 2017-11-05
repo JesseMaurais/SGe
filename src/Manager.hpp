@@ -80,7 +80,7 @@ public:
 	}
 
 	// Get the internal resource data
-	Type const &Data(unsigned index) const
+	Type &Data(unsigned index)
 	{
 		return ids.at(index);
 	}

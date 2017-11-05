@@ -1,31 +1,32 @@
 #ifndef Shader_hpp
 #define Shader_hpp
 
-struct Shader
+#include "Source.hpp"
+#include <memory>
+#include <vector>
+#include <string>
+
+class Shader : public Source
 {
-	bool LoadFragment(const char **path);
-	bool LoadVertex(const char **path);
+public:
 
-	bool LoadFragment(const char *path);
-	bool LoadVertex(const char *path);
-
-	bool LinkProgram();
-	bool UseProgram();
-
+	Shader();
 	~Shader();
+	bool Include(std::string const &sourceCode);
+	bool Import(std::string const &sourcePath);
+	bool Link();
+	bool Use();
 
- protected:
+protected:
 
-	unsigned program, vertex, fragment;
+	static Resources &SourceManager();
+	static Resources &ProgramManager();
 
- private:
+private:
 
-	static char *ReadSource(SDL_RWops *ops, size_t &size);
-	static char *ReadSource(const char *path, size_t &size);
-	static void LoadShader(unsigned shader, const char **paths);
-	static void LogShader(const char *type, unsigned shader);
-	static void LogProgram(unsigned program);
+	class Source;
+	std::vector<std::shared_ptr<Source>> shaderSources;
+	bool UpdateSource() override;
 };
 
 #endif // file
-

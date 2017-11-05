@@ -1,66 +1,64 @@
 #include "Lua.hpp"
 #include "Lux.hpp"
 #include "SDL.hpp"
-#include "Strings.hpp"
+#include "Error.hpp"
 #include <cstdlib>
 #include <cstdio>
 
 lua_State *State = nullptr;
 lua_State *CoState = nullptr;
 
-signed Lua_SetError(lua_State *state)
+bool Lua::SetError(lua_State *state)
 {
 	const auto string = lua_tostring(state, -1);
-	return SDL_SetError("%s", string);
+	return 0 < SDL_SetError("%s", string);
 }
 
-signed Lua_GetError(lua_State *state)
+signed Lua::GetError(lua_State *state)
 {
 	const auto string = SDL_GetError();
 	return luaL_error(state, "%s", string);
 }
 
-void Lua_perror(lua_State *state, const char *prefix)
+void Lua::perror(lua_State *state, const char *prefix)
 {
 	auto string = lua_tostring(state, -1);
 	SDL_Log("%s: %s", prefix, string);
 }
 
-signed Lua_Init(const char *path)
+bool Lua::Init(const char *path)
 {
 	State = luaL_newstate();
 	if (not State)
 	{
-		return SDL_SetError(String(OutOfMemory));
+		return SDL::SetError(OutOfMemory);
 	}
 
 	luaL_checkversion(State);
 	luaL_openlibs(State);
 
-	if (Lux_Init(State))
+	if (Lux::Init(State))
 	{
-		return SDL_SetError("Lux_Init");
+		return false;
 	}
 
 	CoState = lua_newthread(State);
 	if (not CoState)
 	{
-		return SDL_SetError(String(OutOfMemory));
+		SDL::SetError(OutOfMemory);
+		return false;
 	}
 
 	if (luaL_dofile(CoState, path))
 	{
-		if (SDL_strcasecmp(path, String(Config)))
-		{
-			Lua_perror(CoState, "luaL_dofile");
-			return SDL_SetError(String(CannotLoadScript), path);
-		}
+		Lua::perror(CoState, "luaL_dofile");
+		return false;
 	}
 
-	return 0;
+	return true;
 }
 
-void Lua_Quit(void)
+void Lua::Quit(void)
 {
 	if (State)
 	{
@@ -70,12 +68,12 @@ void Lua_Quit(void)
 	}
 }
 
-int Lua_Yield(lua_State *state)
+int Lua::Yield(lua_State *state)
 {
 	return lua_yield(state, 0);
 }
 
-int Lua_Resume(lua_State *state)
+int Lua::Resume(lua_State *state)
 {
 	bool requested = SDL_QuitRequested();
 	lua_pushboolean(state, !requested);

@@ -10,21 +10,21 @@
 namespace
 {
 	// User event codes to queue updates for buffers and sources
-	enum AudioEventCode : Uint32 { UpdateBuffers, UpdateSources };
+	enum UpdateEventCode : Uint32 { UpdateBuffers, UpdateSources };
 
 	// Generic resource manager for any ALuint based id type
-	template <AudioEventCode UpdateCode>
-	class AudioManager : public Manager<ALuint>
+	template <UpdateEventCode UpdateCode>
+	class UpdateManager : public Manager<ALuint>
 	{
 	private:
 
 		bool SendUpdate() override
 		{
-			return SendUserEvent(UpdateAudio, UpdateCode);
+			return SDL::SendUserEvent(UpdateOpenAL, UpdateCode);
 		}
 	};
 
-	class AudioBufferManager final : public AudioManager<UpdateBuffers>
+	class AudioBufferManager final : public UpdateManager<UpdateBuffers>
 	{
 	public:
 
@@ -51,7 +51,7 @@ namespace
 		}
 	};
 
-	class AudioSourceManager final : public AudioManager<UpdateSources>
+	class AudioSourceManager final : public UpdateManager<UpdateSources>
 	{
 	public:
 
@@ -107,14 +107,14 @@ ALuint OpenAL::GetSource(unsigned index)
 
 ALCdevice *OpenAL::GetDevice(const char *name)
 {
-	static class AudioDevice
+	static class Device
 	{
 	public:
 
 		ALCdevice *device = nullptr;
 
-		AudioDevice() = default;
-		AudioDevice(const char *name)
+		Device() = default;
+		Device(const char *name)
 		{
 			if (name)
 			{
@@ -133,7 +133,7 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 				}
 			}
 		}
-		~AudioDevice()
+		~Device()
 		{
 			// Destroy the singleton context too
 			verify(not OpenAL::GetContext(nullptr));
@@ -149,7 +149,7 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 	if (name or not singleton.device)
 	{
 		// Update to the named device
-		singleton = AudioDevice(name);
+		singleton = Device(name);
 	}
 	return singleton.device;
 }
@@ -158,14 +158,14 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 
 ALCcontext *OpenAL::GetContext(int const *attributes)
 {
-	static class AudioContext
+	static class Context
 	{
 	public:
 
 		ALCcontext *context = nullptr;
 
-		AudioContext() = default;
-		AudioContext(int const *attributes)
+		Context() = default;
+		Context(int const *attributes)
 		{
 			if (attributes)
 			{
@@ -200,18 +200,18 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 						// Begin processing input
 						alcProcessContext(context);
 						// Register update handler
-						PushEventHandler(UpdateAudio, UpdateAudioHandler);
+						SDL::PushEventHandler(UpdateOpenAL, UpdateHandler);
 					}
 				}
 			}
 		}
-		~AudioContext()
+		~Context()
 		{
 			// Destroy if it was created
 			if (context)
 			{
 				// Unregister update handler
-				PopEventHandler(UpdateAudio);
+				SDL::PopEventHandler(UpdateOpenAL);
 				// Stop processing input
 				alcSuspendContext(context);
 				// Delete audio sources
@@ -234,20 +234,20 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 
 	private:
 
-		static bool UpdateAudioHandler(SDL_Event const &event)
+		static bool UpdateHandler(SDL_Event const &event)
 		{
-			assert(UserEventType::UpdateAudio == event.user.type);
+			assert(UserEventType::UpdateOpenAL == event.user.type);
 			// Update method by code
 			switch (event.user.code)
 			{
-			case AudioEventCode::UpdateBuffers:
+			case UpdateEventCode::UpdateBuffers:
 				AudioBufferManager::Instance().Update();
 				break;
-			case AudioEventCode::UpdateSources:
+			case UpdateEventCode::UpdateSources:
 				AudioSourceManager::Instance().Update();
 				break;
 			default:
-				assert(not "AudioEventCode");
+				assert(not "OpenAL event code");
 				return false;
 			}
 			return true;
@@ -258,7 +258,7 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 	if (attributes or not singleton.context)
 	{
 		// Update with given attributes
-		singleton = AudioContext(attributes);
+		singleton = Context(attributes);
 	}
 	return singleton.context;
 }

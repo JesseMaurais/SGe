@@ -16,8 +16,8 @@ static bool OnQuit(const SDL_Event &event)
 
 int main(int argc, char **argv)
 {
-	PushEventHandler(SDL_QUIT, OnQuit);
-	SDL::SetAssertHandler(nullptr);
+	SDL::PushEventHandler(SDL_QUIT, OnQuit);
+	SDL::SetAssertionHandler(nullptr);
 	{
 		unsigned media = SDL_INIT_EVENTS;
 		char const *script = nullptr;
@@ -57,27 +57,15 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		if (Lua_Init(script))
+		if (not Lua::Init(script))
 		{
-			SDL::perror("Lua_Init");
+			SDL::perror("Lua::Init");
 			return EXIT_FAILURE;
 		}
 		else
-		if (std::atexit(Lua_Quit))
+		if (std::atexit(Lua::Quit))
 		{
 			SDL_Log(String(CannotMakeExit), "Lua_Quit");
-			return EXIT_FAILURE;
-		}
-
-		if (CommandInit(String(CommandPrompt)))
-		{
-			SDL::perror("CommandInit");
-			return EXIT_FAILURE;
-		}
-		else
-		if (std::atexit(CommandQuit))
-		{
-			SDL_Log(String(CannotMakeExit), "CommandQuit");
 			return EXIT_FAILURE;
 		}
 	}
@@ -87,7 +75,7 @@ int main(int argc, char **argv)
 	{
 		if (SDL_WaitEvent(&event))
 		{
-			Dispatch(event);
+			SDL::Dispatch(event);
 		}
 		else
 		{

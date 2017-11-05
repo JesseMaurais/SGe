@@ -2,7 +2,7 @@
 #include "Lua.hpp"
 #include "SDL.hpp"
 #include "XML.hpp"
-#include "Strings.hpp"
+#include "Error.hpp"
 #include "Document.hpp"
 #include <lux/lux.hpp>
 #include <exception>
@@ -295,7 +295,7 @@ static int renderer(lua_State *state)
 	auto renderer = SDL_CreateRenderer(window, driver, flags);
 	if (not renderer)
 	{
-		return Lua_GetError(state);
+		return Lua::GetError(state);
 	}
 
 	lux_push(state, renderer);
@@ -470,7 +470,7 @@ static int document(lua_State *state)
 }
 
 
-signed Lux_Init(lua_State *state)
+signed Lux::Init(lua_State *state)
 {
 	lua_pushcfunction(state, setattributes);
 	lua_setglobal(state, "SetAttributes");

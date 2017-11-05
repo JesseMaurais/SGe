@@ -5,34 +5,47 @@
 #include "SDL.hpp"
 #include "Strings.hpp"
 
-template <typename... Args>
-std::string::size_type Format(std::string &string, const char *format, Args... args)
+namespace SDL
 {
-	std::string::size_type const subs = io::sprintf(string, format, args...);
-	SDL_assert(sizeof...(args) == subs);
-	return subs;
-}
+	template <typename... Args>
+	bool perror(std::string const &prefix)
+	{
+		return perror(prefix.c_str());
+	}
 
-template <typename... Args>
-std::string::size_type Format(std::string &string, enum Strings format, Args... args)
-{
-	return Format(string, String(format), args...);
-}
+	template <typename... Args>
+	bool perror(enum Strings prefix)
+	{
+		return perror(String(prefix));
+	}
 
-template <typename FormatType, typename... Args>
-signed SetError(FormatType const format, Args... args)
-{
-	std::string string;
-	Format(string, format, args...);
-	return SDL_SetError("%s", string.c_str());
-}
+	template <typename... Args>
+	bool SetError(std::string const &format, Args&&... args)
+	{
+		std::string message;
+		io::sprintf(message, format, args...);
+		return 0 > SDL_SetError("%s", message.c_str());
+	}
 
-template <typename FormatType, typename... Args>
-signed Log(FormatType const format, Args... args)
-{
-	std::string string;
-	Format(string, format, args...);
-	return SDL_Log("%s", string.c_str());
+	template <typename... Args>
+	bool SetError(enum Strings format, Args&&... args)
+	{
+		return SetError(String(format), args...);
+	}
+
+	template <typename... Args>
+	void Log(std::string const &format, Args&&... args)
+	{
+		std::string message;
+		io::sprintf(message, format, args...);
+		SDL_Log("%s", message.c_str());
+	}
+
+	template <typename... Args>
+	void Log(enum Strings format, Args&&... args)
+	{
+		Log(String(format), args...);
+	}
 }
 
 #endif // file

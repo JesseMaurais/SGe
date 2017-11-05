@@ -3,22 +3,20 @@
 
 #define dDOUBLE
 #include <ode/ode.h>
+#include "Source.hpp"
 
-extern dWorldID World;
-extern dSpaceID Space;
-
-signed Ode_Init();
-void Ode_Quit();
-signed Ode_Lock();
-signed Ode_Unlock();
-
-struct Geom
+namespace Ode
 {
-	virtual void Update() = 0;
-	virtual ~Geom() = default;
-};
+	void Update(dGeomID);
+	void Update(dSpaceID);
 
-void Update(dGeomID);
-void Update(dSpaceID);
+	signed Lock();
+	signed Unlock();
+}
+
+struct Geom : Source
+{
+
+};
 
 #endif // file

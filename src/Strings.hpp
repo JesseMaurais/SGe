@@ -4,22 +4,12 @@
 enum Strings
 {
 	 None
-	,Config
-	,CommandPrompt
-	,CmdHelp
-	,CmdConfigs
-	,CmdMedia
-	,CmdQuit
-	,Retry
-	,Break
-	,Abort
-	,Ignore
-	,AlwaysIgnore
+	,ColonSeparator
 	,UnknownError
 	,NoError
 	,OutOfMemory
-	,NameNotUnique
 	,EncodingError
+	,NameNotUnique
 	,InvalidArgument
 	,InvalidName
 	,InvalidEnum
@@ -27,6 +17,14 @@ enum Strings
 	,InvalidOperation
 	,InvalidDevice
 	,InvalidContext
+	,MessageBoxError
+	,MessageBoxWarning
+	,MessageBoxInformation
+	,MessageBoxContinue
+	,MessageBoxAbort
+	,MessageBoxRetry
+	,MessageBoxBreak
+	,MessageBoxIgnore
 	,CannotLock
 	,CannotUnlock
 	,CannotMakeExit
@@ -38,13 +36,16 @@ enum Strings
 	,CannotFindSchema
 	,CannotLoadScript
 	,CannotLoadDocument
+	,CannotCompileShader
+	,CannotQueryShader
 	,CannotUseShader
+	,CannotQueryProgram
+	,CannotLinkProgram
 	,CannotUseProgram
 	,CannotCreateCommandQueue
 	,CaughtException
 };
 
 char const *String(enum Strings);
-signed SetError(enum Strings);
 
 #endif // file

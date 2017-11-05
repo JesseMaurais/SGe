@@ -1,6 +1,5 @@
 /** \file
- * Utilities for with SDL2
- * 		Additional error string reporting functions
+ * Utility functions for working with SDL2.
  */
 
 #ifndef SDL_hpp
@@ -10,31 +9,42 @@
 
 namespace SDL
 {
-	/**
-	 * \brief Setup a handler so that SDL_assert activates a popup window with
-	 * options about how to proceed.
-	 * \param window Handle to the window that the popup is transient for, or
-	 * null so that it floats over the desktop.
-	 */
-	void SetAssertHandler(SDL_Window *window = nullptr);
-	/**
-	 * \brief Reset to the default error handler and flush all prior asserts.
-	 */
-	void ResetAssertHandler();
+	/// Logs the current error string like 'std::perror' does. Returns true when an error exists.
+	bool perror(char const *origin);
 
-	/**
-	 * \brief Logs the current error string like 'perror' does.
-	 * \param origin Name of the function which generated the error.
-	 * \return If there is no error, 0, otherwise -1.
-	 */
-	signed perror(const char *origin);
+	/// Logs the given error string with origin as prefix. Always returns true.
+	bool perror(char const *origin, char const *error);
 
-	/**
-	 * \brief Logs the given error string with origin as prefix.
-	 * \param origin Name of the function which generated the error.
-	 * \return Always returns -1.
-	 */
-	signed perror(const char *origin, const char *error);
+	/// Message box with the current error asking how to proceed. Returns true when retry requested.
+	bool ShowError(SDL_MessageBoxFlags flags, SDL_Window *transientFor = nullptr);
+
+	/// Make SDL_assert activate a message box asking how to proceed.
+	void SetAssertionHandler(SDL_Window *transientFor = nullptr);
+
+	/// Reset to the default error handler and flush all prior asserts.
+	void ResetAssertionHandler();
+
+	/// Utility to make assertion message box in scope transient for a window.
+	class ScopedAssertHandler
+	{
+	public:
+
+		ScopedAssertHandler(SDL_Window *window)
+		{
+			handler = SDL_GetAssertionHandler(&userdata);
+			SetAssertionHandler(window);
+		}
+
+		~ScopedAssertHandler()
+		{
+			SDL_SetAssertionHandler(handler, userdata);
+		}
+
+	private:
+
+		SDL_AssertionHandler handler;
+		void *userdata;
+	};
 }
 
 #endif // file

@@ -4,22 +4,23 @@
 #include <stack>
 #include <map>
 
-bool SendUserEvent(enum UserEventType type, unsigned code)
-{
-	SDL_Event event;
-	event.user.type = UserEvent(type);
-	event.user.code = code;
-	return 0 == SDL_PushEvent(&event);
-}
 
-unsigned UserEvent(enum UserEventType type)
+unsigned SDL::UserEvent(enum UserEventType type)
 {
 	assert(type < UserEventCount);
 	static const auto base = SDL_RegisterEvents(UserEventCount);
 	return static_cast<unsigned>(base + type);
 }
 
-using Stack = std::stack<EventHandler>;
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code)
+{
+	SDL_Event event;
+	event.user.type = SDL::UserEvent(type);
+	event.user.code = code;
+	return 0 == SDL_PushEvent(&event);
+}
+
+using Stack = std::stack<SDL::EventHandler>;
 using StackMap = std::map<Uint32, Stack>;
 
 static Stack &HandlerStack(Uint32 eventCode)
@@ -28,17 +29,17 @@ static Stack &HandlerStack(Uint32 eventCode)
 	return eventStacks[eventCode];
 }
 
-void PushEventHandler(unsigned eventCode, EventHandler function)
+void SDL::PushEventHandler(unsigned eventCode, EventHandler function)
 {
 	HandlerStack(eventCode).push(function);
 }
 
-void PopEventHandler(unsigned eventCode)
+void SDL::PopEventHandler(unsigned eventCode)
 {
 	HandlerStack(eventCode).pop();
 }
 
-void Dispatch(const SDL_Event &event)
+void SDL::Dispatch(const SDL_Event &event)
 {
 	Stack store;
 	Stack &stack = HandlerStack(event.type);

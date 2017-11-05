@@ -1,12 +1,14 @@
-#ifndef STL_hpp
-#define STL_hpp
+#ifndef stdcpp_hpp
+#define stdcpp_hpp
 
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <type_traits>
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cctype>
 
 #ifndef NDEBUG
 #define verify(condition) assert(condition)
@@ -45,10 +47,20 @@ namespace
 		return to<int>(val);
 	}
 
-	template  <typename Src>
+	template <typename Src>
 	std::string to_string(const Src &val)
 	{
 		return std::to_string(val);
+	}
+
+	inline std::string to_string(const unsigned char *val)
+	{
+		return std::string(reinterpret_cast<const char*>(val));
+	}
+
+	inline std::string to_string(const char *val)
+	{
+		return std::string(val);
 	}
 }
 
@@ -80,50 +92,61 @@ namespace stl
 	{
 		return std::make_pair(stl::min(a, b), stl::max(a, b));
 	}
-
-	template <typename Container, typename Predicate>
-	auto count_if(Container& c, Predicate& p)
-	{
-		return std::count_if(c.begin(), c.end(), p);
-	}
 }
 
 namespace str
 {
-	inline std::string::size_type replace(std::string &string, std::string const &search, std::string const &replace)
+	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
-		std::string::size_type index, count = 0;
 		std::string::size_type const length = search.length();
-		for (index = string.find(search); std::string::npos != index; index = string.find(search, index + length))
+		for (auto pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos))
 		{
-			string.replace(index, length, replace);
-			++count;
+			string.replace(pos, length, replace);
+			pos += length;
 		}
-		return count;
+	}
+
+	inline void split(std::vector<std::string> &tokens, std::string const &string, std::string const &delimiter)
+	{
+		constexpr std::string::size_type start = 0;
+		std::string::size_type const length = delimiter.length();
+		for (auto next = string.find(delimiter), last = start; std::string::npos != next; next = string.find(delimiter, last))
+		{
+			bool end = std::string::npos == next;
+			auto count = end ? next : next - last;
+			tokens.emplace_back(string.substr(last, count));
+			last = end ? next : next + length;
+		}
+	}
+
+	inline std::string to_upper(std::string string)
+	{
+		constexpr auto upper = [](unsigned char c) { return std::toupper(c); };
+		std::transform(string.begin(), string.end(), string.begin(), upper);
+		return string;
+	}
+
+	inline std::string to_lower(std::string string)
+	{
+		constexpr auto lower = [](unsigned char c) { return std::tolower(c); };
+		std::transform(string.begin(), string.end(), string.begin(), lower);
+		return string;
 	}
 
 	class format
 	{
-	private:
-
-		std::string string;
-		std::size_t index;
-		std::size_t subs;
-
 	public:
 
 		format(std::string const &s)
 			: string(s)
 			, index(0)
-			, subs(0)
 		{}
 
 		template <typename Type> format &operator%(Type const &arg)
 		{
-			using std::to_string;
-			std::string const search = std::string('%') + to_string(++index);
+			std::string const search = std::string("%") + std::to_string(++index);
 			std::string const replace = to_string(arg);
-			subs += str::replace(string, search, replace);
+			str::replace(string, search, replace);
 			return *this;
 		}
 
@@ -132,10 +155,10 @@ namespace str
 			return string;
 		}
 
-		operator std::size_t()
-		{
-			return subs;
-		}
+	private:
+
+		std::string string;
+		std::string::size_type index;
 	};
 }
 
@@ -144,7 +167,9 @@ namespace io
 	template <typename... Args>
 	std::size_t sprintf(std::string &string, std::string const &format, Args... args)
 	{
-		return (str::format(string = format) ... % args);
+		auto output = (str::format(format) % ... % args);
+		string = output;
+		return sizeof...(args);
 	}
 
 	template <typename... Args>

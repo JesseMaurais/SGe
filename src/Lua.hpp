@@ -10,14 +10,17 @@ extern "C"
 
 extern lua_State *CoState;
 
-signed Lua_SetError(lua_State *state);
-signed Lua_GetError(lua_State *state);
-void Lua_perror(lua_State *state, const char *prefix);
+namespace Lua
+{
+	bool SetError(lua_State *state);
+	signed GetError(lua_State *state);
+	void perror(lua_State *state, const char *prefix);
 
-signed Lua_Init(const char *path);
-void Lua_Quit();
+	bool Init(const char *path);
+	void Quit();
 
-int Lua_Yield(lua_State *state);
-int Lua_Resume(lua_State *state);
+	int Yield(lua_State *state);
+	int Resume(lua_State *state);
+}
 
 #endif // file
