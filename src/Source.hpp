@@ -3,7 +3,7 @@
 
 class Source
 {
-	friend class ManagerCommon;
+	friend class ResourcesCommon;
 
 public:
 
@@ -13,6 +13,21 @@ public:
 protected:
 
 	unsigned id;
+};
+
+template <class Resource> class SourceCommon : public Source
+{
+protected:
+
+	SourceCommon()
+	{
+		id = Resource::Manager().Add(this);
+	}
+	~SourceCommon()
+	{
+		auto const that = Resource::Manager().Remove(id);
+		assert(that == this);
+	}
 };
 
 class Resources

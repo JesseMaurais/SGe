@@ -3,28 +3,18 @@
 
 #include "Source.hpp"
 
-class AudioBuffer : public Source
+class AudioBuffer : public SourceCommon<AudioBuffer>
 {
-protected:
-
-	static Resources &Manager();
-
 public:
 
-	AudioBuffer();
-	~AudioBuffer();
+	static Resources &Manager();
 };
 
-class AudioSource : public Source
+class AudioSource : public SourceCommon<AudioSource>
 {
-protected:
-
-	static Resources &Manager();
-
 public:
 
-	AudioSource();
-	~AudioSource();
+	static Resources &Manager();
 };
 
 #endif // file

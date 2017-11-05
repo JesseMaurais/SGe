@@ -9,17 +9,6 @@
 
 namespace
 {
-	char const *ErrorString(GLenum error)
-	{
-		union
-		{
-		 const GLubyte *bytes;
-		 const char *string;
-		};
-		bytes = gluErrorString(error);
-		return string;
-	}
-
 	enum UpdateEventCode : Uint32
 	{
 		UpdateTextures,
@@ -89,20 +78,20 @@ namespace
 		{
 			stl::generate(ids, []()
 			{
-				auto const id = glCreateProgram();
+				GLuint const program = glCreateProgram();
 				if (OpenGL::CheckError("glCreateProgram"))
 				{
 					SDL::perror(CannotCreateResource);
 				}
-				return id;
+				return program;
 			});
 		}
 
 		void Destroy(std::vector<GLuint> const &ids) override
 		{
-			stl::for_each(ids, [](GLuint id)
+			stl::for_each(ids, [](GLuint const program)
 			{
-				glDeleteProgram(id);
+				glDeleteProgram(program);
 				if (OpenGL::CheckError("glDeleteProgram"))
 				{
 					SDL::perror(CannotDeleteResource);
@@ -155,6 +144,18 @@ namespace
 			});
 		}
 	};
+
+	// Convert error code to error string.
+	char const *ErrorString(GLenum error)
+	{
+		union
+		{
+		 const GLubyte *bytes;
+		 const char *string;
+		};
+		bytes = gluErrorString(error);
+		return string;
+	}
 }
 
 // OpenGL error utility functions
@@ -176,12 +177,14 @@ bool OpenGL::LogError(const char *origin)
 	return error and SDL::perror(origin, ErrorString(error));
 }
 
+// OpenGL resource utility functions
+
 GLuint OpenGL::GetTexture(unsigned index)
 {
 	return TextureManager::Instance().Data(index);
 }
 
-Resources &Shader::ProgramManager()
+Resources &Shader::Manager()
 {
 	return ProgramManager::Instance();
 }
@@ -191,7 +194,7 @@ GLuint OpenGL::GetProgram(unsigned index)
 	return ProgramManager::Instance().Data(index);
 }
 
-Resources &Shader::SourceManager()
+Resources &Shader::SourceCode::Manager()
 {
 	return ShaderManager::Instance();
 }

@@ -6,28 +6,35 @@
 #include <vector>
 #include <string>
 
-class Shader : public Source
+class Shader : public SourceCommon<Shader>
 {
 public:
 
-	Shader();
 	~Shader();
 	bool LoadString(std::string const &code);
 	bool LoadFile(std::string const &path);
 	bool Link();
 	bool Use();
 
-	class SourceCode;
+	class SourceCode : public SourceCommon<SourceCode>
+	{
+	public:
+
+		bool Attach(unsigned id);
+		bool Detach(unsigned id);
+
+		static Resources &Manager();
+	};
+
+	static Resources &Manager();
 
 protected:
 
-	static Resources &SourceManager();
-	static Resources &ProgramManager();
+	bool UpdateSource() override;
 
 private:
 
 	std::vector<std::shared_ptr<SourceCode>> shaderSources;
-	bool UpdateSource() override;
 };
 
 #endif // file

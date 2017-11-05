@@ -6,25 +6,6 @@
 
 #include "stl/algorithm.hpp"
 
-class Shader::SourceCode : public Source, public std::enable_shared_from_this<SourceCode>
-{
-public:
-
-	bool Attach(GLuint const program);
-	bool Detach(GLuint const program);
-
-protected:
-
-	SourceCode()
-	{
-		id = Shader::SourceManager().Add(this);
-	}
-	virtual ~SourceCode()
-	{
-		verify(this == Shader::SourceManager().Remove(id));
-	}
-};
-
 namespace
 {
 	// Get the shader info log and set it as the SDL error string.
@@ -82,7 +63,7 @@ namespace
 	{
 		// Collect raw C strings.
 		std::vector<GLint> lengths;
-		std::vector<GLchar*> strings;
+		std::vector<GLchar const *> strings;
 		for (auto const &line : lines)
 		{
 			lengths.emplace_back(line.size());
@@ -148,7 +129,10 @@ namespace
 		return 0;
 	}
 
+	// Shader source code loaded from a string.
+
 	class SourceString : public Shader::SourceCode
+	, public std::enable_shared_from_this<SourceString>
 	{
 	public:
 
@@ -161,21 +145,13 @@ namespace
 			// Share or make new object.
 			if (code.set.end() == it)
 			{
-				return std::make_shared<SourceCode>(sourceString);
+				return std::make_shared<SourceString>(sourceString);
 			}
 			else
 			{
-				auto const &that = *it;
-				return that->shared_from_this();
+				return (*it)->shared_from_this();
 			}
 		}
-
-	private:
-
-		std::string const sourceString;
-		bool UpdateSource() override;
-
-		static Collection<SourceString> code;
 
 		SourceString(std::string const &source) : sourceString(source)
 		{
@@ -188,9 +164,20 @@ namespace
 			verify(code.Remove(this));
 		}
 
+	private:
+
+		std::string const sourceString;
+		bool UpdateSource() override;
+
+		static Collection<SourceString> code;
 	};
 
+	Collection<SourceString> SourceString::code;
+
+	// Shader source code loaded from a file.
+
 	class SourceFile : public Shader::SourceCode
+	, public std::enable_shared_from_this<SourceFile>
 	{
 	public:
 
@@ -203,21 +190,13 @@ namespace
 			// Share or make new object.
 			if (code.set.end() == it)
 			{
-				return std::make_shared<SourceCode>(sourceFile);
+				return std::make_shared<SourceFile>(sourceFile);
 			}
 			else
 			{
-				auto const &that = *it;
-				return that->shared_from_this();
+				return (*it)->shared_from_this();
 			}
 		}
-
-	private:
-
-		std::string const sourceFile;
-		bool UpdateSource() override;
-
-		static Collection<SourceFile> code;
 
 		SourceFile(std::string const &source) : sourceFile(source)
 		{
@@ -227,7 +206,16 @@ namespace
 		{
 			verify(code.Remove(this));
 		}
+
+	private:
+
+		std::string const sourceFile;
+		bool UpdateSource() override;
+
+		static Collection<SourceFile> code;
 	};
+
+	Collection<SourceFile> SourceFile::code;
 }
 
 bool SourceString::UpdateSource()
@@ -279,9 +267,10 @@ bool SourceFile::UpdateSource()
 	}
 }
 
-bool Shader::SourceCode::Attach(GLuint const program)
+bool Shader::SourceCode::Attach(unsigned id)
 {
 	GLuint const shader = OpenGL::GetShader(Source::id);
+	GLuint const program = OpenGL::GetProgram(id);
 	glAttachShader(program, shader);
 	if (OpenGL::CheckError("glAttachShader"))
 	{
@@ -291,9 +280,10 @@ bool Shader::SourceCode::Attach(GLuint const program)
 	return true;
 }
 
-bool Shader::SourceCode::Detach(GLuint const program)
+bool Shader::SourceCode::Detach(unsigned id)
 {
 	GLuint const shader = OpenGL::GetShader(Source::id);
+	GLuint const program = OpenGL::GetProgram(id);
 	glDetachShader(program, shader);
 	if (OpenGL::CheckError("glDetachShader"))
 	{
@@ -362,10 +352,9 @@ bool Shader::LoadFile(std::string const &file)
 bool Shader::UpdateSource()
 {
 	unsigned count = 0;
-	GLuint const program = OpenGL::GetProgram(Source::id);
 	for (auto const &shader : shaderSources)
 	{
-		if (shader->Attach(program))
+		if (shader->Attach(Source::id))
 		{
 			++count;
 		}
@@ -376,19 +365,13 @@ bool Shader::UpdateSource()
 Shader::~Shader()
 {
 	unsigned count = 0;
-	GLuint const program = OpenGL::GetProgram(Source::id);
 	for (auto const &shader : shaderSources)
 	{
-		if (shader->Detach(program))
+		if (shader->Detach(Source::id))
 		{
 			++count;
 		}
 	}
 	assert(shaderSources.size() == count);
-	verify(this == ProgramManager().Remove(Source::id));
 }
 
-Shader::Shader()
-{
-	Source::id = ProgramManager().Add(this);
-}

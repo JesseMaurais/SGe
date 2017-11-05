@@ -5,7 +5,7 @@
 #include "Source.hpp"
 #include <vector>
 
-class ManagerCommon : public Resources
+class ResourcesCommon : public Resources
 {
 public:
 
@@ -25,7 +25,7 @@ private:
 	std::vector<Source*> sources;
 };
 
-template <typename Type> class Manager : public ManagerCommon
+template <typename Type> class Manager : public ResourcesCommon
 {
 public:
 
