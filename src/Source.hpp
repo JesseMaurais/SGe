@@ -15,15 +15,15 @@ protected:
 	unsigned id;
 };
 
-template <class Resource> class SourceCommon : public Source
+template <class Resource> class ManagedSource : public Source
 {
 protected:
 
-	SourceCommon()
+	ManagedSource()
 	{
 		id = Resource::Manager().Add(this);
 	}
-	~SourceCommon()
+	~ManagedSource()
 	{
 		auto const that = Resource::Manager().Remove(id);
 		assert(that == this);

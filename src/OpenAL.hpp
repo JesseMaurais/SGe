@@ -1,7 +1,5 @@
 /** \file
- * Utilities for working with OpenAL:
- * 		Reporting of errors through SDL
- * 		Audio device and context singletons for automatic resource management
+ * Utility functions for working with OpenAL.
  */
 
 #ifndef OpenAL_hpp
@@ -12,23 +10,22 @@
 
 namespace OpenAL
 {
-	/// Set the SDL error string to the given error code
-	signed SetError(const char *origin, ALenum error);
-	/// Set the SDL error string to the current error code
-	signed CheckError(const char *origin);
-	/// Log the current error with SDL
-	signed LogError(const char *origin);
+	/// Set the SDL error string to the given error code. Always returns true.
+	bool SetError(const char *origin, ALenum error);
+	/// Set the SDL error string to the current error code. Returns true when an error exists.
+	bool CheckError(const char *origin);
+	/// Log the current error with SDL. Returns true when an error exists.
+	bool LogError(const char *origin);
 
-	/// Set the SDL error string to the given device error code
-	signed SetError(ALCdevice *device, const char *origin, ALCenum error);
-	/// Set the SDL error string to the current device error code
-	signed CheckError(ALCdevice *device, const char *origin);
-	/// Log the current device error with SDL
-	signed LogError(ALCdevice *device, const char *origin);
+	/// Set the SDL error string to the given device error code. Always returns true.
+	bool SetError(ALCdevice *device, const char *origin, ALCenum error);
+	/// Set the SDL error string to the current device error code. Returns true when an error exists.
+	bool CheckError(ALCdevice *device, const char *origin);
+	/// Log the current device error with SDL. Returns true when an error exists.
+	bool LogError(ALCdevice *device, const char *origin);
 
 	// Buffer id at the given index from within the singleton.
 	ALuint GetBuffer(unsigned index);
-
 	// Source id at the given index from within the singleton.
 	ALuint GetSource(unsigned index);
 

@@ -1,7 +1,5 @@
 /** \file
- * Utilities for working with OpenGL:
- * 		Reporting of errors through SDL
- *		Graphics context singleton for resource management.
+ * Utility functions for working with OpenGL.
  */
 
 #ifndef OpenGL_hpp
@@ -15,9 +13,9 @@ struct SDL_Window;
 
 namespace OpenGL
 {
-	/// Set the SDL error string to the given error code. Always returns false.
+	/// Set the SDL error string to the given error code. Always returns true.
 	bool SetError(const char *origin, GLenum error);
-	/// Set the SDL error string for the current error code. Returns true when an error exists.
+	/// Set the SDL error string to the current error code. Returns true when an error exists.
 	bool CheckError(const char *origin);
 	/// Log the current error with SDL. Returns true when an error exists.
 	bool LogError(const char *origin);

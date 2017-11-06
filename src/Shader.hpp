@@ -1,3 +1,6 @@
+/** \file
+ * High level interface for OpenGL shaders using managed resources framework.
+ */
 #ifndef Shader_hpp
 #define Shader_hpp
 
@@ -6,7 +9,7 @@
 #include <vector>
 #include <string>
 
-class Shader : public SourceCommon<Shader>
+class Shader : public ManagedSource<Shader>
 {
 public:
 
@@ -16,7 +19,7 @@ public:
 	bool Link();
 	bool Use();
 
-	class SourceCode : public SourceCommon<SourceCode>
+	class SourceCode : public ManagedSource<SourceCode>
 	{
 	public:
 

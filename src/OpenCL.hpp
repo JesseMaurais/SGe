@@ -1,7 +1,5 @@
 /** \file
- * Utilities for working with OpenAL:
- * 		Reporting of errors through SDL
- * 		Audio device and context singletons for automatic resource management
+ * Utility functions for working with OpenCL.
  */
 
 #ifndef OpenCL_hpp
@@ -11,13 +9,15 @@
 
 namespace OpenCL
 {
-	/// Set the SDL error string to the given error code
-	signed SetError(const char *origin, cl_int error);
+	/// Set the SDL error string to the given error code. Always returns true.
+	bool SetError(const char *origin, cl_int error);
 
 	cl_platform_id *GetPlatformIDs();
 	cl_device_id *GetDeviceIDs(cl_device_type type = CL_DEVICE_TYPE_DEFAULT);
 	cl_context GetContext(cl_context_properties const *properties = nullptr);
 	cl_command_queue GetCommandQueue(cl_queue_properties const *properties = nullptr);
+	cl_program &GetProgram(unsigned id);
+	cl_kernel &GetKerenel(unsigned id);
 }
 
 #endif//file

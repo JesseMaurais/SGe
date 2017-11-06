@@ -1,9 +1,9 @@
-#include "Audio.hpp"
 #include "OpenAL.hpp"
 #include "Manager.hpp"
+#include "Audio.hpp"
 #include "Event.hpp"
+#include "Error.hpp"
 #include "SDL.hpp"
-#include "std.hpp"
 
 // Resource management implementation
 
@@ -41,13 +41,19 @@ namespace
 		void Generate(std::vector<ALuint> &ids) override
 		{
 			alGenBuffers(ids.size(), ids.data());
-			OpenAL::LogError("alGenBuffers");
+			if (OpenAL::CheckError("alGenBuffers"))
+			{
+				SDL::perror(CannotCreateResource);
+			}
 		}
 
 		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteBuffers(ids.size(), ids.data());
-			OpenAL::LogError("alDeleteBuffers");
+			if (OpenAL::LogError("alDeleteBuffers"))
+			{
+				SDL::perror(CannotDeleteResource);
+			}
 		}
 	};
 
@@ -68,13 +74,19 @@ namespace
 		void Generate(std::vector<ALuint> &ids) override
 		{
 			alGenSources(ids.size(), ids.data());
-			OpenAL::LogError("alGenSources");
+			if (OpenAL::CheckError("alGenSources"))
+			{
+				SDL::perror(CannotCreateResource);
+			}
 		}
 
 		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteSources(ids.size(), ids.data());
-			OpenAL::LogError("alDeleteSources");
+			if (OpenAL::LogError("alDeleteSources"))
+			{
+				SDL::perror(CannotDeleteResource);
+			}
 		}
 	};
 }
@@ -265,41 +277,41 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 
 // OpenAL error utility functions
 
-signed OpenAL::SetError(char const *origin, ALenum error)
+bool OpenAL::SetError(const char *origin, ALenum error)
 {
-	return SDL_SetError("%s: %s", origin, alGetString(error));
+	return SDL::SetError(ColonSeparator, origin, alGetString(error));
 }
 
-signed OpenAL::CheckError(char const *origin)
+bool OpenAL::CheckError(const char *origin)
 {
-	ALenum error = alGetError();
+	ALenum const error = alGetError();
 	if (error)
 	{
 		return OpenAL::SetError(origin, error);
 	}
-	return 0;
+	return false;
 }
 
-signed OpenAL::LogError(char const *origin)
+bool OpenAL::LogError(const char *origin)
 {
-	ALenum error = alGetError();
+	ALenum const error = alGetError();
 	if (error)
 	{
 		return SDL::perror(origin, alGetString(error));
 	}
-	return 0;
+	return false;
 }
 
 // ALC error utility functions
 
 signed OpenAL::SetError(ALCdevice *device, char const *origin, ALenum error)
 {
-	return SDL_SetError("%s: %s", origin, alcGetString(device, error));
+	return SDL::SetError(ColonSeparator, origin, alcGetString(device, error));
 }
 
 signed OpenAL::CheckError(ALCdevice *device, char const *origin)
 {
-	ALCenum error = alcGetError(device);
+	ALCenum const error = alcGetError(device);
 	if (error)
 	{
 		return OpenAL::SetError(device, origin, error);
@@ -309,7 +321,7 @@ signed OpenAL::CheckError(ALCdevice *device, char const *origin)
 
 signed OpenAL::LogError(ALCdevice *device, char const *origin)
 {
-	ALCenum error = alcGetError(device);
+	ALCenum const error = alcGetError(device);
 	if (error)
 	{
 		return SDL::perror(origin, alcGetString(device, error));

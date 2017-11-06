@@ -7,9 +7,10 @@ enum UserEventType
 {
 	UpdateSpace,
 	UpdateOpenAL,
+	UpdateOpenCL,
 	UpdateOpenGL,
 	ExecuteCommand,
-	UserEventCount
+	UserEventCount,
 };
 
 namespace SDL
