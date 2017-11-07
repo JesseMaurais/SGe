@@ -32,32 +32,28 @@ public:
 	// Regenerate all from their sources
 	bool Initialize()
 	{
-		bool ok = true;
 		// Current will match data sources
-		auto const size = Size();
+		unsigned const size = Size();
 		ids.resize(size);
-		if (size > 0)
-		{
-			Generate(ids);
-			// Update from data sources
-			ok = UpdateSources() == size;
-		}
-		return ok;
+		removed.clear();
+		added.clear();
+		Generate(ids);
+		// Update from data sources
+		return UpdateSources() == size;
 	}
 
 	// Destroy all resources
 	bool Release()
 	{
 		// Current should match data sources
-		auto const size = Size();
-		bool ok = ids.size() == size;
+		unsigned const size = Size();
+		bool const ok = ids.size() == size;
 		// Destroy current and removed
 		stl::append(ids, removed);
-		if (not ids.empty())
-		{
-			Destroy(ids);
-			ids.clear();
-		}
+		removed.clear();
+		added.clear();
+		Destroy(ids);
+		ids.clear();
 		return ok;
 	}
 
@@ -74,7 +70,7 @@ public:
 		Generate(newids);
 		stl::append(ids, newids);
 		// Update the new from their sources
-		bool ok = UpdateSources(added) == size;
+		bool const ok = UpdateSources(added) == size;
 		added.clear();
 		return ok;
 	}
