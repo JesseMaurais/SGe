@@ -32,44 +32,36 @@ public:
 	// Regenerate all from their sources
 	bool Initialize()
 	{
-		// Current will match data sources
-		unsigned const size = Size();
-		ids.resize(size);
-		removed.clear();
-		added.clear();
-		Generate(ids);
-		// Update from data sources
-		return UpdateSources() == size;
+		Generate(data); // includes added
+		added.clear(); // done adding now
+		// Verify that sources sync with data
+		return UpdateSources() == data.size();
 	}
 
 	// Destroy all resources
 	bool Release()
 	{
-		// Current should match data sources
-		unsigned const size = Size();
-		bool const ok = ids.size() == size;
-		// Destroy current and removed
-		stl::append(ids, removed);
-		removed.clear();
-		added.clear();
-		Destroy(ids);
-		ids.clear();
-		return ok;
+		// Destroy any removed too
+		stl::append(removed, data);
+		Destroy(removed); // retain data memory
+		removed.clear(); // done removing now
+		// Verify sources sync with data
+		return Size() == data.size();
 	}
 
 	// Update any added or removed sources
 	bool Update()
 	{
-		// Delete any removed
+		// Destroy any removed
 		Destroy(removed);
 		removed.clear();
 		// Reserve space for added
-		auto const size = added.size();
-		std::vector<Type> newids(size);
+		unsigned const size = added.size();
+		std::vector<Type> newdata(size);
 		// Generate new for added
-		Generate(newids);
-		stl::append(ids, newids);
-		// Update the new from their sources
+		Generate(newdata);
+		stl::append(data, newdata);
+		// Update the added from their sources
 		bool const ok = UpdateSources(added) == size;
 		added.clear();
 		return ok;
@@ -78,18 +70,18 @@ public:
 	// Get the internal resource data
 	Type &Data(unsigned index)
 	{
-		return ids.at(index);
+		return data.at(index);
 	}
 
 protected:
 
-	virtual void Generate(std::vector<Type> &ids) = 0;
-	virtual void Destroy(std::vector<Type> const &ids) = 0;
+	virtual void Generate(std::vector<Type> &data) = 0;
+	virtual void Destroy(std::vector<Type> const &data) = 0;
 	virtual bool SendUpdate() = 0;
 
 private:
 
-	std::vector<Type> ids;
+	std::vector<Type> data;
 	std::vector<unsigned> added;
 	std::vector<Type> removed;
 
@@ -105,24 +97,23 @@ private:
 		return not NeedUpdate() or SendUpdate();
 	}
 
-	// Capture the id and add in queue later
+	// Capture the id and generate in queue later
 	unsigned Add(Source* that) override
 	{
-		QueueUpdate();
 		unsigned index = Manager::Add(that);
 		added.push_back(index);
+		QueueUpdate();
 		return index;
 	}
 
-	// Capture the id and remove in queue later
+	// Capture the id and destroy in queue later
 	Source* Remove(unsigned index) override
 	{
-		QueueUpdate();
 		Source *that = Manager::Remove(index);
-		removed.push_back(ids.at(index));
-		// Replace back like Manager does
-		ids.at(index) = ids.back();
-		ids.pop_back();
+		removed.push_back(data.at(index));
+		data.at(index) = data.back();
+		data.pop_back();
+		QueueUpdate();
 		return that;
 	}
 };

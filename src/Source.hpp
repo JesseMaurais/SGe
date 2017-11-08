@@ -3,7 +3,7 @@
 
 class Source
 {
-	friend class ResourcesCommon;
+	friend class ResourceManager;
 
 public:
 

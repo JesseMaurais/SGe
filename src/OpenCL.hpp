@@ -16,8 +16,8 @@ namespace OpenCL
 	cl_device_id *GetDeviceIDs(cl_device_type type = CL_DEVICE_TYPE_DEFAULT);
 	cl_context GetContext(cl_context_properties const *properties = nullptr);
 	cl_command_queue GetCommandQueue(cl_queue_properties const *properties = nullptr);
-	cl_program &GetProgram(unsigned id);
-	cl_kernel &GetKerenel(unsigned id);
+	cl_program &GetProgram(unsigned index);
+	cl_kernel &GetKerenel(unsigned index);
 }
 
 #endif//file

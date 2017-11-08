@@ -8,22 +8,16 @@ class Kernel : public ManagedSource<Kernel>
 {
 public:
 
-	class Program : public ManagedSource<Program>
-	{
-	public:
-
-		static Resources &Manager();
-	};
-
 	static Resources &Manager();
 
 protected:
 
-	void UpdateSource() override;
+	bool UpdateSource() override;
 
 private:
 
-	std::shared_ptr<Program> program;
+	class Program;
+	std::shared_ptr<Program> source;
 	std::string options;
 };
 

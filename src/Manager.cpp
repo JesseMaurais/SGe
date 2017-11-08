@@ -1,7 +1,7 @@
 #include "Manager.hpp"
 #include "std.hpp"
 
-unsigned ResourcesCommon::Add(Source *that)
+unsigned ResourceManager::Add(Source *that)
 {
 	assert(that);
 	unsigned id = Size();
@@ -9,7 +9,7 @@ unsigned ResourcesCommon::Add(Source *that)
 	return id;
 }
 
-Source *ResourcesCommon::Remove(unsigned id)
+Source *ResourceManager::Remove(unsigned id)
 {
 	assert(Has(id));
 	auto const that = sources.at(id);
@@ -19,7 +19,7 @@ Source *ResourcesCommon::Remove(unsigned id)
 	return that;
 }
 
-unsigned ResourcesCommon::UpdateSources(std::vector<Source*> const &sources)
+unsigned ResourceManager::UpdateSources(std::vector<Source*> const &sources)
 {
 	unsigned count = 0;
 	for (auto const that : sources)
@@ -32,7 +32,7 @@ unsigned ResourcesCommon::UpdateSources(std::vector<Source*> const &sources)
 	return count;
 }
 
-unsigned ResourcesCommon::UpdateSources(std::vector<unsigned> const &ids)
+unsigned ResourceManager::UpdateSources(std::vector<unsigned> const &ids)
 {
 	unsigned count = 0;
 	for (auto const id : ids)
@@ -46,17 +46,17 @@ unsigned ResourcesCommon::UpdateSources(std::vector<unsigned> const &ids)
 	return count;
 }
 
-unsigned ResourcesCommon::UpdateSources()
+unsigned ResourceManager::UpdateSources()
 {
 	return UpdateSources(sources);
 }
 
-bool ResourcesCommon::Has(unsigned index)
+bool ResourceManager::Has(unsigned index)
 {
 	return index < sources.size() and sources.at(index);
 }
 
-unsigned ResourcesCommon::Size()
+unsigned ResourceManager::Size()
 {
 	return to_unsigned(sources.size());
 }
