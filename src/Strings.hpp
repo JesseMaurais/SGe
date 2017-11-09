@@ -37,14 +37,18 @@ enum Strings
 	,CannotFindSchema
 	,CannotLoadScript
 	,CannotLoadDocument
-	,CannotCreateResource
-	,CannotDeleteResource
+	,CannotAllocateResource
+	,CannotFreeResource
 	,CannotCompileShader
 	,CannotQueryShader
 	,CannotUseShader
+	,CannotQueryValue
 	,CannotQueryProgram
+	,CannotBuildProgram
 	,CannotLinkProgram
 	,CannotUseProgram
+	,CannotQueryPlatform
+	,CannotQueryDevices
 };
 
 char const *String(enum Strings);

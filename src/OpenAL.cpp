@@ -43,7 +43,7 @@ namespace
 			alGenBuffers(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenBuffers"))
 			{
-				SDL::perror(CannotCreateResource);
+				SDL::perror(CannotAllocateResource);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace
 			alDeleteBuffers(ids.size(), ids.data());
 			if (OpenAL::LogError("alDeleteBuffers"))
 			{
-				SDL::perror(CannotDeleteResource);
+				SDL::perror(CannotFreeResource);
 			}
 		}
 	};
@@ -76,7 +76,7 @@ namespace
 			alGenSources(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenSources"))
 			{
-				SDL::perror(CannotCreateResource);
+				SDL::perror(CannotAllocateResource);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace
 			alDeleteSources(ids.size(), ids.data());
 			if (OpenAL::LogError("alDeleteSources"))
 			{
-				SDL::perror(CannotDeleteResource);
+				SDL::perror(CannotFreeResource);
 			}
 		}
 	};
@@ -285,46 +285,30 @@ bool OpenAL::SetError(const char *origin, ALenum error)
 bool OpenAL::CheckError(const char *origin)
 {
 	ALenum const error = alGetError();
-	if (error)
-	{
-		return OpenAL::SetError(origin, error);
-	}
-	return false;
+	return error or OpenAL::SetError(origin, error);
 }
 
 bool OpenAL::LogError(const char *origin)
 {
 	ALenum const error = alGetError();
-	if (error)
-	{
-		return SDL::perror(origin, alGetString(error));
-	}
-	return false;
+	return error or SDL::perror(origin, alGetString(error));
 }
 
 // ALC error utility functions
 
-signed OpenAL::SetError(ALCdevice *device, char const *origin, ALenum error)
+bool OpenAL::SetError(ALCdevice *device, const char *origin, ALenum error)
 {
 	return SDL::SetError(ColonSeparator, origin, alcGetString(device, error));
 }
 
-signed OpenAL::CheckError(ALCdevice *device, char const *origin)
+bool OpenAL::CheckError(ALCdevice *device, const char *origin)
 {
 	ALCenum const error = alcGetError(device);
-	if (error)
-	{
-		return OpenAL::SetError(device, origin, error);
-	}
-	return 0;
+	return error or OpenAL::SetError(device, origin, error);
 }
 
-signed OpenAL::LogError(ALCdevice *device, char const *origin)
+bool OpenAL::LogError(ALCdevice *device, const char *origin)
 {
 	ALCenum const error = alcGetError(device);
-	if (error)
-	{
-		return SDL::perror(origin, alcGetString(device, error));
-	}
-	return 0;
+	return error or SDL::perror(origin, alcGetString(device, error));
 }

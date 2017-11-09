@@ -3,14 +3,14 @@
 
 #include "Source.hpp"
 
-class AudioBuffer : public SourceCommon<AudioBuffer>
+class AudioBuffer : public ManagedSource<AudioBuffer>
 {
 public:
 
 	static Resources &Manager();
 };
 
-class AudioSource : public SourceCommon<AudioSource>
+class AudioSource : public ManagedSource<AudioSource>
 {
 public:
 

@@ -44,13 +44,17 @@ char const *String(enum Strings id)
 	case Strings::CannotFindSchema: return "Cannot find \"%1\" in schema";
 	case Strings::CannotLoadScript: return "Cannot load script \"%1\"";
 	case Strings::CannotLoadDocument: return "Cannot load document \"%1\"";
-	case Strings::CannotCreateResource: return "Cannot create resource";
-	case Strings::CannotDeleteResource: return "Cannot delete resource";
+	case Strings::CannotAllocateResource: return "Cannot allocate resource";
+	case Strings::CannotFreeResource: return "Cannot free resource";
 	case Strings::CannotCompileShader: return "Cannot compile shader";
 	case Strings::CannotQueryShader: return "Cannot query shader value";
 	case Strings::CannotUseShader: return "Cannot use shader for program";
+	case Strings::CannotQueryValue: return "Cannot query a value";
 	case Strings::CannotQueryProgram: return "Cannot query shader program value";
-	case Strings::CannotLinkProgram: return "Cannot link shader program";
-	case Strings::CannotUseProgram: return "Cannot use shader program";
+	case Strings::CannotBuildProgram: return "Cannot build program";
+	case Strings::CannotLinkProgram: return "Cannot link program";
+	case Strings::CannotUseProgram: return "Cannot use program";
+	case Strings::CannotQueryPlatform: return "Cannot query platform";
+	case Strings::CannotQueryDevices: return "Cannot query devices";
 	}
 }

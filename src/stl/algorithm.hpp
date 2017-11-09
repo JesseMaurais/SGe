@@ -28,6 +28,12 @@ namespace stl
 	{
 		std::generate(c.begin(), c.end(), g);
 	}
+
+	template <typename Container, typename Value>
+	inline void replace(Container &&c, Value const &a, Value const &b)
+	{
+		std::replace(c.begin(), c.end(), a, b);
+	}
 }
 
 #endif // file

@@ -1,7 +1,7 @@
 #ifndef stdcpp_hpp
 #define stdcpp_hpp
 
-#include <algorithm>
+#include "stl/algorithm.hpp"
 #include <iostream>
 #include <limits>
 #include <type_traits>
@@ -116,15 +116,15 @@ namespace str
 
 	inline std::string to_upper(std::string string)
 	{
-		constexpr auto upper = [](unsigned char c) { return std::toupper(c); };
-		std::transform(string.begin(), string.end(), string.begin(), upper);
+		constexpr auto upper = [](char c) { return std::toupper(c); };
+		stl::transform(string, upper);
 		return string;
 	}
 
 	inline std::string to_lower(std::string string)
 	{
-		constexpr auto lower = [](unsigned char c) { return std::tolower(c); };
-		std::transform(string.begin(), string.end(), string.begin(), lower);
+		constexpr auto lower = [](char c) { return std::tolower(c); };
+		stl::transform(string, lower);
 		return string;
 	}
 
@@ -162,8 +162,7 @@ namespace io
 	template <typename... Args>
 	std::size_t sprintf(std::string &string, std::string const &format, Args... args)
 	{
-		auto output = (str::format(format) % ... % args);
-		string = output;
+		string = (str::format(format) % ... % args);
 		return sizeof...(args);
 	}
 

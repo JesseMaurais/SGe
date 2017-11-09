@@ -22,6 +22,8 @@ namespace OpenGL
 
 	/// Texture id at the given index from within the singleton.
 	GLuint GetTexture(unsigned index);
+	/// Buffer id at the given index from within the singleton.
+	GLuint GetBuffer(unsigned index);
 	/// Program id at the given index from within the singleton.
 	GLuint GetProgram(unsigned index);
 	/// Shader id at the given index from within the singleton.

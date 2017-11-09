@@ -1,39 +1,18 @@
 #ifndef Manager_hpp
 #define Manager_hpp
 
-#include "std.hpp"
 #include "Source.hpp"
-#include <vector>
+#include "std.hpp"
 
-class ResourceManager : public Resources
-{
-public:
-
-	unsigned Add(Source *that) override;
-	Source *Remove(unsigned id) override;
-	bool Has(unsigned id);
-	unsigned UpdateSources();
-	unsigned Size();
-
-protected:
-
-	unsigned UpdateSources(std::vector<Source*> const &sources);
-	unsigned UpdateSources(std::vector<unsigned> const &ids);
-
-private:
-
-	std::vector<Source*> sources;
-};
-
-template <typename Type> class Manager : public ResourceManager
+template <typename Type> class Manager : public Resources
 {
 public:
 
 	// Regenerate all from their sources
 	bool Initialize()
 	{
-		Generate(data); // includes added
-		added.clear(); // done adding now
+		Generate(data); // include added
+		added.clear(); // done adding
 		// Verify that sources sync with data
 		return UpdateSources() == data.size();
 	}
@@ -43,8 +22,8 @@ public:
 	{
 		// Destroy any removed too
 		stl::append(removed, data);
-		Destroy(removed); // retain data memory
-		removed.clear(); // done removing now
+		Destroy(removed); // retain data
+		removed.clear(); // done removing
 		// Verify sources sync with data
 		return Size() == data.size();
 	}
@@ -58,9 +37,9 @@ public:
 		// Reserve space for added
 		unsigned const size = added.size();
 		std::vector<Type> newdata(size);
-		// Generate new for added
+		// Generate new data for added
 		Generate(newdata);
-		stl::append(data, newdata);
+		Replace(newdata);
 		// Update the added from their sources
 		bool const ok = UpdateSources(added) == size;
 		added.clear();
@@ -111,10 +90,22 @@ private:
 	{
 		Source *that = Manager::Remove(index);
 		removed.push_back(data.at(index));
+		stl::replace(added, Size(), index);
 		data.at(index) = data.back();
 		data.pop_back();
 		QueueUpdate();
 		return that;
+	}
+
+	// Replace data with new data at added indices
+	void Replace(std::vector<Type> const &newdata)
+	{
+		assert(newdata.size() == added.size());
+		for (std::size_t it = 0; it < added.size(); ++it)
+		{
+			unsigned const id = added.at(it);
+			data.at(id) = newdata.at(it);
+		}
 	}
 };
 

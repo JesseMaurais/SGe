@@ -1,21 +1,27 @@
 #include "OpenGL.hpp"
 #include "Shader.hpp"
 #include "Manager.hpp"
+#include "Video.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
 
 #include "stl/algorithm.hpp"
 
+// Resource management implementation
+
 namespace
 {
+	// User event codes to queue updates with
 	enum UpdateEventCode : Uint32
 	{
 		UpdateTextures,
+		UpdateBuffers,
 		UpdateShaders,
 		UpdatePrograms,
 	};
 
+	// Generic resource manager for any ALuint based id type
 	template <UpdateEventCode UpdateCode>
 	class UpdateManager : public Manager<GLuint>
 	{
@@ -46,7 +52,7 @@ namespace
 			glGenTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glGenTextures"))
 			{
-				SDL::perror(CannotCreateResource);
+				SDL::perror(CannotAllocateResource);
 			}
 		}
 
@@ -55,7 +61,40 @@ namespace
 			glDeleteTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glDeleteTextures"))
 			{
-				SDL::perror(CannotDeleteResource);
+				SDL::perror(CannotFreeResource);
+			}
+		}
+	};
+
+	class BufferManager final : public UpdateManager<UpdateBuffers>
+	{
+	private:
+
+		BufferManager() = default;
+
+	public:
+
+		static BufferManager &Instance()
+		{
+			static BufferManager singleton;
+			return singleton;
+		}
+
+		void Generate(std::vector<GLuint> &ids) override
+		{
+			glGenBuffers(ids.size(), ids.data());
+			if (OpenGL::CheckError("glGenBuffers"))
+			{
+				SDL::perror(CannotAllocateResource);
+			}
+		}
+
+		void Destroy(std::vector<GLuint> const &ids) override
+		{
+			glDeleteBuffers(ids.size(), ids.data());
+			if (OpenGL::CheckError("glDeleteTextures"))
+			{
+				SDL::perror(CannotFreeResource);
 			}
 		}
 	};
@@ -81,7 +120,7 @@ namespace
 				GLuint const program = glCreateProgram();
 				if (OpenGL::CheckError("glCreateProgram"))
 				{
-					SDL::perror(CannotCreateResource);
+					SDL::perror(CannotAllocateResource);
 				}
 				return program;
 			});
@@ -94,7 +133,7 @@ namespace
 				glDeleteProgram(program);
 				if (OpenGL::CheckError("glDeleteProgram"))
 				{
-					SDL::perror(CannotDeleteResource);
+					SDL::perror(CannotFreeResource);
 				}
 			});
 		}
@@ -127,7 +166,7 @@ namespace
 				pair.shader = glCreateShader(pair.type);
 				if (OpenGL::CheckError("glCreateShader"))
 				{
-					SDL::perror(CannotCreateResource);
+					SDL::perror(CannotAllocateResource);
 				}
 			});
 		}
@@ -139,7 +178,7 @@ namespace
 				glDeleteShader(pair.shader);
 				if (OpenGL::CheckError("glDeleteShader"))
 				{
-					SDL::perror(CannotDeleteResource);
+					SDL::perror(CannotFreeResource);
 				}
 			});
 		}
@@ -184,14 +223,29 @@ GLuint OpenGL::GetTexture(unsigned index)
 	return TextureManager::Instance().Data(index);
 }
 
-Resources &Shader::Manager()
+Resources &VideoTexture::Manager()
 {
-	return ProgramManager::Instance();
+	return TextureManager::Instance();
+}
+
+GLuint OpenGL::GetBuffer(unsigned index)
+{
+	return BufferManager::Instance().Data(index);
+}
+
+Resources &VideoBuffer::Manager()
+{
+	return BufferManager::Instance();
 }
 
 GLuint OpenGL::GetProgram(unsigned index)
 {
 	return ProgramManager::Instance().Data(index);
+}
+
+Resources &Shader::Manager()
+{
+	return ProgramManager::Instance();
 }
 
 Resources &Shader::SourceCode::Manager()
@@ -249,6 +303,8 @@ void *OpenGL::GetContext(SDL_Window *window)
 					}
 					// Generate textures
 					TextureManager::Instance().Initialize();
+					// Generate buffers
+					BufferManager::Instance().Initialize();
 					// Create shaders
 					ShaderManager::Instance().Initialize();
 					// Create programs
@@ -272,6 +328,8 @@ void *OpenGL::GetContext(SDL_Window *window)
 				SDL::PopEventHandler(UpdateOpenGL);
 				// Delete textures
 				TextureManager::Instance().Release();
+				// Delete buffers
+				BufferManager::Instance().Release();
 				// Delete shaders
 				ShaderManager::Instance().Release();
 				// Delete programs
@@ -297,6 +355,9 @@ void *OpenGL::GetContext(SDL_Window *window)
 			{
 			case UpdateEventCode::UpdateTextures:
 				TextureManager::Instance().Update();
+				break;
+			case UpdateEventCode::UpdateBuffers:
+				BufferManager::Instance().Update();
 				break;
 			case UpdateEventCode::UpdateShaders:
 				ShaderManager::Instance().Update();

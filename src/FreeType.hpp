@@ -2,8 +2,8 @@
 #define __FreeType__
 
 #include <ft2build.h>
-#include FT_GLYPH_H
-#include FT_OUTLINE_H
+#include <freetype2/freetype/ftglyph.h>
+#include <freetype2/freetype/ftoutln.h>
 
 void FT_perror(const char *string, FT_Error);
 

@@ -3,7 +3,7 @@
 
 class Source
 {
-	friend class ResourceManager;
+	friend class Resources;
 
 public:
 
@@ -35,8 +35,20 @@ class Resources
 public:
 
 	virtual ~Resources() = default;
-	virtual unsigned Add(Source *that) = 0;
-	virtual Source *Remove(unsigned id) = 0;
+	virtual unsigned Add(Source *that);
+	virtual Source *Remove(unsigned id);
+	bool Has(unsigned id);
+	unsigned Size();
+
+protected:
+
+	unsigned UpdateSources();
+	unsigned UpdateSources(std::vector<Source*> const &sources);
+	unsigned UpdateSources(std::vector<unsigned> const &ids);
+
+private:
+
+	std::vector<Source*> sources;
 };
 
 #endif // file

@@ -4,23 +4,23 @@
 
 static const char *ErrorString(FT_Error error)
 {
-	/*
 	#undef __FTERRORS_H__
 	#define FT_ERRORDEF(e, v, s) { e, s },
 	#define FT_ERROR_START_LIST {
-	#define FT_ERROR_END_LIST { 0, 0 } );
+	#define FT_ERROR_END_LIST { 0, NULL } };
 	const struct
 	{
 	 int error;
 	 const char *string;
 	} list[] =
-	#include FT_ERRORS_H
-	for (int it = 0; list[it].error; ++it)
+	#include <freetype2/freetype/fterrors.h>
+	for (unsigned it = 0; list[it].error; ++it)
 	{
 		if (error == list[it].error)
+		{
 			return list[it].string;
+		}
 	}
-	*/
 	return "unknown";
 }
 

@@ -7,82 +7,6 @@
 
 namespace
 {
-	enum UpdateEventCode : Uint32 { UpdatePrograms, UpdateKernels };
-
-	class ProgamManager : public Manager<cl_program>
-	{
-	public:
-
-		ProgamManager() = default;
-
-		bool SendUpdate() override
-		{
-			return SDL::SendUserEvent(UpdateOpenCL, UpdatePrograms);
-		}
-
-	public:
-
-		static ProgamManager &Instances()
-		{
-			static ProgamManager singleton;
-			return singleton;
-		}
-
-		void Generate(std::vector<cl_program> &ids) override
-		{
-
-		}
-
-		void Destroy(std::vector<cl_program> const &ids) override
-		{
-			stl::for_each(ids, [](cl_program const program)
-			{
-				cl_int error = clReleaseProgram(program);
-				if (error and SDL::SetError("clReleaseProgram", error))
-				{
-					SDL::perror(CannotDeleteResource);
-				}
-			});
-		}
-	};
-
-	class KernelManager : public Manager<cl_kernel>
-	{
-	public:
-
-		KernelManager() = default;
-
-		bool SendUpdate() override
-		{
-			return SDL::SendUserEvent(UpdateOpenCL, UpdateKernels);
-		}
-
-	public:
-
-		static KernelManager &Instances()
-		{
-			static KernelManager singleton;
-			return singleton;
-		}
-
-		void Generate(std::vector<cl_kernel> &ids) override
-		{
-
-		}
-
-		void Destroy(std::vector<cl_kernel> const &ids) override
-		{
-			stl::for_each(ids, [](cl_kernel const kernel)
-			{
-				cl_int error = clReleaseKernel(kernel);
-				if (error and SDL::SetError("clReleaseKernel", error))
-				{
-					SDL::perror(CannotDeleteResource);
-				}
-			});
-		}
-	};
-
 	const char *ErrorString(cl_int error)
 	{
 		switch (error)
@@ -217,107 +141,134 @@ bool OpenCL::SetError(const char *origin, cl_int error)
 	return SDL::SetError(ColonSeparator, origin, ErrorString(error));
 }
 
+bool OpenCL::CheckError(const char *origin, cl_int error)
+{
+	return error and OpenCL::SetError(origin, error);
+}
 
-cl_platform_id *OpenCL::GetPlatformIDs()
+bool OpenCL::LogError(const char *origin, cl_int error)
+{
+	return error and SDL::perror(origin, ErrorString(error));
+}
+
+
+std::vector<cl_platform_id> const &OpenCL::GetPlatformIDs()
 {
 	static struct PlatformIDs : std::vector<cl_platform_id>
 	{
-		cl_platform_id *Pointer()
-		{
-			return empty() ? nullptr : data();
-		}
-
 		PlatformIDs()
 		{
 			cl_uint num_platforms = 0;
 			do
 			{
 				resize(num_platforms);
-				cl_platform_id *platforms = Pointer();
+				cl_platform_id *platforms = empty() ? nullptr : data();
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
-				if (error)
+				if (OpenCL::CheckError("clGetPlatformIDs", error))
 				{
-					OpenCL::SetError("clGetPlatformIDs", error);
+					SDL::perror(CannotQueryValue);
 					clear();
-					return;
+					break;
 				}
 			}
 			while (size() < num_platforms);
-			push_back(nullptr);
 		}
 
 	} singleton;
 
-	return singleton.Pointer();
+	return singleton;
 }
 
 
-cl_device_id *OpenCL::GetDeviceIDs(cl_device_type type)
+std::vector<cl_device_id> const &OpenCL::GetDeviceIDs(cl_device_type type)
 {
 	static struct DeviceIDs : std::vector<cl_device_id>
 	{
-		cl_device_id *Pointer()
-		{
-			return empty() ? nullptr : data();
-		}
-
 		DeviceIDs() = default;
 		DeviceIDs(cl_platform_id platform, cl_device_type type)
 		{
 			cl_uint num_devices = 0;
 			do
 			{
-				reserve(num_devices);
-				cl_device_id *devices = Pointer();
+				resize(num_devices);
+				cl_device_id *devices = empty() ? nullptr : data();
 				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
-				if (error)
+				if (OpenCL::CheckError("clGetDeviceIDs", error))
 				{
-					OpenCL::SetError("clGetDeviceIDs", error);
+					SDL::perror(CannotQueryValue);
 					clear();
-					return;
+					break;
 				}
 			}
 			while (size() < num_devices);
-			push_back(nullptr);
 		}
 
 	} singleton;
 
-	if (CL_DEVICE_TYPE_DEFAULT == type)
+	static cl_device_type current = CL_DEVICE_TYPE_DEFAULT;
+	if (singleton.empty() or type != current)
 	{
-		cl_platform_id *platforms = OpenCL::GetPlatformIDs();
-		if (platforms)
+		if (not type) type = current;
+		for (cl_platform_id const platform : OpenCL::GetPlatformIDs())
 		{
-			for (std::size_t it = 0; singleton.size() < 2 and platforms[it]; ++it)
+			singleton = DeviceIDs(platform, type);
+			if (not singleton.empty())
 			{
-				singleton = DeviceIDs(platforms[it], type);
+				current = type;
+				break;
 			}
 		}
 	}
 
-	return singleton.Pointer();
+	return singleton;
 }
 
+std::vector<cl_device_id> OpenCL::GetDeviceIDs(cl_context context)
+{
+	struct DeviceIDs : std::vector<cl_device_id>
+	{
+		DeviceIDs(cl_context context)
+		{
+			unsigned count = 0;
+			do
+			{
+				resize(count);
+				std::size_t bytes = size()*sizeof(cl_device_id);
+				cl_device_id *devices = empty() ? nullptr : data();
+				cl_int error = clGetContextInfo(context, CL_CONTEXT_DEVICES, bytes, devices, &bytes);
+				if (OpenCL::CheckError("clGetContextInfo", error))
+				{
+					SDL::perror(CannotQueryValue);
+					clear();
+					break;
+				}
+				count = bytes/sizeof(cl_device_id);
+			}
+			while (size() < count);
+		}
 
-cl_context OpenCL::GetContext(cl_context_properties const *properties)
+	} devices = context;
+	return devices;
+}
+
+cl_context OpenCL::GetContext(std::vector<cl_context_properties> const &properties)
 {
 	struct Context
 	{
 		cl_context context = nullptr;
 
 		Context() = default;
-		Context(cl_context_properties const *properties)
+		Context(std::vector<cl_context_properties> properties)
 		{
-			cl_device_id *devices = OpenCL::GetDeviceIDs();
-			if (devices)
+			auto &devices = OpenCL::GetDeviceIDs();
+			if (not devices.empty())
 			{
-				cl_uint num_devices = 0;
-				while (devices[num_devices++]);
 				cl_int error;
-				context = clCreateContext(properties, num_devices, devices, OnNotify, this, &error);
-				if (error)
+				properties.push_back(0); // ensure terminal
+				context = clCreateContext(properties.data(), devices.size(), devices.data(), OnNotify, this, &error);
+				if (OpenCL::CheckError("clCreateContext", error))
 				{
-					OpenCL::SetError("clCreateContext", error);
+					SDL::perror(CannotAllocateResource);
 				}
 			}
 		}
@@ -326,9 +277,9 @@ cl_context OpenCL::GetContext(cl_context_properties const *properties)
 			if (context)
 			{
 				cl_int error = clReleaseContext(context);
-				if (error)
+				if (OpenCL::CheckError("clReleaseContext", error))
 				{
-					OpenCL::SetError("clReleaseContext", error);
+					SDL::perror(CannotFreeResource);
 				}
 			}
 		}
@@ -345,7 +296,7 @@ cl_context OpenCL::GetContext(cl_context_properties const *properties)
 
 	} singleton;
 	// Either new or not initialized
-	if (properties or not singleton.context)
+	if (not properties.empty() or not singleton.context)
 	{
 		// Update for compatibility with given properties
 		singleton = Context(properties);
@@ -353,29 +304,31 @@ cl_context OpenCL::GetContext(cl_context_properties const *properties)
 	return singleton.context;
 }
 
-cl_command_queue OpenCL::GetCommandQueue(cl_queue_properties const *properties)
+cl_command_queue OpenCL::GetCommandQueue(std::vector<unsigned long> const &properties)
 {
 	static struct CommandQueue
 	{
 		cl_command_queue queue = nullptr;
 
 		CommandQueue() = default;
-		CommandQueue(cl_queue_properties const *properties)
+		CommandQueue(std::vector<unsigned long> properties)
 		{
-			cl_device_id *devices = OpenCL::GetDeviceIDs();
-			if (devices)
+			cl_context context = OpenCL::GetContext();
+			if (context)
 			{
-				cl_context context = OpenCL::GetContext();
-				if (context)
+				auto devices = OpenCL::GetDeviceIDs(context);
+				properties.push_back(0); // ensure terminal
+				for (cl_device_id const device : devices)
 				{
-					for (std::size_t it = 0; not queue and devices[it]; ++it)
+					cl_int error;
+					queue = clCreateCommandQueueWithProperties(context, device, properties.data(), &error);
+					if (OpenCL::CheckError("clCreateCommandQueueWithProperties", error))
 					{
-						cl_int error;
-						queue = clCreateCommandQueueWithProperties(context, devices[it], properties, &error);
-						if (error)
-						{
-							OpenCL::SetError("clCreateCommandQueue", error);
-						}
+						SDL::perror(CannotAllocateResource);
+					}
+					else if (queue)
+					{
+						break;
 					}
 				}
 			}
@@ -383,15 +336,15 @@ cl_command_queue OpenCL::GetCommandQueue(cl_queue_properties const *properties)
 		~CommandQueue()
 		{
 			cl_int error = clReleaseCommandQueue(queue);
-			if (error)
+			if (OpenCL::CheckError("glReleaseCommandQueue", error))
 			{
-				OpenCL::SetError("clReleaseCommandQueue", error);
+				SDL::perror(CannotFreeResource);
 			}
 		}
 
 	} singleton;
 	// Either new or not initialized
-	if (properties or not singleton.queue)
+	if (not properties.empty() or not singleton.queue)
 	{
 		// Update for compatibility with given properties
 		singleton = CommandQueue(properties);

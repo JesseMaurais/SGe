@@ -98,23 +98,20 @@ signed CommandInit(const char *prompt)
 	Cond = SDL_CreateCond();
 	if (not Cond)
 	{
-	 SDL::perror("SDL_CreateCond");
-	 return SDL::SetError(CannotCreateCommandQueue);
+	 return SDL::perror("SDL_CreateCond");
 	}
 	Mutex = SDL_CreateMutex();
 	if (not Mutex)
 	{
 	 SDL_DestroyCond(Cond);
-	 SDL::perror("SDL_CreateMutex");
-	 return SDL::SetError(CannotCreateCommandQueue);
+	 return SDL::perror("SDL_CreateMutex");
 	}
 	Thread = SDL_CreateThread(CommandThread, "Command", nullptr);
 	if (not Thread)
 	{
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL::perror("SDL_CreateThread");
-	 return SDL::SetError(CannotCreateCommandQueue);
+	 return SDL::perror("SDL_CreateThread");
 	}
 	SDL::PushEventHandler(ExecuteCommand, CommandExec);
 	Prompt = prompt;
