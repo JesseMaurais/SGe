@@ -17,6 +17,12 @@ namespace stl
 		return std::find_if(c.begin(), c.end(), p);
 	}
 
+	template <typename Container, typename Iterator>
+	inline auto copy(Container &&c, Iterator &&it) -> decltype(c.end())
+	{
+		return std::copy(std::begin(c), std::end(c), it);
+	}
+
 	template <typename Container, typename Operation>
 	inline void transform(Container &&c, Operation &&op)
 	{
