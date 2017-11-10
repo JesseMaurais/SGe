@@ -1,5 +1,5 @@
-#ifndef __FreeType__
-#define __FreeType__
+#ifndef FreeType_hpp
+#define FreeType_hpp
 
 #include <ft2build.h>
 #include <freetype2/freetype/ftglyph.h>

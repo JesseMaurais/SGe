@@ -2,6 +2,8 @@
 #define stdcpp_hpp
 
 #include "stl/algorithm.hpp"
+#include "stl/string.hpp"
+
 #include <iostream>
 #include <limits>
 #include <type_traits>
@@ -46,17 +48,6 @@ namespace
 		static_assert(source::is_integer, "Value must be an integer type");
 		return to<int>(val);
 	}
-
-	template <typename Src>
-	std::string to_string(const Src &val)
-	{
-		return std::to_string(val);
-	}
-
-	inline std::string to_string(const char *val)
-	{
-		return std::string(val);
-	}
 }
 
 namespace stl
@@ -87,10 +78,7 @@ namespace stl
 	{
 		return std::make_pair(stl::min(a, b), stl::max(a, b));
 	}
-}
 
-namespace str
-{
 	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
 		std::string::size_type const length = search.length();
@@ -141,7 +129,7 @@ namespace str
 		{
 			std::string const search = std::string("%") + std::to_string(++index);
 			std::string const replace = to_string(arg);
-			str::replace(string, search, replace);
+			replace(string, search, replace);
 			return *this;
 		}
 
@@ -155,10 +143,7 @@ namespace str
 		std::string string;
 		std::string::size_type index;
 	};
-}
 
-namespace io
-{
 	template <typename... Args>
 	std::size_t sprintf(std::string &string, std::string const &format, Args... args)
 	{
@@ -179,6 +164,13 @@ namespace io
 	std::size_t printf(std::string const &format, Args... args)
 	{
 		return fprintf(std::cout, format, args...);
+	}
+
+	std::string quote(std::string const &string)
+	{
+		std::string result;
+		sprintf(result, "\"%1\"", string);
+		return result;
 	}
 }
 

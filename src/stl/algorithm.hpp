@@ -23,6 +23,12 @@ namespace stl
 		std::transform(c.begin(), c.end(), c.begin(), op);
 	}
 
+	template <typename ContainerA, typename ContainerB, typename Operation>
+	inline void transform(ContainerA &&a, ContainerB &&b, Operation &&op)
+	{
+		std::transform(std::begin(a), std::end(a), std::begin(b), op);
+	}
+
 	template <typename Container, typename Generator>
 	inline void generate(Container &&c, Generator &&g)
 	{

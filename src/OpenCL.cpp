@@ -247,7 +247,8 @@ std::vector<cl_device_id> OpenCL::GetDeviceIDs(cl_context context)
 			while (size() < count);
 		}
 
-	} devices = context;
+	} devices(context);
+
 	return devices;
 }
 
