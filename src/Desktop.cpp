@@ -306,13 +306,11 @@ std::vector<std::string> xdg::FindDesktopApplications()
 
 std::string xdg::OpenFileSelection(std::string const &title)
 {
-	std::string path;
-	std::deque<std::string> args;
-
 	// Store selected file path in cache
 	fs::path cache = xdg::GetCacheHome();
 	cache /= "file-selection";
 
+	std::deque<std::string> args;
 	// Enable the file selection option
 	args.push_back("--file-selection");
 	if (not title.empty())
@@ -325,6 +323,7 @@ std::string xdg::OpenFileSelection(std::string const &title)
 	args.push_back(">" + cache);
 	// Block on call to external program
 	int status = Zenity(args);
+	std::string path;
 	switch (status)
 	{
 	case 0:
