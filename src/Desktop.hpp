@@ -9,19 +9,10 @@
 
 namespace xdg
 {
-	// System environment variable names as string constants
-	constexpr auto CURRENT_DESKTOP = "XDG_CURRENT_DESKTOP";
-	constexpr auto DATA_DIRS = "XDG_DATA_DIRS";
-	constexpr auto CONFIG_DIRS = "XDG_CONFIG_DIRS";
-	constexpr auto CONFIG_HOME = "XDG_CONFIG_HOME";
-	constexpr auto DATA_HOME = "XDG_DATA_HOME";
-	constexpr auto CACHE_HOME = "XDG_CACHE_HOME";
-	constexpr auto MENU_PREFIX = "XDG_MENU_PREFIX";
-
 	/// Get system environment variable
 	std::string GetEnv(std::string const &var);
 
-	/// System PATH separated into components
+	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
 
 	/// Get an absolute native path to an executable found in the system PATH
@@ -45,11 +36,17 @@ namespace xdg
 	/// Get the directory to store cache data
 	std::string GetCacheHome();
 
+	/// Determine whether a given file is a desktop application
+	bool IsDesktop(std::string const &path);
+
 	/// Find any application menus under the configuration directories
 	std::vector<std::string> FindApplicationsMenus();
 
 	/// Find all application desktop files under the configuration directories
 	std::vector<std::string> FindDesktopApplications();
+
+	/// Use zenity to open a file selection dialog
+	std::string OpenFileSelection(std::string const &title);
 }
 
 #endif // file

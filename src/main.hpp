@@ -6,6 +6,7 @@
 // Standard C
 
 #include <cassert>
+#include <cerrno>
 #include <ciso646>
 #include <cstring>
 #include <cinttypes>

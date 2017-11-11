@@ -17,6 +17,12 @@ namespace stl
 		return std::find_if(c.begin(), c.end(), p);
 	}
 
+	template <typename Container, typename Predicate>
+	inline auto find_if_not(Container &&c, Predicate &&p) -> decltype(c.begin())
+	{
+		return std::find_if_not(std::begin(c), std::end(c), p);
+	}
+
 	template <typename Container, typename Iterator>
 	inline auto copy(Container &&c, Iterator &&it) -> decltype(c.end())
 	{

@@ -116,6 +116,16 @@ namespace stl
 		return string;
 	}
 
+	inline std::string trim(std::string const &string)
+	{
+		constexpr auto is_blank = [](char c) { return std::isblank(c); };
+		auto const first = std::find_if_not(string.begin(), string.end(), is_blank);
+		auto const last = std::find_if_not(string.rbegin(), string.rend(), is_blank);
+		std::string trimmed;
+		std::copy(first, last+1, std::back_inserter(trimmed));
+		return trimmed;
+	}
+
 	class format
 	{
 	public:
