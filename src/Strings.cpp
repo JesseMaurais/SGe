@@ -36,6 +36,7 @@ char const *String(enum Strings id)
 	case Strings::CannotLock: return "Cannot lock";
 	case Strings::CannotUnlock: return "Cannot unlock";
 	case Strings::CannotMakeExit: return "Cannot make %1 at exit";
+	case Strings::CannotStartProcess: return "Cannot start a system process";
 	case Strings::CannotFindFormat: return "Cannot find matching format";
 	case Strings::CannotShowMessageBox: return "Cannot show message box";
 	case Strings::CannotQueueEvent: return "Cannot queue event";

@@ -26,7 +26,7 @@ namespace stl
 	template <typename Container, typename Iterator>
 	inline auto copy(Container &&c, Iterator &&it) -> decltype(c.end())
 	{
-		return std::copy(std::begin(c), std::end(c), it);
+		return std::copy(c.begin(), c.end(), it);
 	}
 
 	template <typename Container, typename Operation>

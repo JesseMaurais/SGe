@@ -1,4 +1,5 @@
 #include "Desktop.hpp"
+#include "System.hpp"
 #include "SDL.hpp"
 #include "std.hpp"
 #include <cstdlib>
@@ -14,18 +15,17 @@ namespace
 {
 	// Handle some differences between POSIX and other file systems
 
-	#ifdef _WIN32
-	constexpr auto POSIX = false;
-	#else
-	constexpr auto POSIX = true;
-	#endif
-	constexpr auto DIR_SEPARATOR = POSIX ? ':' : ';';
+	constexpr auto DIR_SEPARATOR = POSIX ? ":" : ";";
 	constexpr auto EXE_EXTENSION = POSIX ? "" : ".exe";
+	constexpr auto EXIT_STATUS = POSIX ? "?" : "ERRORLEVEL";
 
 	// System environment variable names as constants
 
 	constexpr auto PATH = "PATH";
 	constexpr auto HOME = "HOME";
+	constexpr auto DISPLAY = "DISPLAY";
+	constexpr auto VISUAL = "VISUAL";
+	constexpr auto EDITOR = "EDITOR";
 	constexpr auto CURRENT_DESKTOP = "XDG_CURRENT_DESKTOP";
 	constexpr auto DATA_DIRS = "XDG_DATA_DIRS";
 	constexpr auto CONFIG_DIRS = "XDG_CONFIG_DIRS";
@@ -39,7 +39,7 @@ namespace
 	std::vector<std::string> SplitDirs(std::string const &string)
 	{
 		std::vector<std::string> paths;
-		stl::split(paths, string, stl::to_string(DIR_SEPARATOR));
+		stl::split(paths, string, DIR_SEPARATOR);
 		return paths;
 	}
 
@@ -54,7 +54,8 @@ namespace
 			{
 				if (*it != '#') // not a comment
 				{
-					return stl::trim(line);
+					stl::trim(line);
+					return line;
 				}
 			}
 		}
@@ -75,17 +76,50 @@ namespace
 		return false;
 	}
 
-	int SystemCommand(std::deque<std::string> const &args)
+	constexpr int ExitStatus(int status)
 	{
-		static bool const HasProcessor = std::system(nullptr);
+		return POSIX ? WEXITSTATUS(status) : status;
+	}
 
-		if (HasProcessor)
+	int SystemCommand(std::deque<std::string> &args, std::vector<std::string> &out)
+	{
+		try
 		{
-			std::stringstream stream;
-			auto it = std::ostream_iterator(stream, " ");
-			stl::copy(args, it);
-			std::string command = stream.str();
-			return std::system(command.c_str());
+			// Determine whether the system has a command processor
+			static bool const HasProcessor = std::system(nullptr);
+
+			if (HasProcessor)
+			{
+				// Write stdout to a temporary file
+				fs::path path;
+				{
+					fs::path program = args.front();
+					path = fs::temp_directory_path()/program.filename();
+					args.push_back(">" + stl::quote(path));
+				}
+				// Execute and acquire return value
+				int status;
+				{
+					std::string const command = stl::merge(args, " ");
+					status = std::system(command.c_str());
+				}
+				// Read output back from temporary file
+				if (not path.empty())
+				{
+					std::string line;
+					std::ifstream istream(path);
+					while (std::getline(istream, line))
+					{
+						out.push_back(line);
+					}
+				}
+				// Return the exit status
+				return ExitStatus(status);
+			}
+		}
+		catch (std::exception const &exception)
+		{
+			SDL::perror(exception.what());
 		}
 		return ~0;
 	}
@@ -142,15 +176,47 @@ namespace
 		return path;
 	}
 
-	int Zenity(std::deque<std::string> &args)
+	int Zenity(std::deque<std::string> &args, std::vector<std::string> &out)
 	{
 		static std::string const path = GetZenityPath();
 		if (not path.empty())
 		{
+			static std::string const display = xdg::GetEnv(DISPLAY);
+			args.push_front(stl::param_value("--display", display));
 			args.push_front(path);
-			return SystemCommand(args);
+			return SystemCommand(args, out);
 		}
 		return ~0;
+	}
+
+	int ZenityMessage(std::string const &text, std::string const &kind, std::string const &icon="")
+	{
+		std::deque<std::string> args;
+		// The message kind
+		args.push_back(kind);
+		// Escaped quotes around the text
+		std::string const quote = stl::quote(text);
+		args.push_back(stl::param_value("--text", quote));
+		// Notification type has icon option
+		if (not icon.empty())
+		{
+			args.push_back(stl::param_value("--window-icon", icon));
+		}
+		// We don't expect any output
+		std::vector<std::string> out;
+		return Zenity(args, out);
+	}
+
+	// Select the launcher that will open the preferred program for a file
+
+	std::string GetStartProgramPath()
+	{
+		std::string open = xdg::GetProgramPath("xdg-open");
+		if (open.empty())
+		{
+			open = xdg::GetProgramPath("start");
+		}
+		return open;
 	}
 }
 
@@ -161,7 +227,8 @@ std::string xdg::GetEnv(std::string const &var)
 
 std::vector<std::string> xdg::GetSystemDirs()
 {
-	return SplitDirs(xdg::GetEnv(PATH));
+	std::string const path = xdg::GetEnv(PATH);
+	return SplitDirs(path);
 }
 
 std::string xdg::GetProgramPath(std::string const &name)
@@ -290,7 +357,7 @@ std::vector<std::string> xdg::FindDesktopApplications()
 		path /= "applications";
 		if (fs::exists(path) and fs::is_directory(path))
 		{
-			fs::directory_iterator it = path, end;
+			fs::directory_iterator it(path), end;
 			while (it != end)
 			{
 				fs::path const &path = *it;
@@ -304,44 +371,130 @@ std::vector<std::string> xdg::FindDesktopApplications()
 	return paths;
 }
 
-std::string xdg::OpenFileSelection(std::string const &title)
+bool xdg::Open(std::string const &path)
 {
-	// Store selected file path in cache
-	fs::path cache = xdg::GetCacheHome();
-	cache /= "file-selection";
-
-	std::deque<std::string> args;
-	// Enable the file selection option
-	args.push_back("--file-selection");
-	if (not title.empty())
+	static std::string const open = GetStartProgramPath();
+	if (not open.empty())
 	{
-		// Add escaped quotes around the title
-		std::string quote = stl::quote(title);
-		args.push_back("--title=" + quote);
+		std::deque<std::string> args;
+		args.push_back(open);
+		args.push_back(path);
+		std::vector<std::string> out; // dummy
+		int const status = SystemCommand(args, out);
+		return 0 == status;
 	}
-	// Redirect STDOUT to cache
-	args.push_back(">" + cache);
-	// Block on call to external program
-	int status = Zenity(args);
-	std::string path;
+	return false;
+}
+
+bool xdg::Edit(std::string const &path)
+{
+	// Try with launcher first
+	bool ok = xdg::Open(path);
+	if (not ok)
+	{
+		// Next look for a visual editor like VIM
+		std::string editor = xdg::GetEnv(VISUAL);
+		if (editor.empty())
+		{
+			// Look for a basic editor last
+			editor = xdg::GetEnv(EDITOR);
+		}
+		if (not editor.empty())
+		{
+			std::deque<std::string> args;
+			args.push_back(editor);
+			args.push_back(path);
+			args.push_back("&"); // don't block
+			std::vector<std::string> out; // dummy;
+			ok = 0 == SystemCommand(args, out);
+		}
+	}
+	return ok;
+}
+
+bool xdg::ShowError(std::string const &text)
+{
+	return 0 == ZenityMessage(text, "--error");
+}
+
+bool xdg::ShowWarning(std::string const &text)
+{
+	return 0 == ZenityMessage(text, "--warning");
+}
+
+bool xdg::ShowInformation(std::string const &text)
+{
+	return 0 == ZenityMessage(text, "--info");
+}
+
+bool xdg::ShowNotification(std::string const &text)
+{
+	return 0 == ZenityMessage(text, "--notification");
+}
+
+bool xdg::ShowQuestion(std::string const &text, enum xdg::Answer &answer)
+{
+	int status = ZenityMessage(text, "--question");
 	switch (status)
 	{
 	case 0:
-		{
-		// Read the result back in
-		std::istream stream(cache);
-		std::getline(stream, path);
-		}
-		break;
+		answer = xdg::Answer::Yes;
+		return true;
 	case 1:
-		// no selection
-		break;
-	case -1:
-		// error
-		break;
-	case ~0:
-		// no dialog
-		break;
+		answer = xdg::Answer::No;
+		return true;
 	}
-	return path;
+	return false;
+}
+
+bool xdg::OpenFile(std::vector<std::string> &out, enum xdg::OpenFile options, std::string const &path, std::string const &title)
+{
+	std::deque<std::string> args;
+
+	// Enable the file selection option
+	args.push_back("--file-selection");
+
+	// Allow custom title
+	if (not title.empty())
+	{
+		// Escaped quotes around the title
+		std::string const quote = stl::quote(title);
+		args.push_back(stl::param_value("--title", quote));
+	}
+
+	// Default directory or file
+	if (not path.empty())
+	{
+		// Escaped quotes around the path
+		std::string quote = stl::quote(path);
+		args.push_back(stl::param_value("--filename", quote));
+	}
+
+	// Select multiple files
+	if (options & xdg::OpenFile::Multiple)
+	{
+		args.push_back("--multiple");
+		// Use the system directory separator
+		std::string quote = stl::quote(DIR_SEPARATOR);
+		args.push_back(stl::param_value("--separator", quote));
+	}
+
+	// Choose a directory rather than a file
+	if (options & xdg::OpenFile::Directory)
+	{
+		args.push_back("--directory");
+	}
+
+	// Save rather than open
+	if (options & xdg::OpenFile::Save)
+	{
+		args.push_back("--save");
+	}
+
+	// Block on call to external program
+	int const status = Zenity(args, out);
+	// Separate the result string
+	out = SplitDirs(out.front());
+	// Okay if exit code zero
+	return 0 == status;
 }

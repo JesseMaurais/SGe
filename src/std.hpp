@@ -79,6 +79,8 @@ namespace stl
 		return std::make_pair(stl::min(a, b), stl::max(a, b));
 	}
 
+	// Basic string formatting tools
+
 	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
 		std::string::size_type const length = search.length();
@@ -89,17 +91,27 @@ namespace stl
 		}
 	}
 
-	inline void split(std::vector<std::string> &tokens, std::string const &string, std::string const &delimiter)
+	template <template <typename, typename> class Container>
+	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string const &string, std::string const &delimiter)
 	{
-		constexpr std::string::size_type start = 0;
+		if (string.empty()) return;
 		std::string::size_type const length = delimiter.length();
-		for (auto next = string.find(delimiter), last = start; std::string::npos != next; next = string.find(delimiter, last))
+		for (std::string::size_type next = string.find(delimiter), last = 0; std::string::npos != last; next = string.find(delimiter, last))
 		{
 			bool end = std::string::npos == next;
 			auto count = end ? next : next - last;
 			tokens.emplace_back(string.substr(last, count));
 			last = end ? next : next + length;
 		}
+	}
+
+	template <template <typename, typename> class Container>
+	std::string merge(Container<std::string, std::allocator<std::string>> const &tokens, std::string const &delimiter)
+	{
+		std::stringstream sstream;
+		auto it = std::ostream_iterator<std::string>(sstream, delimiter.c_str());
+		std::copy(tokens.begin(), tokens.end(), it);
+		return sstream.str();
 	}
 
 	inline std::string to_upper(std::string string)
@@ -116,15 +128,24 @@ namespace stl
 		return string;
 	}
 
-	inline std::string trim(std::string const &string)
+	inline std::string::iterator trim_begin(std::string &string)
 	{
-		constexpr auto is_blank = [](char c) { return std::isblank(c); };
-		auto const first = std::find_if_not(string.begin(), string.end(), is_blank);
-		auto const last = std::find_if_not(string.rbegin(), string.rend(), is_blank);
-		std::string trimmed;
-		std::copy(first, last+1, std::back_inserter(trimmed));
-		return trimmed;
+		constexpr auto is_blank = [](char c) { return not std::isblank(c); };
+		return string.erase(string.begin(), stl::find_if(string, is_blank));
 	}
+
+	inline std::string::iterator trim_end(std::string &string)
+	{
+		constexpr auto is_blank = [](char c) { return not std::isblank(c); };
+		return string.erase(stl::find_if(string, is_blank), string.end());
+	}
+
+	inline bool trim(std::string &string)
+	{
+		return trim_begin(string) != trim_end(string);
+	}
+
+	// Type-safe printf-like string formatting tools
 
 	class format
 	{
@@ -139,7 +160,7 @@ namespace stl
 		{
 			std::string const search = std::string("%") + std::to_string(++index);
 			std::string const replace = to_string(arg);
-			replace(string, search, replace);
+			stl::replace(string, search, replace);
 			return *this;
 		}
 
@@ -157,7 +178,7 @@ namespace stl
 	template <typename... Args>
 	std::size_t sprintf(std::string &string, std::string const &format, Args... args)
 	{
-		string = (str::format(format) % ... % args);
+		string = (stl::format(format) % ... % args);
 		return sizeof...(args);
 	}
 
@@ -176,10 +197,17 @@ namespace stl
 		return fprintf(std::cout, format, args...);
 	}
 
-	std::string quote(std::string const &string)
+	inline std::string quote(std::string const &string)
 	{
 		std::string result;
 		sprintf(result, "\"%1\"", string);
+		return result;
+	}
+
+	inline std::string param_value(std::string const &param, std::string const &value)
+	{
+		std::string result;
+		sprintf(result, "%1=%2", param, value);
 		return result;
 	}
 }

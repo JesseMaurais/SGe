@@ -11,14 +11,24 @@ namespace stl
 		return std::to_string(value);
 	}
 
+	inline std::string to_string(std::string const &value)
+	{
+		return value;
+	}
+
 	inline std::string to_string(const char *value)
 	{
 		return std::string(value);
 	}
 
+	inline std::string to_string(char const value)
+	{
+		return std::string(1, value);
+	}
+
 	inline bool find(std::string const &string, std::string const &search)
 	{
-		return string.find(search) == std::string::npos;
+		return string.find(search) != std::string::npos;
 	}
 }
 

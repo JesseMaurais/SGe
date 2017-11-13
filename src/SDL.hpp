@@ -24,21 +24,13 @@ namespace SDL
 	/// Reset to the default error handler and flush all prior asserts.
 	void ResetAssertionHandler();
 
-	/// Utility to make assertion message box in scope transient for a window.
+	/// Make assertion message box in scope transient for a window.
 	class ScopedAssertHandler
 	{
 	public:
 
-		ScopedAssertHandler(SDL_Window *window)
-		{
-			handler = SDL_GetAssertionHandler(&userdata);
-			SetAssertionHandler(window);
-		}
-
-		~ScopedAssertHandler()
-		{
-			SDL_SetAssertionHandler(handler, userdata);
-		}
+		ScopedAssertHandler(SDL_Window *window);
+		~ScopedAssertHandler();
 
 	private:
 

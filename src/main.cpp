@@ -1,3 +1,4 @@
+#include "Desktop.hpp"
 #include "Command.hpp"
 #include "Strings.hpp"
 #include "Event.hpp"
@@ -16,6 +17,20 @@ static bool OnQuit(const SDL_Event &event)
 
 int main(int argc, char **argv)
 {
+	std::vector<std::string> paths;
+	if (xdg::OpenFile(paths, xdg::OpenFile::Multiple))
+	{
+		for (auto const &path : paths)
+		{
+			std::cout << path << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "failed" << std::endl;
+	}
+	return 0;
+
 	SDL::PushEventHandler(SDL_QUIT, OnQuit);
 	SDL::SetAssertionHandler(nullptr);
 	{

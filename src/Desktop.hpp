@@ -45,8 +45,33 @@ namespace xdg
 	/// Find all application desktop files under the configuration directories
 	std::vector<std::string> FindDesktopApplications();
 
-	/// Use zenity to open a file selection dialog
-	std::string OpenFileSelection(std::string const &title);
+	/// Open an arbitrary file with the user's preferred application
+	bool Open(std::string const &path);
+
+	/// Open a file with the user's preferred text editor
+	bool Edit(std::string const &path);
+
+	// Following are not really XDG specifications but are just as useful
+
+	/// Open an error message dialog with one "OK" button
+	bool ShowError(std::string const &text);
+
+	/// Open a warning message dialog with one "OK" button
+	bool ShowWarning(std::string const &text);
+
+	/// Open an information message dialog with one "OK" button
+	bool ShowInformation(std::string const &text);
+
+	/// Open a desktop notification
+	bool ShowNotification(std::string const &text);
+
+	enum Answer { No, Yes };
+	/// Open a question dialog with "No" and "Yes" buttons
+	bool ShowQuestion(std::string const &text, enum Answer &answer);
+
+	enum OpenFile { None, Multiple=1, Directory=2, Save=4 };
+	/// Use the Zenity program to open a file selection dialog
+	bool OpenFile(std::vector<std::string> &out, enum OpenFile options=None, std::string const &path="", std::string const &title="");
 }
 
 #endif // file

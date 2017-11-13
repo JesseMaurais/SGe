@@ -79,5 +79,9 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
 
+// Make all asserts use the SDL assert window
+#undef assert
+#define assert(condition) SDL_assert(condition)
+
 
 #endif // file

@@ -95,7 +95,7 @@ namespace
 	{
 		// Inspect the first line (usually a comment) for a keyword.
 		auto line = sourceCode.substr(0, sourceCode.find("\n"));
-		line = str::to_upper(line); // case insensitive match
+		line = stl::to_upper(line); // case insensitive match
 
 		if (std::string::npos != line.find("FRAGMENT"))
 		{
@@ -224,7 +224,7 @@ bool SourceString::UpdateSource()
 	{
 		// Split the code into lines.
 		std::vector<std::string> lines;
-		str::split(lines, sourceString, "\n");
+		stl::split(lines, sourceString, "\n");
 		// Compile the source code lines into a shader.
 		GLuint const shader = OpenGL::GetShader(Source::id);
 		bool const ok = CompileShaderSource(shader, lines);

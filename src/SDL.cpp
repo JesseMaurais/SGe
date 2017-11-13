@@ -165,3 +165,13 @@ void SDL::ResetAssertionHandler()
 	SDL_SetAssertionHandler(handler, nullptr);
 }
 
+SDL::ScopedAssertHandler::ScopedAssertHandler(SDL_Window *window)
+{
+	handler = SDL_GetAssertionHandler(&userdata);
+	SetAssertionHandler(window);
+}
+
+SDL::ScopedAssertHandler::~ScopedAssertHandler()
+{
+	SDL_SetAssertionHandler(handler, userdata);
+}
