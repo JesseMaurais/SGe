@@ -69,9 +69,9 @@ namespace xdg
 	/// Open a question dialog with "No" and "Yes" buttons
 	bool ShowQuestion(std::string const &text, enum Answer &answer);
 
-	enum OpenFile { None, Multiple=1, Directory=2, Save=4 };
+	enum ChooseFile { None, Multiple=1, Directory=2, Save=4 };
 	/// Use the Zenity program to open a file selection dialog
-	bool OpenFile(std::vector<std::string> &out, enum OpenFile options=None, std::string const &path="", std::string const &title="");
+	bool ChooseFile(std::vector<std::string> &out, enum ChooseFile options=None, std::string const &path="", std::string const &title="");
 }
 
 #endif // file

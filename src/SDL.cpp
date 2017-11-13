@@ -106,6 +106,27 @@ namespace
 			}
 		}
 	};
+
+	SDL_AssertState AssertionHandler(const SDL_AssertData *data, void *user)
+	{
+		if (data->always_ignore) return SDL_ASSERTION_IGNORE;
+
+		std::stringstream stream;
+		stream << "Assertion failure at " << data->function;
+		stream << "in " << data->filename << " on line " << data->linenum << "), ";
+		stream << "triggered " << data->trigger_count << "times\n";
+		stream << "       '" << data->condition << "'\n";
+
+		union {
+		 SDL_Window *window;
+		 void *address;
+		};
+		if (user) address = user;
+		else window = SDL_GetGrabbedWindow();
+		auto const string = stream.str();
+		auto const message = string.c_str();
+		return MessageBox(message, window, SDL_MESSAGEBOX_ERROR);
+	}
 }
 
 bool SDL::ShowError(SDL_MessageBoxFlags flags, SDL_Window *window)
@@ -134,28 +155,7 @@ bool SDL::ShowError(SDL_MessageBoxFlags flags, SDL_Window *window)
 
 void SDL::SetAssertionHandler(SDL_Window *window)
 {
-	auto handler = [](const SDL_AssertData *data, void *user) -> SDL_AssertState
-	{
-		if (data->always_ignore) return SDL_ASSERTION_IGNORE;
-
-		std::stringstream stream;
-		stream << "Assertion failure at " << data->function;
-		stream << "in " << data->filename << " on line " << data->linenum << "), ";
-		stream << "triggered " << data->trigger_count << "times\n";
-		stream << "       '" << data->condition << "'\n";
-
-		union {
-		 SDL_Window *window;
-		 void *address;
-		};
-		if (user) address = user;
-		else window = SDL_GetGrabbedWindow();
-		auto const string = stream.str();
-		auto const message = string.c_str();
-		return MessageBox(message, window, SDL_MESSAGEBOX_ERROR);
-	};
-
-	SDL_SetAssertionHandler(handler, window);
+	SDL_SetAssertionHandler(AssertionHandler, window);
 }
 
 void SDL::ResetAssertionHandler()

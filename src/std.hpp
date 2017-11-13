@@ -15,7 +15,7 @@
 #ifndef NDEBUG
 #define verify(condition) assert(condition)
 #else
-#define verify(condtiion) condition
+#define verify(condtiion) (condition)
 #endif
 
 namespace

@@ -17,13 +17,12 @@ namespace
 
 	constexpr auto DIR_SEPARATOR = POSIX ? ":" : ";";
 	constexpr auto EXE_EXTENSION = POSIX ? "" : ".exe";
-	constexpr auto EXIT_STATUS = POSIX ? "?" : "ERRORLEVEL";
 
 	// System environment variable names as constants
 
 	constexpr auto PATH = "PATH";
 	constexpr auto HOME = "HOME";
-	constexpr auto DISPLAY = "DISPLAY";
+
 	constexpr auto VISUAL = "VISUAL";
 	constexpr auto EDITOR = "EDITOR";
 	constexpr auto CURRENT_DESKTOP = "XDG_CURRENT_DESKTOP";
@@ -181,8 +180,6 @@ namespace
 		static std::string const path = GetZenityPath();
 		if (not path.empty())
 		{
-			static std::string const display = xdg::GetEnv(DISPLAY);
-			args.push_front(stl::param_value("--display", display));
 			args.push_front(path);
 			return SystemCommand(args, out);
 		}
@@ -447,7 +444,7 @@ bool xdg::ShowQuestion(std::string const &text, enum xdg::Answer &answer)
 	return false;
 }
 
-bool xdg::OpenFile(std::vector<std::string> &out, enum xdg::OpenFile options, std::string const &path, std::string const &title)
+bool xdg::ChooseFile(std::vector<std::string> &out, enum xdg::ChooseFile options, std::string const &path, std::string const &title)
 {
 	std::deque<std::string> args;
 
@@ -471,7 +468,7 @@ bool xdg::OpenFile(std::vector<std::string> &out, enum xdg::OpenFile options, st
 	}
 
 	// Select multiple files
-	if (options & xdg::OpenFile::Multiple)
+	if (options & xdg::ChooseFile::Multiple)
 	{
 		args.push_back("--multiple");
 		// Use the system directory separator
@@ -480,13 +477,13 @@ bool xdg::OpenFile(std::vector<std::string> &out, enum xdg::OpenFile options, st
 	}
 
 	// Choose a directory rather than a file
-	if (options & xdg::OpenFile::Directory)
+	if (options & xdg::ChooseFile::Directory)
 	{
 		args.push_back("--directory");
 	}
 
 	// Save rather than open
-	if (options & xdg::OpenFile::Save)
+	if (options & xdg::ChooseFile::Save)
 	{
 		args.push_back("--save");
 	}
