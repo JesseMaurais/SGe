@@ -12,6 +12,12 @@ namespace sys
 	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
 
+	/// Get absolute paths to folders for sharing application data
+	std::vector<std::string> GetDataDirs();
+
+	/// Get absolute paths to folders for configuration data
+	std::vector<std::string> GetConfigDirs();
+
 	/// Get an absolute path to an executable found in the system PATH
 	std::string GetProgramPath(std::string const &program);
 

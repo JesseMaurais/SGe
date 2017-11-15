@@ -18,6 +18,11 @@ namespace
 	constexpr auto DIR_SEPARATOR = POSIX ? ":" : ";";
 	constexpr auto EXE_EXTENSION = POSIX ? "" : ".exe";
 
+	constexpr int ExitStatus(int status)
+	{
+		return POSIX ? WEXITSTATUS(status) : status;
+	}
+
 	// Split a string of directories according the system separator
 	std::vector<std::string> SplitDirs(std::string const &string)
 	{
@@ -26,6 +31,7 @@ namespace
 		return dirs;
 	}
 
+	// Read all the lines from a text file
 	void ReadLinesFromFile(fs::path const &path, std::vector<std::string> &out)
 	{
 		std::string line;
@@ -43,6 +49,16 @@ std::vector<std::string> sys::GetSystemDirs()
 	return SplitDirs(path);
 }
 
+std::vector<std::string> sys::GetDataDirs()
+{
+	return POSIX ? { "/usr/local/share", "/usr/share" } : { std::getenv("ALLUSERSPROFILE") };
+}
+
+std::vector<std::string> sys::GetConfigDirs()
+{
+	return POSIX ? { "/etc/xdg" } : { std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
+}
+	
 std::string sys::GetProgramPath(std::string const &name)
 {
 	// Unless extension is given, assume it's a binary
@@ -126,12 +142,6 @@ std::string sys::GetBaseDir()
 
 namespace
 {
-	// Extract the exit status from a system call
-	constexpr int ExitStatus(int status)
-	{
-		return POSIX ? WEXITSTATUS(status) : status;
-	}
-
 	// Wrapper around a system call to catch output in a text file
 	int SystemCommand(std::deque<std::string> &args, std::vector<std::string> &out)
 	{
@@ -159,7 +169,7 @@ namespace
 	}
 
 	// Select the launcher that will open the preferred program for a file
-	std::string GetStartPath()
+	std::string GetLauncherPath()
 	{
 		std::string open = sys::GetProgramPath("xdg-open");
 		if (open.empty())
@@ -218,7 +228,7 @@ std::vector<std::string> xdg::GetDataDirs()
 	std::string dirs = std::getenv("XDG_DATA_DIRS");
 	if (dirs.empty())
 	{
-		return { "/usr/local/share/", "/usr/share" };
+		return sys::GetDataDirs();
 	}
 	return SplitDirs(dirs);
 }
@@ -239,7 +249,7 @@ std::vector<std::string> xdg::GetConfigDirs()
 	std::string dirs = std::getenv("XDG_CONFIG_DIRS");
 	if (dirs.empty())
 	{
-		return { "/etc/xdg" };
+		return sys::GetConfigDirs();
 	}
 	return SplitDirs(dirs);
 }
@@ -312,7 +322,7 @@ std::vector<std::string> xdg::FindDesktopApplications()
 
 bool xdg::Open(std::string const &path)
 {
-	static std::string const open = GetStartPath();
+	static std::string const open = GetLauncherPath();
 	if (not open.empty())
 	{
 		std::deque<std::string> args;
@@ -415,7 +425,7 @@ namespace
 		return ~0;
 	}
 
-	int ZenityMessage(std::string const &text, std::string const &kind, std::string const &icon="")
+	int Message(std::string const &text, std::string const &kind, std::string const &icon="")
 	{
 		std::deque<std::string> args;
 		// The message kind
@@ -436,27 +446,27 @@ namespace
 
 bool zen::ShowError(std::string const &text)
 {
-	return 0 == ZenityMessage(text, "--error");
+	return 0 == Message(text, "--error");
 }
 
 bool zen::ShowWarning(std::string const &text)
 {
-	return 0 == ZenityMessage(text, "--warning");
+	return 0 == Message(text, "--warning");
 }
 
 bool zen::ShowInformation(std::string const &text)
 {
-	return 0 == ZenityMessage(text, "--info");
+	return 0 == Message(text, "--info");
 }
 
 bool zen::ShowNotification(std::string const &text)
 {
-	return 0 == ZenityMessage(text, "--notification");
+	return 0 == Message(text, "--notification");
 }
 
 bool zen::ShowQuestion(std::string const &text, enum zen::Answer &answer)
 {
-	int status = ZenityMessage(text, "--question");
+	int status = Message(text, "--question");
 	switch (status)
 	{
 	case 0:
