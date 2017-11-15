@@ -43,9 +43,16 @@
 #include <sstream>
 #include <iomanip>
 
+// C++ Utility
+
+#include <utility>
+#include <bitset>
+#include <functional>
+
 // RTTI
 
 #include <typeinfo>
+#include <typeindex>
 #include <type_traits>
 
 // OpenGL

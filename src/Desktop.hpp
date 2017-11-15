@@ -9,14 +9,20 @@
 
 namespace xdg
 {
-	/// Get system environment variable
-	std::string GetEnv(std::string const &var);
-
 	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
 
-	/// Get an absolute native path to an executable found in the system PATH
-	std::string GetProgramPath(std::string const &name);
+	/// Get an absolute path to an executable found in the system PATH
+	std::string GetProgramPath(std::string const &program);
+
+	/// Get an absolute path to a folder for temporary files
+	std::string GetTemporaryDir();
+
+	/// Get an absolute path to a temporary file name
+	std::string GetTemporaryPath(std::string const &filename);
+
+	/// Get an absolute path to the user's home directory
+	std::string GetHomeDir();
 
 	/// Get the application base directory
 	std::string GetBaseDir();
@@ -51,8 +57,6 @@ namespace xdg
 	/// Open a file with the user's preferred text editor
 	bool Edit(std::string const &path);
 
-	// Following are not really XDG specifications but are just as useful
-
 	/// Open an error message dialog with one "OK" button
 	bool ShowError(std::string const &text);
 
@@ -70,7 +74,7 @@ namespace xdg
 	bool ShowQuestion(std::string const &text, enum Answer &answer);
 
 	enum ChooseFile { None, Multiple=1, Directory=2, Save=4 };
-	/// Use the Zenity program to open a file selection dialog
+	/// Open a file selection dialog
 	bool ChooseFile(std::vector<std::string> &out, enum ChooseFile options=None, std::string const &path="", std::string const &title="");
 }
 

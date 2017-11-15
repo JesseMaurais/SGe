@@ -4,6 +4,7 @@
 enum Strings
 {
 	 None
+	,Application
 	,ColonSeparator
 	,NoError
 	,UnknownError

@@ -1,6 +1,7 @@
 #include "Desktop.hpp"
 #include "Command.hpp"
 #include "Strings.hpp"
+#include "Error.hpp"
 #include "Event.hpp"
 #include "Args.hpp"
 #include "Lua.hpp"
@@ -8,22 +9,9 @@
 #include "std.hpp"
 #include <cstdlib>
 
-static bool Quit = false;
-static bool OnQuit(const SDL_Event &event)
-{
-	SDL_assert(SDL_QUIT == event.type);
-	Quit = true;
-	return true;
-}
-
 int main(int argc, char **argv)
 {
-	SDL::PushEventHandler(SDL_QUIT, OnQuit);
-	SDL::SetAssertionHandler(nullptr);
-
-	std::vector<std::string> paths;
-	verify(not xdg::ChooseFile(paths));
-	return 0;
+	SDL::ScopedAssertHandler handler;
 	{
 		unsigned media = SDL_INIT_EVENTS;
 		char const *script = nullptr;
@@ -35,8 +23,6 @@ int main(int argc, char **argv)
 				cmd = ParseCommandLine(argc, argv);
 				switch (cmd.opt)
 				{
-				case Option::Quit:
-					Quit = true;
 					break;
 				case Option::Media:
 					media |= SDL_INIT_EVERYTHING;
@@ -59,35 +45,11 @@ int main(int argc, char **argv)
 		else
 		if (std::atexit(SDL_Quit))
 		{
-			SDL_Log(String(CannotMakeExit), "SDL_Quit");
-			return EXIT_FAILURE;
-		}
-
-		if (not Lua::Init(script))
-		{
-			SDL::perror("Lua::Init");
-			return EXIT_FAILURE;
-		}
-		else
-		if (std::atexit(Lua::Quit))
-		{
-			SDL_Log(String(CannotMakeExit), "Lua_Quit");
+			SDL::Log(CannotMakeExit, "SDL_Quit");
 			return EXIT_FAILURE;
 		}
 	}
-
-	SDL_Event event;
-	while (not Quit)
-	{
-		if (SDL_WaitEvent(&event))
-		{
-			SDL::Dispatch(event);
-		}
-		else
-		{
-			SDL::perror("SDL_WaitEvent");
-		}
-	}
+	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }
 

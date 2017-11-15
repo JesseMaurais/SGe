@@ -11,6 +11,7 @@ char const *String(enum Strings id)
 		return nullptr;
 
 	case Strings::None: return "";
+	case Strings::Application: return "SGe";
 	case Strings::ColonSeparator: return "%1: %2";
 	case Strings::NoError: return "Error reported without information";
 	case Strings::UnknownError: return "Unknown error";

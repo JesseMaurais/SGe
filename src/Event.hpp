@@ -1,6 +1,8 @@
 #ifndef Event_hpp
 #define Event_hpp
 
+#include <functional>
+
 union SDL_Event;
 
 enum UserEventType
@@ -13,25 +15,27 @@ enum UserEventType
 	UserEventCount,
 };
 
+using EventHandler = std::function<bool(SDL_Event const &event)>;
+
+class ScopedEventHandler
+{
+public:
+
+	ScopedEventHandler() = default;
+	ScopedEventHandler(UserEventType type, EventHandler handler);
+	ScopedEventHandler(unsigned type, EventHandler handler);
+	~ScopedEventHandler();
+
+private:
+
+	unsigned event = 0;
+};
+
 namespace SDL
 {
 	unsigned UserEvent(enum UserEventType type);
 	bool SendUserEvent(enum UserEventType type, unsigned code = 0);
-
-	using EventHandler = bool(*)(SDL_Event const &event);
-	void PushEventHandler(unsigned type, EventHandler function);
-	void PopEventHandler(unsigned type);
-	void Dispatch(const SDL_Event &event);
-
-	inline void PushEventHandler(UserEventType type, EventHandler function)
-	{
-		PushEventHandler(UserEvent(type), function);
-	}
-
-	inline void PopEventHandler(UserEventType type)
-	{
-		PopEventHandler(UserEvent(type));
-	}
+	void ProcessEvents();
 }
 
 #endif // file

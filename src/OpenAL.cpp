@@ -172,12 +172,35 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 {
 	static class Context
 	{
+	private:
+
+		static bool UpdateHandler(SDL_Event const &event)
+		{
+			assert(UpdateOpenAL == event.user.type);
+			// Update method by code
+			switch (event.user.code)
+			{
+			case UpdateBuffers:
+				AudioBufferManager::Instance().Update();
+				break;
+			case UpdateSources:
+				AudioSourceManager::Instance().Update();
+				break;
+			default:
+				assert(not "OpenAL event code");
+				return false;
+			}
+			return true;
+		}
+
+		ScopedEventHandler updater;
+
 	public:
 
 		ALCcontext *context = nullptr;
 
 		Context() = default;
-		Context(int const *attributes)
+		Context(int const *attributes) : updater(UpdateOpenAL, UpdateHandler)
 		{
 			if (attributes)
 			{
@@ -211,8 +234,6 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 						AudioSourceManager::Instance().Initialize();
 						// Begin processing input
 						alcProcessContext(context);
-						// Register update handler
-						SDL::PushEventHandler(UpdateOpenAL, UpdateHandler);
 					}
 				}
 			}
@@ -222,8 +243,6 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 			// Destroy if it was created
 			if (context)
 			{
-				// Unregister update handler
-				SDL::PopEventHandler(UpdateOpenAL);
 				// Stop processing input
 				alcSuspendContext(context);
 				// Delete audio sources
@@ -242,27 +261,6 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 				// Now safe to destroy
 				alcDestroyContext(context);
 			}
-		}
-
-	private:
-
-		static bool UpdateHandler(SDL_Event const &event)
-		{
-			assert(UserEventType::UpdateOpenAL == event.user.type);
-			// Update method by code
-			switch (event.user.code)
-			{
-			case UpdateEventCode::UpdateBuffers:
-				AudioBufferManager::Instance().Update();
-				break;
-			case UpdateEventCode::UpdateSources:
-				AudioSourceManager::Instance().Update();
-				break;
-			default:
-				assert(not "OpenAL event code");
-				return false;
-			}
-			return true;
 		}
 
 	} singleton;

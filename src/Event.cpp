@@ -8,8 +8,8 @@
 unsigned SDL::UserEvent(enum UserEventType type)
 {
 	assert(type < UserEventCount);
-	static const auto base = SDL_RegisterEvents(UserEventCount);
-	return static_cast<unsigned>(base + type);
+	static Uint32 const base = SDL_RegisterEvents(UserEventCount);
+	return static_cast<unsigned>(type) + base;
 }
 
 bool SDL::SendUserEvent(enum UserEventType type, unsigned code)
@@ -20,43 +20,81 @@ bool SDL::SendUserEvent(enum UserEventType type, unsigned code)
 	return 0 == SDL_PushEvent(&event);
 }
 
-using Stack = std::stack<SDL::EventHandler>;
-using StackMap = std::map<Uint32, Stack>;
-
-static Stack &HandlerStack(Uint32 eventCode)
+namespace
 {
-	static StackMap eventStacks;
-	return eventStacks[eventCode];
-}
+	using Stack = std::stack<EventHandler>;
+	using StackMap = std::map<Uint32, Stack>;
 
-void SDL::PushEventHandler(unsigned eventCode, EventHandler function)
-{
-	HandlerStack(eventCode).push(function);
-}
-
-void SDL::PopEventHandler(unsigned eventCode)
-{
-	HandlerStack(eventCode).pop();
-}
-
-void SDL::Dispatch(const SDL_Event &event)
-{
-	Stack store;
-	Stack &stack = HandlerStack(event.type);
-	while (not stack.empty())
+	Stack &HandlerStack(Uint32 eventCode)
 	{
-		EventHandler handler = stack.top();
-		if (not handler(event))
+		static StackMap eventStacks;
+		return eventStacks[eventCode];
+	}
+
+	void PushEventHandler(unsigned eventCode, EventHandler function)
+	{
+		HandlerStack(eventCode).push(function);
+	}
+
+	void PopEventHandler(unsigned eventCode)
+	{
+		HandlerStack(eventCode).pop();
+	}
+
+	bool Dispatch(const SDL_Event &event)
+	{
+		Stack store;
+		Stack &stack = HandlerStack(event.type);
+		while (not stack.empty())
 		{
-			store.push(handler);
-			stack.pop();
+			EventHandler handler = stack.top();
+			if (not handler(event))
+			{
+				store.push(handler);
+				stack.pop();
+			}
+			else break;
 		}
-		else break;
+		while (not store.empty())
+		{
+			EventHandler handler = store.top();
+			stack.push(handler);
+			store.pop();
+		}
+		return false;
 	}
-	while (not store.empty())
+}
+
+void SDL::ProcessEvents()
+{
+	static SDL_Event event;
+	bool done = false;
+	do
 	{
-		EventHandler handler = store.top();
-		stack.push(handler);
-		store.pop();
+		if (SDL_WaitEvent(&event))
+		{
+			done = Dispatch(event);
+		}
+		else
+		{
+			SDL::perror("SDL_WaitEvent");
+		}
+
+		done |= SDL_FALSE == SDL_QuitRequested();
 	}
+	while (not done);
+}
+
+ScopedEventHandler::ScopedEventHandler(UserEventType type, EventHandler handler)
+	: ScopedEventHandler(SDL::UserEvent(type), handler)
+{}
+
+ScopedEventHandler::ScopedEventHandler(unsigned type, EventHandler handler) : event(type)
+{
+	PushEventHandler(event, handler);
+}
+
+ScopedEventHandler::~ScopedEventHandler()
+{
+	PopEventHandler(event);
 }

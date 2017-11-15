@@ -1,6 +1,6 @@
 #include "Desktop.hpp"
 #include "System.hpp"
-#include "SDL.hpp"
+#include "Error.hpp"
 #include "std.hpp"
 #include <cstdlib>
 #include <fstream>
@@ -18,103 +18,46 @@ namespace
 	constexpr auto DIR_SEPARATOR = POSIX ? ":" : ";";
 	constexpr auto EXE_EXTENSION = POSIX ? "" : ".exe";
 
-	// System environment variable names as constants
-
-	constexpr auto PATH = "PATH";
-	constexpr auto HOME = "HOME";
-
-	constexpr auto VISUAL = "VISUAL";
-	constexpr auto EDITOR = "EDITOR";
-	constexpr auto CURRENT_DESKTOP = "XDG_CURRENT_DESKTOP";
-	constexpr auto DATA_DIRS = "XDG_DATA_DIRS";
-	constexpr auto CONFIG_DIRS = "XDG_CONFIG_DIRS";
-	constexpr auto CONFIG_HOME = "XDG_CONFIG_HOME";
-	constexpr auto DATA_HOME = "XDG_DATA_HOME";
-	constexpr auto CACHE_HOME = "XDG_CACHE_HOME";
-	constexpr auto MENU_PREFIX = "XDG_MENU_PREFIX";
-
-	// Utility functions in this module
-
+	// Split a string of directories according the system separator
 	std::vector<std::string> SplitDirs(std::string const &string)
 	{
-		std::vector<std::string> paths;
-		stl::split(paths, string, DIR_SEPARATOR);
-		return paths;
+		std::vector<std::string> dirs;
+		stl::split(dirs, string, DIR_SEPARATOR);
+		return dirs;
 	}
 
-	std::string GetLine(std::istream &stream)
-	{
-		std::string line;
-		while (std::getline(stream, line))
-		{
-			constexpr auto is_blank = [](char c) { return std::isblank(c); };
-			auto it = stl::find_if_not(line, is_blank);
-			if (line.end() != it) // not an empty line
-			{
-				if (*it != '#') // not a comment
-				{
-					stl::trim(line);
-					return line;
-				}
-			}
-		}
-		return line;
-	}
-
-	bool HasMagic(std::string const &path, std::string const &magic)
-	{
-		std::ifstream stream(path);
-		while (stream)
-		{
-			std::string line = GetLine(stream);
-			if (not line.empty())
-			{
-				return magic == line;
-			}
-		}
-		return false;
-	}
-
+	// Extract the exit status from a system call
 	constexpr int ExitStatus(int status)
 	{
 		return POSIX ? WEXITSTATUS(status) : status;
 	}
 
+	// Wrapper around a system call to catch output in a text file
 	int SystemCommand(std::deque<std::string> &args, std::vector<std::string> &out)
 	{
-		try
-		{
-			// Determine whether the system has a command processor
-			static bool const HasProcessor = std::system(nullptr);
+		// Determine whether the system has a command processor
+		static bool const HasProcessor = std::system(nullptr);
 
-			if (HasProcessor)
+		if (HasProcessor) try
+		{
+			// Write stdout to a temporary file
+			fs::path path = xdg::GetTemporaryPath(args.front());
+			args.push_back(">" + stl::quote(path));
+
+			// Execute and acquire return value
+			std::string const command = stl::merge(args, " ");
+			int const status = std::system(command.c_str());
+
+			// Read output back from temporary file
+			std::string line;
+			std::ifstream istream(path);
+			while (std::getline(istream, line))
 			{
-				// Write stdout to a temporary file
-				fs::path path;
-				{
-					fs::path program = args.front();
-					path = fs::temp_directory_path()/program.filename();
-					args.push_back(">" + stl::quote(path));
-				}
-				// Execute and acquire return value
-				int status;
-				{
-					std::string const command = stl::merge(args, " ");
-					status = std::system(command.c_str());
-				}
-				// Read output back from temporary file
-				if (not path.empty())
-				{
-					std::string line;
-					std::ifstream istream(path);
-					while (std::getline(istream, line))
-					{
-						out.push_back(line);
-					}
-				}
-				// Return the exit status
-				return ExitStatus(status);
+				out.push_back(line);
 			}
+
+			// Return the exit status
+			return ExitStatus(status);
 		}
 		catch (std::exception const &exception)
 		{
@@ -123,13 +66,289 @@ namespace
 		return ~0;
 	}
 
+	// Select the launcher that will open the preferred program for a file
+	std::string GetStartPath()
+	{
+		std::string open = xdg::GetProgramPath("xdg-open");
+		if (open.empty())
+		{
+			open = xdg::GetProgramPath("start");
+		}
+		return open;
+	}
+
+	// Get the next non empty line from an input stream
+	bool GetNextLine(std::istream &stream, std::string &line)
+	{
+		while (std::getline(stream, line))
+		{
+			constexpr auto is_blank = [](char c) { return std::isblank(c); };
+			auto it = stl::find_if_not(line, is_blank);
+			if (line.end() != it) // not an empty line
+			{
+				if (*it != '#') // not a comment
+				{
+					line = line.substr(0, line.find('#')); // strip comment
+					stl::trim(line); // strip whitespace
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	// Determine whether the text file at path has the magic identifier
+	bool HasMagic(std::string const &path, std::string const &magic)
+	{
+		std::string line;
+		std::ifstream stream(path);
+		while (GetNextLine(stream, line))
+		{
+			return magic == line;
+		}
+		return false;
+	}
+}
+
+std::vector<std::string> xdg::GetSystemDirs()
+{
+	std::string const path = std::getenv("PATH");
+	return SplitDirs(path);
+}
+
+std::string xdg::GetProgramPath(std::string const &name)
+{
+	// Unless extension is given, assume it's a binary
+	fs::path image = name;
+	if (image.extension().empty())
+	{
+		image += EXE_EXTENSION;
+	}
+	// Search for image in system directories
+	for (fs::path path : xdg::GetSystemDirs())
+	{
+		path /= image;
+		if (fs::exists(path))
+		{
+			// Check executable status
+			auto status = fs::status(path);
+			auto permissions = status.permissions();
+			permissions &= fs::perms::group_exec;
+			if (fs::perms::none != permissions)
+			{
+				return path; // usable
+			}
+		}
+	}
+	return std::string();
+}
+
+std::string xdg::GetTemporaryDir()
+{
+	static struct TemporaryDir
+	{
+		fs::path dir;
+		std::error_code code;
+
+		TemporaryDir(std::string const &folder)
+		{
+			dir = fs::temp_directory_path() / folder;
+			fs::remove_all(dir, code); // start clean
+			fs::create_directory(dir, code);
+		}
+
+	} temp(String(Application));
+
+	if (temp.code)
+	{
+		SDL::SetError(temp.code.message());
+		return std::string();
+	}
+	return temp.dir;
+}
+
+std::string xdg::GetTemporaryPath(std::string const &filename)
+{
+	static fs::path const dir = xdg::GetTemporaryDir();
+	if (not dir.empty())
+	{
+		return dir/filename;
+	}
+	return dir;
+}
+
+std::string xdg::GetHomeDir()
+{
+	std::string dir = xdg::GetHomeDir();
+	if (dir.empty())
+	{
+		dir = std::getenv("USERPROFILE");
+	}
+	return dir;
+}
+
+std::string xdg::GetBaseDir()
+{
+	return SDL_GetBasePath();
+}
+
+std::string xdg::GetDataHome()
+{
+	fs::path path = std::getenv("XDG_DATA_HOME");
+	if (path.empty())
+	{
+		path = xdg::GetHomeDir();
+		path /= ".local/share";
+	}
+	return path;
+}
+
+std::vector<std::string> xdg::GetDataDirs()
+{
+	std::string dirs = std::getenv("XDG_DATA_DIRS");
+	if (dirs.empty())
+	{
+		return { "/usr/local/share/", "/usr/share" };
+	}
+	return SplitDirs(dirs);
+}
+
+std::string xdg::GetConfigHome()
+{
+	fs::path path = std::getenv("XDG_CONFIG_HOME");
+	if (path.empty())
+	{
+		path = xdg::GetHomeDir();
+		path /= ".config";
+	}
+	return path;
+}
+
+std::vector<std::string> xdg::GetConfigDirs()
+{
+	std::string dirs = std::getenv("XDG_CONFIG_DIRS");
+	if (dirs.empty())
+	{
+		return { "/etc/xdg" };
+	}
+	return SplitDirs(dirs);
+}
+
+std::string xdg::GetCacheHome()
+{
+	fs::path path = std::getenv("XDG_CACHE_HOME");
+	if (path.empty())
+	{
+		path = xdg::GetHomeDir();
+		path /= ".cache";
+	}
+	return path;
+}
+
+bool xdg::IsDesktop(std::string const &string)
+{
+	static std::set<std::string> const set = { ".desktop", ".directory" };
+
+	fs::path const path = string;
+	fs::path const extension = path.extension();
+
+	// With no extension use magic
+	if (extension.empty())
+	{
+		return HasMagic(path, "[Desktop Entry]");
+	}
+	// Base case is that the extension matches
+	return set.find(extension) != set.end();
+}
+
+std::vector<std::string> xdg::FindApplicationsMenus()
+{
+	std::vector<std::string> paths;
+	std::string const menu_prefix = std::getenv("XDG_MENU_PREFIX");
+	std::string const applications_menu = menu_prefix + "applications.menu";
+	for (fs::path path : xdg::GetConfigDirs())
+	{
+		path /= "menus";
+		path /= applications_menu;
+		if (fs::exists(path))
+		{
+			paths.push_back(path);
+		}
+	}
+	return paths;
+}
+
+std::vector<std::string> xdg::FindDesktopApplications()
+{
+	std::vector<std::string> paths;
+	for (fs::path path : xdg::GetConfigDirs())
+	{
+		path /= "applications";
+		if (fs::exists(path) and fs::is_directory(path))
+		{
+			fs::directory_iterator it(path), end;
+			while (it != end)
+			{
+				fs::path const &path = *it;
+				if (path.extension() == ".desktop")
+				{
+					paths.push_back(path);
+				}
+			}
+		}
+	}
+	return paths;
+}
+
+bool xdg::Open(std::string const &path)
+{
+	static std::string const open = GetStartPath();
+	if (not open.empty())
+	{
+		std::deque<std::string> args;
+		args.push_back(open);
+		args.push_back(path);
+		std::vector<std::string> out; // dummy
+		return 0 == SystemCommand(args, out);
+	}
+	return false;
+}
+
+bool xdg::Edit(std::string const &path)
+{
+	// Try with launcher first
+	bool ok = xdg::Open(path);
+	if (not ok)
+	{
+		// Next look for a visual editor like VIM
+		std::string editor = std::getenv("VISUAL");
+		if (editor.empty())
+		{
+			// Look for a basic editor last
+			editor = std::getenv("EDITOR");
+		}
+		if (not editor.empty())
+		{
+			std::deque<std::string> args;
+			args.push_back(editor);
+			args.push_back(path);
+			args.push_back("&"); // don't block
+			std::vector<std::string> out; // dummy
+			ok = 0 == SystemCommand(args, out);
+		}
+	}
+	return ok;
+}
+
+namespace
+{
 	// Tools to ascertain the existence and use of Zenity or Qarma
 
 	enum Toolkit { Unknown, GTK, QT };
 
 	enum Toolkit GuessToolkit()
 	{
-		std::string const desktop = stl::to_upper(xdg::GetEnv(CURRENT_DESKTOP));
+		std::string const desktop = std::getenv("XDG_CURRENT_DESKTOP");
 
 		if (stl::find(desktop, "GNOME"))
 		{
@@ -203,210 +422,6 @@ namespace
 		std::vector<std::string> out;
 		return Zenity(args, out);
 	}
-
-	// Select the launcher that will open the preferred program for a file
-
-	std::string GetStartProgramPath()
-	{
-		std::string open = xdg::GetProgramPath("xdg-open");
-		if (open.empty())
-		{
-			open = xdg::GetProgramPath("start");
-		}
-		return open;
-	}
-}
-
-std::string xdg::GetEnv(std::string const &var)
-{
-	return std::getenv(var.c_str());
-}
-
-std::vector<std::string> xdg::GetSystemDirs()
-{
-	std::string const path = xdg::GetEnv(PATH);
-	return SplitDirs(path);
-}
-
-std::string xdg::GetProgramPath(std::string const &name)
-{
-	// Unless extension is given, assume it's a binary
-	fs::path image = name;
-	if (image.extension().empty())
-	{
-		image += EXE_EXTENSION;
-	}
-	// Search for image in system directories
-	for (fs::path path : xdg::GetSystemDirs())
-	{
-		path /= image;
-		if (fs::exists(path))
-		{
-			// Check executable status
-			auto status = fs::status(path);
-			auto permissions = status.permissions();
-			permissions &= fs::perms::group_exec;
-			if (fs::perms::none != permissions)
-			{
-				return path; // usable
-			}
-		}
-	}
-	return std::string();
-}
-
-std::string xdg::GetBaseDir()
-{
-	return SDL_GetBasePath();
-}
-
-std::string xdg::GetDataHome()
-{
-	fs::path path = xdg::GetEnv(DATA_HOME);
-	if (path.empty())
-	{
-		path = xdg::GetEnv(HOME);
-		path /= ".local/share";
-	}
-	return path;
-}
-
-std::vector<std::string> xdg::GetDataDirs()
-{
-	std::string dirs = xdg::GetEnv(DATA_DIRS);
-	if (dirs.empty())
-	{
-		return { "/usr/local/share/", "/usr/share" };
-	}
-	return SplitDirs(dirs);
-}
-
-std::string xdg::GetConfigHome()
-{
-	fs::path path = xdg::GetEnv(CONFIG_HOME);
-	if (path.empty())
-	{
-		path = xdg::GetEnv(HOME);
-		path /= ".config";
-	}
-	return path;
-}
-
-std::vector<std::string> xdg::GetConfigDirs()
-{
-	std::string dirs = xdg::GetEnv(CONFIG_DIRS);
-	if (dirs.empty())
-	{
-		return { "/etc/xdg" };
-	}
-	return SplitDirs(dirs);
-}
-
-std::string xdg::GetCacheHome()
-{
-	fs::path path = xdg::GetEnv(CACHE_HOME);
-	if (path.empty())
-	{
-		path = xdg::GetEnv(HOME);
-		path /= ".cache";
-	}
-	return path;
-}
-
-bool xdg::IsDesktop(std::string const &string)
-{
-	static std::set<std::string> const set = { ".desktop", ".directory" };
-
-	fs::path const path = string;
-	fs::path const extension = path.extension();
-
-	// With no extension use magic
-	if (extension.empty())
-	{
-		return HasMagic(path, "[Desktop Entry]");
-	}
-	// Base case is that the extension matches
-	return set.find(extension) != set.end();
-}
-
-std::vector<std::string> xdg::FindApplicationsMenus()
-{
-	std::vector<std::string> paths;
-	std::string const menu_prefix = xdg::GetEnv(MENU_PREFIX);
-	std::string const applications_menu = menu_prefix + "applications.menu";
-	for (fs::path path : xdg::GetConfigDirs())
-	{
-		path /= "menus";
-		path /= applications_menu;
-		if (fs::exists(path))
-		{
-			paths.push_back(path);
-		}
-	}
-	return paths;
-}
-
-std::vector<std::string> xdg::FindDesktopApplications()
-{
-	std::vector<std::string> paths;
-	for (fs::path path : xdg::GetConfigDirs())
-	{
-		path /= "applications";
-		if (fs::exists(path) and fs::is_directory(path))
-		{
-			fs::directory_iterator it(path), end;
-			while (it != end)
-			{
-				fs::path const &path = *it;
-				if (path.extension() == "desktop")
-				{
-					paths.push_back(path);
-				}
-			}
-		}
-	}
-	return paths;
-}
-
-bool xdg::Open(std::string const &path)
-{
-	static std::string const open = GetStartProgramPath();
-	if (not open.empty())
-	{
-		std::deque<std::string> args;
-		args.push_back(open);
-		args.push_back(path);
-		std::vector<std::string> out; // dummy
-		int const status = SystemCommand(args, out);
-		return 0 == status;
-	}
-	return false;
-}
-
-bool xdg::Edit(std::string const &path)
-{
-	// Try with launcher first
-	bool ok = xdg::Open(path);
-	if (not ok)
-	{
-		// Next look for a visual editor like VIM
-		std::string editor = xdg::GetEnv(VISUAL);
-		if (editor.empty())
-		{
-			// Look for a basic editor last
-			editor = xdg::GetEnv(EDITOR);
-		}
-		if (not editor.empty())
-		{
-			std::deque<std::string> args;
-			args.push_back(editor);
-			args.push_back(path);
-			args.push_back("&"); // don't block
-			std::vector<std::string> out; // dummy;
-			ok = 0 == SystemCommand(args, out);
-		}
-	}
-	return ok;
 }
 
 bool xdg::ShowError(std::string const &text)

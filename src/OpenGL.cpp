@@ -265,12 +265,42 @@ void OpenGL::SetShaderType(unsigned index, GLenum type)
 
 void *OpenGL::GetContext(SDL_Window *window)
 {
-	static struct Context
+	static class Context
 	{
+	private:
+
+		static bool UpdateHandler(SDL_Event const &event)
+		{
+			assert(UpdateOpenGL == event.user.type);
+			switch (event.user.code)
+			{
+			case UpdateTextures:
+				TextureManager::Instance().Update();
+				break;
+			case UpdateBuffers:
+				BufferManager::Instance().Update();
+				break;
+			case UpdateShaders:
+				ShaderManager::Instance().Update();
+				break;
+			case UpdatePrograms:
+				ProgramManager::Instance().Update();
+				break;
+			default:
+				assert(not "OpenGL event code");
+				return false;
+			}
+			return true;
+		}
+
+		ScopedEventHandler updater;
+
+	public:
+
 		SDL_GLContext context = nullptr;
 
 		Context() = default;
-		Context(SDL_Window *window)
+		Context(SDL_Window *window) : updater(UpdateOpenGL, UpdateHandler)
 		{
 			if (window)
 			{
@@ -309,8 +339,6 @@ void *OpenGL::GetContext(SDL_Window *window)
 					ShaderManager::Instance().Initialize();
 					// Create programs
 					ProgramManager::Instance().Initialize();
-					// Register update handler
-					SDL::PushEventHandler(UpdateOpenGL, UpdateHandler);
 				}
 				else
 				{
@@ -324,8 +352,6 @@ void *OpenGL::GetContext(SDL_Window *window)
 			// Free if it was created
 			if (context)
 			{
-				// Unregister event handler
-				SDL::PopEventHandler(UpdateOpenGL);
 				// Delete textures
 				TextureManager::Instance().Release();
 				// Delete buffers
@@ -344,32 +370,6 @@ void *OpenGL::GetContext(SDL_Window *window)
 				}
 				SDL_GL_DeleteContext(context);
 			}
-		}
-
-	private:
-
-		static bool UpdateHandler(SDL_Event const &event)
-		{
-			assert(UserEventType::UpdateOpenGL == event.user.type);
-			switch (event.user.code)
-			{
-			case UpdateEventCode::UpdateTextures:
-				TextureManager::Instance().Update();
-				break;
-			case UpdateEventCode::UpdateBuffers:
-				BufferManager::Instance().Update();
-				break;
-			case UpdateEventCode::UpdateShaders:
-				ShaderManager::Instance().Update();
-				break;
-			case UpdateEventCode::UpdatePrograms:
-				ProgramManager::Instance().Update();
-				break;
-			default:
-				assert(not "OpenGL event code");
-				return false;
-			}
-			return true;
 		}
 
 	} singleton;
