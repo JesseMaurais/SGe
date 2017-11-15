@@ -51,12 +51,13 @@ std::vector<std::string> sys::GetSystemDirs()
 
 std::vector<std::string> sys::GetDataDirs()
 {
-	return POSIX ? { "/usr/local/share", "/usr/share" } : { std::getenv("ALLUSERSPROFILE") };
+	return POSIX ? { "/usr/local/share", "/usr/share" } 
+	             : { std::getenv("APPDATA"), std::geten("LOCALAPPDATA") };
 }
 
 std::vector<std::string> sys::GetConfigDirs()
 {
-	return POSIX ? { "/etc/xdg" } : { std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
+	return POSIX ? { "/etc/xdg" } : { std::getenv("COMMONPROGRAMFILES") };
 }
 	
 std::string sys::GetProgramPath(std::string const &name)
