@@ -25,6 +25,16 @@ namespace
 		stl::split(dirs, string, DIR_SEPARATOR);
 		return dirs;
 	}
+
+	void ReadLinesFromFile(fs::path const &path, std::vector<std::string> &out)
+	{
+		std::string line;
+		std::ifstream istream(path);
+		while (std::getline(istream, line))
+		{
+			out.push_back(line);
+		}
+	}
 }
 
 std::vector<std::string> sys::GetSystemDirs()
@@ -101,7 +111,7 @@ std::string sys::GetTemporaryPath(std::string const &filename)
 
 std::string sys::GetHomeDir()
 {
-	std::string dir = sys::GetHomeDir();
+	std::string dir = std::getenv("HOME");
 	if (dir.empty())
 	{
 		dir = std::getenv("USERPROFILE");
@@ -133,19 +143,11 @@ namespace
 			// Write stdout to a temporary file
 			fs::path path = sys::GetTemporaryPath(args.front());
 			args.push_back(">" + stl::quote(path));
-
 			// Execute and acquire return value
 			std::string const command = stl::merge(args, " ");
 			int const status = std::system(command.c_str());
-
 			// Read output back from temporary file
-			std::string line;
-			std::ifstream istream(path);
-			while (std::getline(istream, line))
-			{
-				out.push_back(line);
-			}
-
+			ReadLinesFromFile(path, out);
 			// Return the exit status
 			return ExitStatus(status);
 		}

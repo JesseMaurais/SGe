@@ -42,16 +42,16 @@ namespace xdg
 	/// Get the system configuration directories
 	std::vector<std::string> GetConfigDirs();
 
-	/// Get the directory to store cache data
+	/// Get the directory to cache data
 	std::string GetCacheHome();
 
-	/// Determine whether a given file is a desktop application
+	/// Determine whether a given path is a desktop application file
 	bool IsDesktop(std::string const &path);
 
 	/// Find any application menus under the configuration directories
-	std::vector<std::string> FindApplicationsMenus();
+	std::vector<std::string> FindApplicationMenus();
 
-	/// Find all application desktop files under the configuration directories
+	/// Find all desktop application files under the configuration directories
 	std::vector<std::string> FindDesktopApplications();
 
 	/// Open an arbitrary file with the user's preferred application
