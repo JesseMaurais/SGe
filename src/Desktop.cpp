@@ -25,7 +25,97 @@ namespace
 		stl::split(dirs, string, DIR_SEPARATOR);
 		return dirs;
 	}
+}
 
+std::vector<std::string> sys::GetSystemDirs()
+{
+	std::string const path = std::getenv("PATH");
+	return SplitDirs(path);
+}
+
+std::string sys::GetProgramPath(std::string const &name)
+{
+	// Unless extension is given, assume it's a binary
+	fs::path image = name;
+	if (image.extension().empty())
+	{
+		image += EXE_EXTENSION;
+	}
+	// Search for image in system directories
+	for (fs::path path : sys::GetSystemDirs())
+	{
+		path /= image;
+		if (fs::exists(path))
+		{
+			// Check executable status
+			auto status = fs::status(path);
+			auto permissions = status.permissions();
+			permissions &= fs::perms::group_exec;
+			if (fs::perms::none != permissions)
+			{
+				return path; // usable
+			}
+		}
+	}
+	return std::string();
+}
+
+std::string sys::GetTemporaryDir()
+{
+	static struct TemporaryDir
+	{
+		fs::path dir;
+		std::error_code error;
+		TemporaryDir(std::string const &foldername)
+		{
+			fs::path path = fs::temp_directory_path(error);
+			if (not error)
+			{
+				path /= foldername;
+				fs::remove_all(path, error);
+				if (fs::create_directory(path, error))
+				{
+					dir = path;
+				}
+			}
+		}
+
+	} temp(String(Application));
+
+	if (temp.error)
+	{
+		SDL::SetError(temp.error.message());
+	}
+	return temp.dir;
+}
+
+std::string sys::GetTemporaryPath(std::string const &filename)
+{
+	static fs::path const dir = sys::GetTemporaryDir();
+	if (not dir.empty())
+	{
+		return dir/filename;
+	}
+	return dir;
+}
+
+std::string sys::GetHomeDir()
+{
+	std::string dir = sys::GetHomeDir();
+	if (dir.empty())
+	{
+		dir = std::getenv("USERPROFILE");
+	}
+	return dir;
+}
+
+std::string sys::GetBaseDir()
+{
+	return SDL_GetBasePath();
+}
+
+namespace
+{
 	// Extract the exit status from a system call
 	constexpr int ExitStatus(int status)
 	{
@@ -41,7 +131,7 @@ namespace
 		if (HasProcessor) try
 		{
 			// Write stdout to a temporary file
-			fs::path path = xdg::GetTemporaryPath(args.front());
+			fs::path path = sys::GetTemporaryPath(args.front());
 			args.push_back(">" + stl::quote(path));
 
 			// Execute and acquire return value
@@ -69,10 +159,10 @@ namespace
 	// Select the launcher that will open the preferred program for a file
 	std::string GetStartPath()
 	{
-		std::string open = xdg::GetProgramPath("xdg-open");
+		std::string open = sys::GetProgramPath("xdg-open");
 		if (open.empty())
 		{
-			open = xdg::GetProgramPath("start");
+			open = sys::GetProgramPath("start");
 		}
 		return open;
 	}
@@ -110,94 +200,12 @@ namespace
 	}
 }
 
-std::vector<std::string> xdg::GetSystemDirs()
-{
-	std::string const path = std::getenv("PATH");
-	return SplitDirs(path);
-}
-
-std::string xdg::GetProgramPath(std::string const &name)
-{
-	// Unless extension is given, assume it's a binary
-	fs::path image = name;
-	if (image.extension().empty())
-	{
-		image += EXE_EXTENSION;
-	}
-	// Search for image in system directories
-	for (fs::path path : xdg::GetSystemDirs())
-	{
-		path /= image;
-		if (fs::exists(path))
-		{
-			// Check executable status
-			auto status = fs::status(path);
-			auto permissions = status.permissions();
-			permissions &= fs::perms::group_exec;
-			if (fs::perms::none != permissions)
-			{
-				return path; // usable
-			}
-		}
-	}
-	return std::string();
-}
-
-std::string xdg::GetTemporaryDir()
-{
-	static struct TemporaryDir
-	{
-		fs::path dir;
-		std::error_code code;
-
-		TemporaryDir(std::string const &folder)
-		{
-			dir = fs::temp_directory_path() / folder;
-			fs::remove_all(dir, code); // start clean
-			fs::create_directory(dir, code);
-		}
-
-	} temp(String(Application));
-
-	if (temp.code)
-	{
-		SDL::SetError(temp.code.message());
-		return std::string();
-	}
-	return temp.dir;
-}
-
-std::string xdg::GetTemporaryPath(std::string const &filename)
-{
-	static fs::path const dir = xdg::GetTemporaryDir();
-	if (not dir.empty())
-	{
-		return dir/filename;
-	}
-	return dir;
-}
-
-std::string xdg::GetHomeDir()
-{
-	std::string dir = xdg::GetHomeDir();
-	if (dir.empty())
-	{
-		dir = std::getenv("USERPROFILE");
-	}
-	return dir;
-}
-
-std::string xdg::GetBaseDir()
-{
-	return SDL_GetBasePath();
-}
-
 std::string xdg::GetDataHome()
 {
 	fs::path path = std::getenv("XDG_DATA_HOME");
 	if (path.empty())
 	{
-		path = xdg::GetHomeDir();
+		path = sys::GetHomeDir();
 		path /= ".local/share";
 	}
 	return path;
@@ -218,7 +226,7 @@ std::string xdg::GetConfigHome()
 	fs::path path = std::getenv("XDG_CONFIG_HOME");
 	if (path.empty())
 	{
-		path = xdg::GetHomeDir();
+		path = sys::GetHomeDir();
 		path /= ".config";
 	}
 	return path;
@@ -239,7 +247,7 @@ std::string xdg::GetCacheHome()
 	fs::path path = std::getenv("XDG_CACHE_HOME");
 	if (path.empty())
 	{
-		path = xdg::GetHomeDir();
+		path = sys::GetHomeDir();
 		path /= ".cache";
 	}
 	return path;
@@ -376,18 +384,18 @@ namespace
 		{
 		default:
 		case GTK:
-			path = xdg::GetProgramPath(zenity);
+			path = sys::GetProgramPath(zenity);
 			if (path.empty())
 			{
-				path = xdg::GetProgramPath(qarma);
+				path = sys::GetProgramPath(qarma);
 			}
 			break;
 
 		case QT:
-			path = xdg::GetProgramPath(qarma);
+			path = sys::GetProgramPath(qarma);
 			if (path.empty())
 			{
-				path = xdg::GetProgramPath(zenity);
+				path = sys::GetProgramPath(zenity);
 			}
 			break;
 		}
@@ -424,42 +432,42 @@ namespace
 	}
 }
 
-bool xdg::ShowError(std::string const &text)
+bool zen::ShowError(std::string const &text)
 {
 	return 0 == ZenityMessage(text, "--error");
 }
 
-bool xdg::ShowWarning(std::string const &text)
+bool zen::ShowWarning(std::string const &text)
 {
 	return 0 == ZenityMessage(text, "--warning");
 }
 
-bool xdg::ShowInformation(std::string const &text)
+bool zen::ShowInformation(std::string const &text)
 {
 	return 0 == ZenityMessage(text, "--info");
 }
 
-bool xdg::ShowNotification(std::string const &text)
+bool zen::ShowNotification(std::string const &text)
 {
 	return 0 == ZenityMessage(text, "--notification");
 }
 
-bool xdg::ShowQuestion(std::string const &text, enum xdg::Answer &answer)
+bool zen::ShowQuestion(std::string const &text, enum zen::Answer &answer)
 {
 	int status = ZenityMessage(text, "--question");
 	switch (status)
 	{
 	case 0:
-		answer = xdg::Answer::Yes;
+		answer = zen::Answer::Yes;
 		return true;
 	case 1:
-		answer = xdg::Answer::No;
+		answer = zen::Answer::No;
 		return true;
 	}
 	return false;
 }
 
-bool xdg::ChooseFile(std::vector<std::string> &out, enum xdg::ChooseFile options, std::string const &path, std::string const &title)
+bool zen::SelectFile(std::vector<std::string> &out, enum zen::SelectFile options, std::string const &path, std::string const &title)
 {
 	std::deque<std::string> args;
 
@@ -483,7 +491,7 @@ bool xdg::ChooseFile(std::vector<std::string> &out, enum xdg::ChooseFile options
 	}
 
 	// Select multiple files
-	if (options & xdg::ChooseFile::Multiple)
+	if (options & zen::SelectFile ::Multiple)
 	{
 		args.push_back("--multiple");
 		// Use the system directory separator
@@ -492,13 +500,13 @@ bool xdg::ChooseFile(std::vector<std::string> &out, enum xdg::ChooseFile options
 	}
 
 	// Choose a directory rather than a file
-	if (options & xdg::ChooseFile::Directory)
+	if (options & zen::SelectFile ::Directory)
 	{
 		args.push_back("--directory");
 	}
 
 	// Save rather than open
-	if (options & xdg::ChooseFile::Save)
+	if (options & zen::SelectFile::Save)
 	{
 		args.push_back("--save");
 	}

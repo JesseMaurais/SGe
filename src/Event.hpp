@@ -7,6 +7,7 @@ union SDL_Event;
 
 enum UserEventType
 {
+	EscapeEvent,
 	UpdateSpace,
 	UpdateOpenAL,
 	UpdateOpenCL,
@@ -15,14 +16,13 @@ enum UserEventType
 	UserEventCount,
 };
 
-using EventHandler = std::function<bool(SDL_Event const &event)>;
+using EventHandler = std::function<void(SDL_Event const &event)>;
 
 class ScopedEventHandler
 {
 public:
 
 	ScopedEventHandler() = default;
-	ScopedEventHandler(UserEventType type, EventHandler handler);
 	ScopedEventHandler(unsigned type, EventHandler handler);
 	~ScopedEventHandler();
 

@@ -174,10 +174,24 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 	{
 	private:
 
-		static bool UpdateHandler(SDL_Event const &event)
+		static void Initialize()
 		{
-			assert(UpdateOpenAL == event.user.type);
-			// Update method by code
+			// Generate audio buffers
+			AudioBufferManager::Instance().Initialize();
+			// Generate audio sources
+			AudioSourceManager::Instance().Initialize();
+		}
+
+		static void Release()
+		{
+			// Delete audio sources
+			AudioSourceManager::Instance().Release();
+			// Delete audio buffers
+			AudioBufferManager::Instance().Release();
+		}
+
+		static void UpdateHandler(SDL_Event const &event)
+		{
 			switch (event.user.code)
 			{
 			case UpdateBuffers:
@@ -188,9 +202,7 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 				break;
 			default:
 				assert(not "OpenAL event code");
-				return false;
 			}
-			return true;
 		}
 
 		ScopedEventHandler updater;
@@ -200,7 +212,8 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 		ALCcontext *context = nullptr;
 
 		Context() = default;
-		Context(int const *attributes) : updater(UpdateOpenAL, UpdateHandler)
+		Context(int const *attributes)
+		: updater(SDL::UserEvent(UpdateOpenAL), UpdateHandler)
 		{
 			if (attributes)
 			{
@@ -228,10 +241,7 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 						{
 							OpenAL::LogError(device, "alcMakeContextCurrent");
 						}
-						// Generate audio buffers
-						AudioBufferManager::Instance().Initialize();
-						// Generate audio sources
-						AudioSourceManager::Instance().Initialize();
+						Initialize();
 						// Begin processing input
 						alcProcessContext(context);
 					}
@@ -245,10 +255,6 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 			{
 				// Stop processing input
 				alcSuspendContext(context);
-				// Delete audio sources
-				AudioSourceManager::Instance().Release();
-				// Delete audio buffers
-				AudioBufferManager::Instance().Release();
 				// Detach before we destroy it
 				if (alcGetCurrentContext() == context)
 				{

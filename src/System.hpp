@@ -13,11 +13,13 @@
 
 #ifdef __has_include // features before macros
 #if __has_include(<unistd.h>)
+#include <unistd.h>
 constexpr bool UNIX = true;
 #else
 constexpr bool UNIX = false;
 #endif
 #if __has_include(<windows.h>)
+#include <windows.h>
 constexpr bool WINDOWS = true;
 #else
 constexpr bool WINDOWS = false;

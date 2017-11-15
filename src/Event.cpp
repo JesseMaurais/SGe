@@ -1,5 +1,7 @@
 #include "Event.hpp"
+#include "Error.hpp"
 #include "SDL.hpp"
+#include <exception>
 #include <cassert>
 #include <stack>
 #include <map>
@@ -41,55 +43,49 @@ namespace
 		HandlerStack(eventCode).pop();
 	}
 
-	bool Dispatch(const SDL_Event &event)
+	void DispatchEvent(const SDL_Event &event)
 	{
-		Stack store;
-		Stack &stack = HandlerStack(event.type);
-		while (not stack.empty())
+		Stack const &stack = HandlerStack(event.type);
+		if (not stack.empty())
 		{
-			EventHandler handler = stack.top();
-			if (not handler(event))
-			{
-				store.push(handler);
-				stack.pop();
-			}
-			else break;
+			stack.top()(event);
 		}
-		while (not store.empty())
-		{
-			EventHandler handler = store.top();
-			stack.push(handler);
-			store.pop();
-		}
-		return false;
 	}
 }
 
 void SDL::ProcessEvents()
 {
-	static SDL_Event event;
 	bool done = false;
-	do
+	ScopedEventHandler escape(
+		SDL::UserEvent(EscapeEvent), [&done](SDL_Event const &event)
+		{
+			done = true;
+		}
+	);
+	SDL_Event event;
+	do try
 	{
 		if (SDL_WaitEvent(&event))
 		{
-			done = Dispatch(event);
+			DispatchEvent(event);
 		}
 		else
 		{
 			SDL::perror("SDL_WaitEvent");
 		}
 
-		done |= SDL_FALSE == SDL_QuitRequested();
+		done |= SDL_QuitRequested() == SDL_TRUE;
+	}
+	catch (std::exception const &exception)
+	{
+		SDL::SetError(CaughtException, exception.what());
+		done |= not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 	}
 	while (not done);
 }
 
-ScopedEventHandler::ScopedEventHandler(UserEventType type, EventHandler handler)
-	: ScopedEventHandler(SDL::UserEvent(type), handler)
-{}
-
-ScopedEventHandler::ScopedEventHandler(unsigned type, EventHandler handler) : event(type)
+ScopedEventHandler::ScopedEventHandler(unsigned type, EventHandler handler)
+: event(type)
 {
 	PushEventHandler(event, handler);
 }

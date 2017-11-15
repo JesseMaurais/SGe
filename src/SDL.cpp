@@ -61,15 +61,15 @@ namespace
 
 		operator SDL_AssertState() const
 		{
-			int id = SDL_ASSERTION_IGNORE;
+			int id = SDL_ASSERTION_ABORT;
 			if (SDL_ShowMessageBox(this, &id))
 			{
 				auto const error = SDL_GetError();
 				if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, String(CannotShowMessageBox), error, window))
 				{
 					SDL::perror(CannotShowMessageBox);
-					SDL::perror(title, error);
 				}
+				SDL::perror(title, message);
 			}
 			return static_cast<SDL_AssertState>(id);
 		}
@@ -83,7 +83,7 @@ namespace
 			case SDL_MESSAGEBOX_ERROR:
 				return 5; // Continue, Abort, Retry, Break, Ignore
 			case SDL_MESSAGEBOX_WARNING:
-				return 3; // Continue, Abort, Retry
+				return 4; // Continue, Abort, Retry, Break
 			case SDL_MESSAGEBOX_INFORMATION:
 				return 1; // Continue
 			default:
@@ -113,16 +113,15 @@ namespace
 
 		std::stringstream stream;
 		stream << "Assertion failure at " << data->function;
-		stream << "in " << data->filename << " on line " << data->linenum << "), ";
-		stream << "triggered " << data->trigger_count << "times\n";
-		stream << "       '" << data->condition << "'\n";
+		stream << " in " << data->filename << " on line " << data->linenum << ", ";
+		stream << "triggered " << data->trigger_count << " times\n";
+		stream << "\t'" << data->condition << "'\n";
 
 		union {
 		 SDL_Window *window;
 		 void *address;
 		};
 		if (user) address = user;
-		else window = SDL_GetGrabbedWindow();
 		auto const string = stream.str();
 		auto const message = string.c_str();
 		return MessageBox(message, window, SDL_MESSAGEBOX_ERROR);
@@ -137,14 +136,14 @@ bool SDL::ShowError(SDL_MessageBoxFlags flags, SDL_Window *window)
 		SDL_AssertState const state = MessageBox(message, window, flags);
 		switch (state)
 		{
-		case SDL_ASSERTION_BREAK:
-			SDL_TriggerBreakpoint();
-			break;
-		case SDL_ASSERTION_IGNORE:
-		case SDL_ASSERTION_ALWAYS_IGNORE:
-			break;
 		case SDL_ASSERTION_ABORT:
 			std::abort();
+			// no break
+		case SDL_ASSERTION_BREAK:
+			SDL_TriggerBreakpoint();
+			// no break
+		case SDL_ASSERTION_IGNORE:
+		case SDL_ASSERTION_ALWAYS_IGNORE:
 			break;
 		case SDL_ASSERTION_RETRY:
 			return true;

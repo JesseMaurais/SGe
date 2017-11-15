@@ -8,13 +8,13 @@
 namespace SDL
 {
 	/// Overload of SDL::perror that takes std::string
-	template <typename... Args>	bool perror(std::string const &prefix)
+	inline bool perror(std::string const &prefix)
 	{
 		return perror(prefix.c_str());
 	}
 
 	/// Overload of SDL::perror that takes Strings enum
-	template <typename... Args>	bool perror(enum Strings prefix)
+	inline	bool perror(enum Strings prefix)
 	{
 		return perror(String(prefix));
 	}

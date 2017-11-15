@@ -269,9 +269,32 @@ void *OpenGL::GetContext(SDL_Window *window)
 	{
 	private:
 
-		static bool UpdateHandler(SDL_Event const &event)
+		static void Initialize()
 		{
-			assert(UpdateOpenGL == event.user.type);
+			// Generate textures
+			TextureManager::Instance().Initialize();
+			// Generate buffers
+			BufferManager::Instance().Initialize();
+			// Create shaders
+			ShaderManager::Instance().Initialize();
+			// Create programs
+			ProgramManager::Instance().Initialize();
+		}
+
+		static void Release()
+		{
+			// Delete textures
+			TextureManager::Instance().Release();
+			// Delete buffers
+			BufferManager::Instance().Release();
+			// Delete shaders
+			ShaderManager::Instance().Release();
+			// Delete programs
+			ProgramManager::Instance().Release();
+		}
+
+		static void UpdateHandler(SDL_Event const &event)
+		{
 			switch (event.user.code)
 			{
 			case UpdateTextures:
@@ -288,9 +311,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 				break;
 			default:
 				assert(not "OpenGL event code");
-				return false;
 			}
-			return true;
 		}
 
 		ScopedEventHandler updater;
@@ -300,7 +321,8 @@ void *OpenGL::GetContext(SDL_Window *window)
 		SDL_GLContext context = nullptr;
 
 		Context() = default;
-		Context(SDL_Window *window) : updater(UpdateOpenGL, UpdateHandler)
+		Context(SDL_Window *window)
+		: updater(SDL::UserEvent(UpdateOpenGL), UpdateHandler)
 		{
 			if (window)
 			{
@@ -331,14 +353,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 						}
 						else init = true;
 					}
-					// Generate textures
-					TextureManager::Instance().Initialize();
-					// Generate buffers
-					BufferManager::Instance().Initialize();
-					// Create shaders
-					ShaderManager::Instance().Initialize();
-					// Create programs
-					ProgramManager::Instance().Initialize();
+					Initialize();
 				}
 				else
 				{
@@ -352,14 +367,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 			// Free if it was created
 			if (context)
 			{
-				// Delete textures
-				TextureManager::Instance().Release();
-				// Delete buffers
-				BufferManager::Instance().Release();
-				// Delete shaders
-				ShaderManager::Instance().Release();
-				// Delete programs
-				ProgramManager::Instance().Release();
+				Release();
 				// Detach before deletion
 				if (SDL_GL_GetCurrentContext() == context)
 				{

@@ -10,7 +10,7 @@ CommandLineOption ParseCommandLine(int argc, char **argv)
 	{ "configs" , required_argument , nullptr , Option::Configs },
 	{ "media"   , optional_argument , nullptr , Option::Media   },
 	{ "quit"    , no_argument       , nullptr , Option::Quit    },
-	{ nullptr         , 0                 , nullptr , Option::End     }
+	{ nullptr   , 0                 , nullptr , Option::End     }
 	};
 
 	CommandLineOption cmd;

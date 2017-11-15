@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace xdg
+namespace sys
 {
 	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
@@ -26,7 +26,10 @@ namespace xdg
 
 	/// Get the application base directory
 	std::string GetBaseDir();
+}
 
+namespace xdg
+{
 	/// Get the home data directory
 	std::string GetDataHome();
 
@@ -56,7 +59,10 @@ namespace xdg
 
 	/// Open a file with the user's preferred text editor
 	bool Edit(std::string const &path);
+}
 
+namespace zen
+{
 	/// Open an error message dialog with one "OK" button
 	bool ShowError(std::string const &text);
 
@@ -73,9 +79,9 @@ namespace xdg
 	/// Open a question dialog with "No" and "Yes" buttons
 	bool ShowQuestion(std::string const &text, enum Answer &answer);
 
-	enum ChooseFile { None, Multiple=1, Directory=2, Save=4 };
+	enum SelectFile { None, Multiple=1, Directory=2, Save=4 };
 	/// Open a file selection dialog
-	bool ChooseFile(std::vector<std::string> &out, enum ChooseFile options=None, std::string const &path="", std::string const &title="");
+	bool SelectFile(std::vector<std::string> &out, enum SelectFile options=None, std::string const &path="", std::string const &title="");
 }
 
 #endif // file
