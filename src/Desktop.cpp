@@ -57,7 +57,7 @@ std::vector<std::string> sys::GetDataDirs()
 
 std::vector<std::string> sys::GetConfigDirs()
 {
-	return POSIX ? { "/etc/xdg" } : { std::getenv("COMMONPROGRAMFILES") };
+	return POSIX ? { "/etc" } : { std::getenv("COMMONPROGRAMFILES") };
 }
 	
 std::string sys::GetProgramPath(std::string const &name)
@@ -250,7 +250,13 @@ std::vector<std::string> xdg::GetConfigDirs()
 	std::string dirs = std::getenv("XDG_CONFIG_DIRS");
 	if (dirs.empty())
 	{
-		return sys::GetConfigDirs();
+		std::vector<std::string> dirs;
+		for (fs::path path : sys::GetConfigDirs())
+		{
+			path /= "xdg";
+			dirs.emplace_back(path);
+		}
+		return dirs;
 	}
 	return SplitDirs(dirs);
 }
