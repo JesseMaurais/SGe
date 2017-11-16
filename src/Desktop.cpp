@@ -51,13 +51,16 @@ std::vector<std::string> sys::GetSystemDirs()
 
 std::vector<std::string> sys::GetDataDirs()
 {
-	return POSIX ? { "/usr/local/share", "/usr/share" } 
-	             : { std::getenv("APPDATA"), std::geten("LOCALAPPDATA") };
+	using strings = std::vector<std::string>;
+	return POSIX ? strings{ "/usr/local/share", "/usr/share" }
+		: strings{ std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
 }
 
 std::vector<std::string> sys::GetConfigDirs()
 {
-	return POSIX ? { "/etc" } : { std::getenv("COMMONPROGRAMFILES") };
+	using strings = std::vector<std::string>;
+	return POSIX ? strings{ "/etc" }
+		: strings{ std::getenv("COMMONPROGRAMFILES") };
 }
 	
 std::string sys::GetProgramPath(std::string const &name)
@@ -288,7 +291,7 @@ bool xdg::IsDesktop(std::string const &string)
 	return set.find(extension) != set.end();
 }
 
-std::vector<std::string> xdg::FindApplicationsMenus()
+std::vector<std::string> xdg::FindApplicationMenus()
 {
 	std::vector<std::string> paths;
 	std::string const menu_prefix = std::getenv("XDG_MENU_PREFIX");
@@ -308,16 +311,20 @@ std::vector<std::string> xdg::FindApplicationsMenus()
 std::vector<std::string> xdg::FindDesktopApplications()
 {
 	std::vector<std::string> paths;
+
 	for (fs::path path : xdg::GetConfigDirs())
 	{
 		path /= "applications";
+
 		if (fs::exists(path) and fs::is_directory(path))
 		{
 			fs::directory_iterator it(path), end;
+
 			while (it != end)
 			{
 				fs::path const &path = *it;
-				if (path.extension() == ".desktop")
+
+				if (xdg::IsDesktop(path))
 				{
 					paths.push_back(path);
 				}

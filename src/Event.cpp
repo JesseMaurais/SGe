@@ -59,6 +59,7 @@ void SDL::ProcessEvents()
 	ScopedEventHandler escape(
 		SDL::UserEvent(EscapeEvent), [&done](SDL_Event const &event)
 		{
+			(void) event;
 			done = true;
 		}
 	);

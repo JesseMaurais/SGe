@@ -9,8 +9,6 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		Uint32 media = SDL_INIT_EVENTS;
-
 		if (argc > 1)
 		{
 			CommandLineOption cmd;
@@ -19,9 +17,6 @@ int main(int argc, char **argv)
 				cmd = ParseCommandLine(argc, argv);
 				switch (cmd.opt)
 				{
-				case Option::Media:
-					media |= SDL_INIT_EVERYTHING;
-					break;
 				case Option::Help:
 					PrintCommandLineOptions();
 					return EXIT_SUCCESS;
@@ -30,7 +25,7 @@ int main(int argc, char **argv)
 			while (Option::End != cmd.opt);
 		}
 
-		if (SDL_Init(media))
+		if (SDL_Init(SDL_INIT_EVERYTHING))
 		{
 			SDL::perror("SDL_Init");
 			return EXIT_FAILURE;
@@ -42,6 +37,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+	SDL_assert(not "Message Box");
 	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }
