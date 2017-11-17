@@ -84,34 +84,29 @@ namespace stl
 	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
 		std::string::size_type const length = search.length();
-		for (auto pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos))
+		for (auto pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos + length))
 		{
 			string.replace(pos, length, replace);
-			pos += length;
 		}
 	}
 
 	template <template <typename, typename> class Container>
-	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string const &string, std::string const &delimiter)
+	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string string, std::string const &delimiter)
 	{
-		if (string.empty()) return;
-		std::string::size_type const length = delimiter.length();
-		for (std::string::size_type next = string.find(delimiter), last = 0; std::string::npos != last; next = string.find(delimiter, last))
+		std::stringstream stream(string);
+		while (std::getline(stream, string, delimiter))
 		{
-			bool end = std::string::npos == next;
-			auto count = end ? next : next - last;
-			tokens.emplace_back(string.substr(last, count));
-			last = end ? next : next + length;
+			tokens.push_back(string);
 		}
 	}
 
 	template <template <typename, typename> class Container>
 	std::string merge(Container<std::string, std::allocator<std::string>> const &tokens, std::string const &delimiter)
 	{
-		std::stringstream sstream;
-		auto it = std::ostream_iterator<std::string>(sstream, delimiter.c_str());
+		std::stringstream stream;
+		auto it = std::ostream_iterator<std::string>(stream, delimiter.c_str());
 		std::copy(tokens.begin(), tokens.end(), it);
-		return sstream.str();
+		return stream.str();
 	}
 
 	inline std::string to_upper(std::string string)

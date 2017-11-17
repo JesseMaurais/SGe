@@ -7,9 +7,8 @@
 #include <future>
 #include <map>
 
-#ifdef __LINUX__
+#if defined(__LINUX__)
 
-#include <unistd.h>
 #include <sys/inotify.h>
 
 class FileMonitor : public Manager<std::string>
@@ -27,7 +26,7 @@ private:
 
 	int Thread()
 	{
-		fd = ::inotify_init();
+		fd = inotify_init();
 		if (0 > fd)
 		{
 			SDL::perror("inotify_init", std::strerror(errno));
@@ -41,7 +40,7 @@ private:
 		char buf[BUFSIZ];
 		while (true)
 		{
-			ssize_t size = ::read(fd, buf, sizeof(buf));
+			ssize_t size = read(fd, buf, sizeof(buf));
 			if (0 < size)
 			{
 				char *ptr = buf;
@@ -80,14 +79,14 @@ protected:
 	{
 		for (std::string const &path : paths)
 		{
-			int res = ::inotify_add_watch(fd, path.c_str(), IN_ALL_EVENTS);
+			int res = inotify_add_watch(fd, path.c_str(), IN_ALL_EVENTS);
 			if (0 > res)
 			{
 				SDL::perror("inotify_add_watch", std::strerror(errno));
 			}
 			else
 			{
-				wd.at(path) = res;
+				wd.insert(path, res);
 			}
 		}
 	}
@@ -96,9 +95,13 @@ protected:
 	{
 		for (std::string const &path : paths)
 		{
-			if (0 > ::inotify_rm_watch(fd, wd.at(path)))
+			if (0 > inotify_rm_watch(fd, wd.at(path)))
 			{
 				SDL::perror("inotify_rm_watch", std::strerror(errno));
+			}
+			else
+			{
+				wd.erase(path);
 			}
 		}
 	}
@@ -117,7 +120,22 @@ public:
 	}
 };
 
-#endif // LINUX
+#else // BSD
+
+#if defined(__MACOS__) || defined(__FREEBSD__) || defined(__NETBSD__) || defined(__OPENBSD__)
+
+#else // POSIX
+
+#if defined(__POSIX__)
+
+#else // WINDOWS
+
+#if defined(__WINDOWS__)
+
+#endif /// WINDOWS
+#endif /// POSIX
+#endif /// BSD
+#endif /// LINUX
 
 Resources &FileWatch::Manager()
 {
