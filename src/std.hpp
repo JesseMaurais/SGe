@@ -84,19 +84,20 @@ namespace stl
 	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
 		std::string::size_type const length = search.length();
-		for (auto pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos + length))
+		for (std::string::size_type pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos + length))
 		{
 			string.replace(pos, length, replace);
 		}
 	}
 
 	template <template <typename, typename> class Container>
-	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string string, std::string const &delimiter)
+	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string const &string, std::string const &delimiter)
 	{
-		std::stringstream stream(string);
-		while (std::getline(stream, string, delimiter))
+		std::string::size_type const length = delimiter.length();
+		for (std::string::size_type next = string.find(delimiter), last = 0; std::string::npos != last; next = string.find(delimiter, last))
 		{
-			tokens.push_back(string);
+			tokens.emplace_back(string.substr(last, next - last));
+			last = std::string::npos == next ? next : next + length;
 		}
 	}
 

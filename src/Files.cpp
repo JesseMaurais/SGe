@@ -1,143 +1,144 @@
 #include "Files.hpp"
 #include "System.hpp"
-#include "Manager.hpp"
+#include "Desktop.hpp"
 #include "Error.hpp"
 #include <cerrno>
-#include <string>
 #include <future>
+#include <vector>
 #include <map>
 
-#if defined(__LINUX__)
+#include "stl/filesystem.hpp"
+namespace fs = stl::filesystem;
 
-#include <sys/inotify.h>
-
-class FileMonitor : public Manager<std::string>
+namespace
 {
-private:
-
-	std::future<int> future;
-	std::map<std::string, int> wd;
-	int fd;
-
-	FileMonitor() : fd(-1)
+	class FileMonitor : public Resources
 	{
-		future = std::async(Thread);
-	}
+	private:
 
-	int Thread()
-	{
-		fd = inotify_init();
-		if (0 > fd)
+		FileMonitor()
 		{
-			SDL::perror("inotify_init", std::strerror(errno));
-			return EXIT_FAILURE;
-		}
-		if (not Initialize())
-		{
-			return EXIT_FAILURE;
+			std::async(Thread);
 		}
 
-		char buf[BUFSIZ];
-		while (true)
+		static void Thread();
+
+		static void Notify(fs::path const &path)
 		{
-			ssize_t size = read(fd, buf, sizeof(buf));
-			if (0 < size)
-			{
-				char *ptr = buf;
-				char *end = buf + BUFSIZ;
-
-				while (ptr < end)
-				{
-					auto event = static_cast<inotify_event*>(ptr);
-					ptr += sizeof(inotify_event) + event->len;
-					Notify(event);
-				}
-				continue;
-			}
-			else
-			if (size < 0)
-			{
-				SDL::perror("inotify read", std::strerror(errno));
-			}
-			else
-			{
-				SDL::perror("inotify read 0 bytes");
-			}
-			return EXIT_FAILURE;
+			(void) path;
 		}
-		return EXIT_SUCCESS;
-	}
 
-	void Notify(inotify_event *event)
-	{
-		std::string path(event->name, event->name + event->len);
-	}
+	public:
 
-protected:
-
-	void Generate(std::vector<std::string> &paths)
-	{
-		for (std::string const &path : paths)
+		static FileMonitor &Instance()
 		{
-			int res = inotify_add_watch(fd, path.c_str(), IN_ALL_EVENTS);
-			if (0 > res)
-			{
-				SDL::perror("inotify_add_watch", std::strerror(errno));
-			}
-			else
-			{
-				wd.insert(path, res);
-			}
+			static FileMonitor singleton;
+			return singleton;
 		}
-	}
-
-	void Destroy(std::vector<std::string> const &paths)
-	{
-		for (std::string const &path : paths)
-		{
-			if (0 > inotify_rm_watch(fd, wd.at(path)))
-			{
-				SDL::perror("inotify_rm_watch", std::strerror(errno));
-			}
-			else
-			{
-				wd.erase(path);
-			}
-		}
-	}
-
-	bool SendUpdate() override
-	{
-		return false; // stub
-	}
-
-public:
-
-	static FileMonitor &Instance()
-	{
-		static FileMonitor singleton;
-		return singleton;
-	}
-};
-
-#else // BSD
-
-#if defined(__MACOS__) || defined(__FREEBSD__) || defined(__NETBSD__) || defined(__OPENBSD__)
-
-#else // POSIX
-
-#if defined(__POSIX__)
-
-#else // WINDOWS
-
-#if defined(__WINDOWS__)
-
-#endif /// WINDOWS
-#endif /// POSIX
-#endif /// BSD
-#endif /// LINUX
+	};
+}
 
 Resources &FileWatch::Manager()
 {
 	return FileMonitor::Instance();
 }
+
+
+#if defined(__LINUX__)
+
+#include <sys/inotify.h>
+
+void FileMonitor::Thread()
+{
+	int fd = inotify_init();
+	if (0 > fd)
+	{
+		SDL::perror("inotify_init", std::strerror(errno));
+		return;
+	}
+
+	std::vector<fs::path> added;
+	std::vector<fs::path> removed;
+	std::map<fs::path, int> map;
+
+	fs::path const self = sys::GetTemporaryPath("FileMonitor");
+	added.push_back(self);
+
+	char buf[BUFSIZ];
+	while (true)
+	{
+		for (fs::path const &path : added)
+		{
+			int wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
+			if (0 > wd)
+			{
+				SDL::perror("inotify_add_watch", std::strerror(errno));
+			}
+			map[path] = wd;
+		}
+
+		for (fs::path const &path : removed)
+		{
+			int wd = map.at(path);
+			if (0 > inotify_rm_watch(fd, wd))
+			{
+				SDL::perror("inotify_rm_watch", std::strerror(errno));
+			}
+			map.erase(path);
+		}
+
+		ssize_t size = read(fd, buf, sizeof(buf));
+		if (0 < size)
+		{
+			char *ptr = buf;
+			char *end = buf + BUFSIZ;
+
+			while (ptr < end)
+			{
+				// Convert to address of the event data
+				auto event = reinterpret_cast<inotify_event*>(ptr);
+				ptr += sizeof(inotify_event) + event->len;
+				// Extract the path name from the raw string
+				fs::path path(event->name, event->name + event->len);
+				if (self < path) // update notification
+				{
+					std::ifstream stream(path);
+					std::string string = path.filename();
+					if (string == "add")
+					{
+						while (std::getline(stream, string))
+						{
+							added.push_back(string);
+						}
+					}
+					else
+					if (string == "remove")
+					{
+						while (std::getline(stream, string))
+						{
+							removed.push_back(string);
+						}
+					}
+					fs::remove_all(path);
+				}
+				else
+				{
+					Notify(path);
+				}
+			}
+			continue;
+		}
+		else
+		if (size < 0)
+		{
+			SDL::perror("inotify read", std::strerror(errno));
+		}
+		else
+		{
+			SDL::perror("inotify read 0 bytes");
+		}
+	}
+}
+
+#endif
+

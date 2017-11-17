@@ -91,8 +91,6 @@ constexpr bool OPENBSD = false;
 
 constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD;
 
-// SDL2_platform.h does not define a generic BSD macro
-
 #if defined(__MACOS__) || defined(__FREEBSD__) || defined(__NETBSD__) || defined(__OPENBSD__)
 #define __BSD__ 1
 #endif

@@ -8,7 +8,6 @@ union SDL_Event;
 enum UserEventType
 {
 	EscapeEvent,
-	UpdateSpace,
 	UpdateOpenAL,
 	UpdateOpenCL,
 	UpdateOpenGL,
