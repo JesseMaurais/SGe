@@ -267,7 +267,7 @@ void FileMonitor::Thread()
 		(
 			[&](fs::path const &path) // on add
 			{
-				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, FILE_NOTIFY_CHAGE_LAST_WRITE);
+				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 				if (INVALID_HANDLE_VALUE == handle)
 				{
 					SDL::perror("FindFirstChangeNotification", GetLastErrorAsString());
