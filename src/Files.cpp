@@ -117,9 +117,8 @@ namespace
 				{
 					done = true;
 				}
-				// Empty the file of its content
-				auto erase = std::ios::out | std::ios::trunc;
-				std::ofstream stream(path, erase);
+				// Clear contents
+				stl::truncate(path);
 			}
 			else
 			{

@@ -118,6 +118,11 @@ namespace stl
 		std::ofstream stream(path); // open and close
 	}
 
+	inline void truncate(std::string const &path)
+	{
+		std::ofstream stream(path, std::ios::out | std::ios::trunc);
+	}
+
 	// Type-safe printf-like string formatting tools
 
 	class format
