@@ -1,6 +1,8 @@
 #ifndef Source_hpp
 #define Source_hpp
 
+#include <vector>
+
 class Source
 {
 	friend class Resources;

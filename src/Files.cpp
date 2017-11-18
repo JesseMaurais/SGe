@@ -16,16 +16,76 @@ namespace
 	{
 	private:
 
+		fs::path const self;
+		std::vector<fs::path> added;
+		std::vector<fs::path> removed;
+
 		FileMonitor()
 		{
-			std::async(Thread);
+			// Use directory for asynchronous commands
+			self = sys::GetTemporaryPath("FileMonitor");
+			if (self.empty())
+			{
+				SDL::perror("FileMonitor");
+				return;
+			}
+			added.push_back(self);
+			std::async([this]()
+			{
+				Thread(); 
+			});
 		}
 
-		static void Thread();
+		void Thread(); // platform dependent
 
-		static void Notify(fs::path const &path)
+		bool Process(fs::path const &path)
 		{
-			(void) path;
+			if (self < path) // update self
+			{
+				std::string string = path.filename();
+				// Filename selects the operation
+				if (string == "add")
+				{
+					std::ifstream stream(path);
+					while (std::getline(stream, string))
+					{
+						if (not self < string)
+						{
+							added.push_back(string);
+						}
+					}
+				}
+				else
+				if (string == "remove")
+				{
+					std::ifstream stream(path);
+					while (std::getline(stream, string))
+					{
+						if (not self < string)
+						{
+							removed.push_back(string);
+						}
+					}
+				}
+				else
+				if (string == "stop")
+				{
+					return false;
+				}
+				// Empty the file of its content
+				auto erase = std::ios::out | std::ios::trunc;
+				std::ofstream stream(path, erase);
+			}
+			else
+			{
+				Notify(path);
+			}
+			return true;
+		}
+
+		void Notify(fs::path const &path)
+		{
+			(void) path; // TODO
 		}
 
 	public:
@@ -50,95 +110,166 @@ Resources &FileWatch::Manager()
 
 void FileMonitor::Thread()
 {
-	int fd = inotify_init();
-	if (0 > fd)
+	int const fd = inotify_init();
+	if (-1 == fd)
 	{
 		SDL::perror("inotify_init", std::strerror(errno));
 		return;
 	}
 
-	std::vector<fs::path> added;
-	std::vector<fs::path> removed;
-	std::map<fs::path, int> map;
-
-	fs::path const self = sys::GetTemporaryPath("FileMonitor");
-	added.push_back(self);
-
+	std::map<fs::path, int> watched;
 	char buf[BUFSIZ];
+
 	while (true)
 	{
+		// Update our list of watched directories
+
 		for (fs::path const &path : added)
 		{
-			int wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
-			if (0 > wd)
+			// Remove any sub directory of added path
+			auto const upper = watched.upper_bound(path);
+			if (watched.end() != upper)
 			{
-				SDL::perror("inotify_add_watch", std::strerror(errno));
+				removed.push_back(upper->second);
 			}
-			map[path] = wd;
+			// Add only if path not a sub directory
+			auto const lower = watched.lower_bound(path);
+			if (watched.end() == lower)
+			{
+				int const wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
+				if (-1 == wd)
+				{
+					SDL::perror("inotify_add_watch", std::strerror(errno));
+				}
+				else
+				{
+					watched[path] = wd;
+				}
+			}
 		}
 
 		for (fs::path const &path : removed)
 		{
-			int wd = map.at(path);
-			if (0 > inotify_rm_watch(fd, wd))
+			auto const it = watched.find(path);
+			assert(watched.end() != it);
+			if (watched.end() != it)
 			{
-				SDL::perror("inotify_rm_watch", std::strerror(errno));
+				int const wd = it->second;
+				if (-1 == inotify_rm_watch(fd, wd))
+				{
+					SDL::perror("inotify_rm_watch", std::strerror(errno));
+				}
+				watched.erase(it->first);
 			}
-			map.erase(path);
 		}
 
-		ssize_t size = read(fd, buf, sizeof(buf));
-		if (0 < size)
+		// Block until there are events to process
+		ssize_t const sz = read(fd, buf, sizeof(buf));
+		if (-1 == sz)
 		{
-			char *ptr = buf;
-			char *end = buf + BUFSIZ;
-
-			while (ptr < end)
+			SDL::SetError(ColorSeparator, "inotify read", std::strerror(errno));
+			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
-				// Convert to address of the event data
-				auto event = reinterpret_cast<inotify_event*>(ptr);
-				ptr += sizeof(inotify_event) + event->len;
-				// Extract the path name from the raw string
-				fs::path path(event->name, event->name + event->len);
-				if (self < path) // update notification
-				{
-					std::ifstream stream(path);
-					std::string string = path.filename();
-					if (string == "add")
-					{
-						while (std::getline(stream, string))
-						{
-							added.push_back(string);
-						}
-					}
-					else
-					if (string == "remove")
-					{
-						while (std::getline(stream, string))
-						{
-							removed.push_back(string);
-						}
-					}
-					fs::remove_all(path);
-				}
-				else
-				{
-					Notify(path);
-				}
+				continue;
 			}
-			continue;
+			break;
 		}
 		else
-		if (size < 0)
+		if (0 == sz)
 		{
-			SDL::perror("inotify read", std::strerror(errno));
+			SDL::Log("inotify EOF");
+			break;
 		}
-		else
+
+		// Process all buffered file events
+		union
 		{
-			SDL::perror("inotify read 0 bytes");
+			inotify_event *ev;
+			char *it;
+		};
+		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
+		{
+			if (not Process(fs::path(ev->name, ev->name + ev->len)))
+			{
+				return;
+			}
 		}
 	}
 }
 
-#endif
+#else // WINDOWS
+#if defined(__WINDOW__)
+
+void FileMonitor::Thread()
+{
+	std::map<fs::path, HANDLE> watched;
+
+	while (true)
+	{
+		// Update our list of directories watched
+
+		for (fs::path const &path : added)
+		{
+			// Remove any sub directory of added path
+			auto const upper = watched.upper_bound(path);
+			if (watched.end() != upper)
+			{
+				removed.push_back(upper->second);
+			}
+			// Add only if path not a sub directory
+			auto const lower = watched.lower_bound(path);
+			if (watched.end() == lower)
+			{
+				constexpr auto notify = FILE_NOTIFY_CHAGE_LAST_WRITE;
+				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, notify);
+				if (INVALID_HANDLE_VALUE == handle)
+				{
+					// GetLastError
+				}
+				else
+				{
+					watched[path] = handle;
+				}
+			}
+		}
+
+		for (fs::path const &path : removed)
+		{
+			auto const it = watched.find(path);
+			assert(watched.end() != it);
+			if (watched.end() != it)
+			{
+				if (FALSE == FindCloseChangeNotification(it->second))
+				{
+					// GetLastError
+				}
+				else
+				{
+					watched.erase(path);
+				}
+			}
+		}
+
+		std::vector<HANDLE> obj(watched.size());
+		stl::transform(watched, obj, [](auto const &pair) { return pair.second; });
+		DWORD const status = WaitForMultipleObjects(obj.size(), obj.data(), FALSE, INFINITE);
+		if (WAIT_FAILED == status)
+		{
+			// GetLastError
+			return;
+		}
+		
+		HANDLE const handle = obj.at(status - WAIT_OBJECT_0);
+		if (FALSE == FindNextChangeNotification(hChanged))
+		{
+			// GetLastError
+			continue;
+		}
+
+	
+	}
+}
+
+#endif // WINDOWS
+#endif // LINUX
 

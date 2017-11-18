@@ -52,6 +52,30 @@ namespace stl
 	{
 		std::replace(c.begin(), c.end(), a, b);
 	}
+
+	template <typename Container, typename Value>
+	inline auto lower_bound(Container&& c, Value const &a) -> decltype(c.end())
+	{
+		return lower_bound(c.begin(), c.end(), a);
+	}
+
+	template <typename Container, typename Value, typename Compare>
+	inline auto lower_bound(Container&& c, Value const &a, Compare&& op) -> decltype(c.end())
+	{
+		return lower_bound(c.begin(), c.end(), a, op);
+	}
+
+	template <typename Container, typename Value>
+	inline auto upper_bound(Container&& c, Value const &a) -> decltype(c.end())
+	{
+		return upper_bound(c.begin(), c.end(), a);
+	}
+
+	template <typename Container, typename Value, typename Compare>
+	inline auto upper_bound(Container&& c, Value const &a, Compare&& op) -> decltype(c.end())
+	{
+		return upper_bound(c.begin(), c.end(), a, op);
+	}
 }
 
 #endif // file
