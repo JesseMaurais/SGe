@@ -238,7 +238,7 @@ void FileMonitor::Thread()
 }
 
 #else // WINDOWS
-#if defined(__WINDOW__)
+#if defined(__WINDOWS__)
 
 namespace
 {
