@@ -21,6 +21,11 @@ namespace stl
 		return std::string(value);
 	}
 
+	inline std::string to_string(char *const &value)
+	{
+		return std::string(value);
+	}
+
 	inline std::string to_string(char const value)
 	{
 		return std::string(1, value);

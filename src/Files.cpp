@@ -12,7 +12,7 @@ namespace
 	{
 	private:
 
-		std::future future;
+		std::future<void> future;
 		bool done = false;
 
 		fs::path self;

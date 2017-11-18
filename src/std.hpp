@@ -115,7 +115,7 @@ namespace stl
 
 	inline void touch(std::string const &path)
 	{
-		std::ofstream(path); // open and close
+		std::ofstream stream(path); // open and close
 	}
 
 	// Type-safe printf-like string formatting tools
