@@ -12,22 +12,33 @@ namespace
 	{
 	private:
 
+		// Thread control data
 		std::future<void> future;
 		bool done = false;
 
-		fs::path self;
-
+		// Monitored file data
 		std::set<fs::path> watched;
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
+		// File names for monitor commands
+		constexpr char const *addedFilename = "add";
+		constexpr char const *removedFilename = "remove";
+		// Folder monitored for asynchronous commands
+		constexpr char const *folder = "FileMonitor";
+		fs::path const self; // folder directory
+		fs::path const removedPath;
+		fs::path const addedPath;
+
+
 		FileMonitor()
+		: self(sys::GetTemporaryPath(folder))
+		, removedPath(self/removedFilename)
+		, addedPath(self/addedFilename)
 		{
-			// Use directory for asynchronous commands
-			self = sys::GetTemporaryPath("FileMonitor");
 			if (self.empty())
 			{
-				SDL::perror("FileMonitor");
+				SDL::perror(folder);
 				return;
 			}
 			added.push_back(self);
@@ -40,9 +51,26 @@ namespace
 		{
 			if (not self.empty())
 			{
-				self /= "stop";
-				stl::touch(self);
+				Remove({self});
 				future.wait();
+			}
+		}
+
+		void Add(std::vector<fs::path> const &paths)
+		{
+			std::ostream stream(addedPath);
+			for (fs::path const &path : paths)
+			{
+				stream << path;
+			}
+		}
+
+		void Remove(std::vector<fs::path> const &paths)
+		{
+			std::ostream stream(removedPath);
+			for (fs::path const &path : paths)
+			{
+				stream << path;
 			}
 		}
 
@@ -89,7 +117,7 @@ namespace
 			{
 				std::string string = path.filename();
 				// Filename selects the operation
-				if (string == "add")
+				if (string == addedFilename)
 				{
 					std::ifstream stream(path);
 					while (std::getline(stream, string))
@@ -101,7 +129,7 @@ namespace
 					}
 				}
 				else
-				if (string == "remove")
+				if (string == removedFilename)
 				{
 					std::ifstream stream(path);
 					while (std::getline(stream, string))
@@ -110,12 +138,12 @@ namespace
 						{
 							removed.push_back(string);
 						}
+						else
+						if (self == string)
+						{
+							done = true;
+						}
 					}
-				}
-				else
-				if (string == "stop")
-				{
-					done = true;
 				}
 				// Clear contents
 				stl::truncate(path);
@@ -203,7 +231,7 @@ void FileMonitor::Thread()
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
 		{
-			SDL::SetError(ColonSeparator, "inotify", std::strerror(errno));
+			SDL::SetError(ColonSeparator, "inotify read", std::strerror(errno));
 			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
 				continue;
@@ -229,6 +257,89 @@ void FileMonitor::Thread()
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{
 			Process(fs::path(ev->name, ev->name + ev->len));
+		}
+	}
+	catch (std::exception const &exception)
+	{
+		QueryError(exception);
+	}
+}
+
+#else // BSD
+#if defined(__BSD__)
+
+#include <sys/event.h>
+
+void FileWatcher::Thread()
+{
+	int kq = kqueue();
+	if (-1 == kq)
+	{
+		SDL::perror("kqueue", std::strerror(errno));
+		return;
+	}
+
+	std::vector<struct kevent> monitor;
+	std::vector<struct kevent> events;
+
+	while (not done) try
+	{
+		Update
+		(
+			[&](fs::path const &path) // on add
+			{
+				int fd = open(path.c_str(), O_EVTONLY);
+				if (-1 == fd)
+				{
+					SDL::perror("kqueue open", std::strerror(errno));
+				}
+				else
+				{
+					struct kevent ev;
+					EV_SET(&ev, fd, EVFILT_VNODE, EV_ADD|EV_CLEAR, NOTE_WRITE, 0, path.c_str());
+					monitor.push_back(ev);
+				}
+			}
+			,
+			[&](fs::path const &path) // on remove
+			{
+
+			}
+		);
+
+		// Block until there are events to process
+		int const nev = kevent(kq, monitor.data(), monitor.size(), events.data(), events.size(), nullptr);
+		if (-1 == nev)
+		{
+			SDL::SetError(ColonSeparator, "kevent", std::strerror(errno));
+			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+			{
+				continue;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		for (int ev = 0; ev < nev; ++ev)
+		{
+			union
+			{
+				uintptr_t uiptr;
+				void *udata
+				char *str;
+			};
+			if (EV_ERROR == events[ev].flags)
+			{
+				uiptr = events[ev].data;
+				SDL::perror("EV_ERROR", str);
+			}
+			else
+			{
+				udata = events[ev].udata;
+				Process(str);
+			}
 		}
 	}
 	catch (std::exception const &exception)
@@ -319,5 +430,6 @@ void FileMonitor::Thread()
 }
 
 #endif // WINDOWS
+#endif // BSD
 #endif // LINUX
 
