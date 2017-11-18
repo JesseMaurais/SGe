@@ -2,7 +2,9 @@
 #define stdcpp_hpp
 
 #include "stl/algorithm.hpp"
+#include "stl/numeric.hpp"
 #include "stl/string.hpp"
+#include "stl/filesystem.hpp"
 
 #include <iostream>
 #include <limits>
@@ -11,6 +13,7 @@
 #include <vector>
 #include <cassert>
 #include <cctype>
+#include <future>
 
 #ifndef NDEBUG
 #define verify(condition) assert(condition)
@@ -18,37 +21,6 @@
 #define verify(condtiion) (condition)
 #endif
 
-namespace
-{
-	template <typename Dst, typename Src>
-	Dst to(const Src &value)
-	{
-		using dst = std::numeric_limits<Dst>;
-		using src = std::numeric_limits<Src>;
-		static_assert(dst::is_exact == src::is_exact, "Exact mismatch");
-		constexpr auto min = dst::is_signed and src::is_signed ? dst::min() : 0;
-		constexpr auto max = dst::max();
-		assert(min <= value);
-		assert(value <= max);
-		return static_cast<Dst>(value);
-	}
-
-	template <typename Src>
-	unsigned to_unsigned(const Src &value)
-	{
-		using source = std::numeric_limits<Src>;
-		static_assert(source::is_integer, "Value must be an integer type");
-		return to<unsigned>(value);
-	}
-
-	template <typename Src>
-	int to_int(const Src &val)
-	{
-		using source = std::numeric_limits<Src>;
-		static_assert(source::is_integer, "Value must be an integer type");
-		return to<int>(val);
-	}
-}
 
 namespace stl
 {
@@ -141,6 +113,11 @@ namespace stl
 		return trim_begin(string) != trim_end(string);
 	}
 
+	inline void touch(std::string const &path)
+	{
+		std::ofstream(path); // open and close
+	}
+
 	// Type-safe printf-like string formatting tools
 
 	class format
@@ -205,6 +182,39 @@ namespace stl
 		std::string result;
 		sprintf(result, "%1=%2", param, value);
 		return result;
+	}
+}
+
+
+namespace
+{
+	template <typename Dst, typename Src>
+	Dst to(const Src &value)
+	{
+		using dst = std::numeric_limits<Dst>;
+		using src = std::numeric_limits<Src>;
+		static_assert(dst::is_exact == src::is_exact, "Exact mismatch");
+		constexpr auto min = dst::is_signed and src::is_signed ? dst::min() : 0;
+		constexpr auto max = dst::max();
+		assert(min <= value);
+		assert(value <= max);
+		return static_cast<Dst>(value);
+	}
+
+	template <typename Src>
+	unsigned to_unsigned(const Src &value)
+	{
+		using source = std::numeric_limits<Src>;
+		static_assert(source::is_integer, "Value must be an integer type");
+		return to<unsigned>(value);
+	}
+
+	template <typename Src>
+	int to_int(const Src &val)
+	{
+		using source = std::numeric_limits<Src>;
+		static_assert(source::is_integer, "Value must be an integer type");
+		return to<int>(val);
 	}
 }
 
