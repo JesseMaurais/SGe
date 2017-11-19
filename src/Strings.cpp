@@ -19,6 +19,7 @@ char const *String(enum Strings id)
 	case Strings::EncodingError: return "Encoding error";
 	case Strings::NameNotUnique: return "The name \"%1\" is not unique";
 	case Strings::CaughtException: return "C++ exception was caught";
+	case Strings::InvalidArgumentRange: return "Invalid argument range";
 	case Strings::InvalidArgument: return "Invalid argument \"%1\" to function";
 	case Strings::InvalidName: return "Invalid name";
 	case Strings::InvalidEnum: return "Invalid enumeration";

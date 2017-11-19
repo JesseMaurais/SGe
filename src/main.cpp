@@ -1,4 +1,5 @@
 #include "Desktop.hpp"
+#include "JavaScript.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
@@ -93,6 +94,7 @@ int main(int argc, char **argv)
 		}
 
 	}
+	js::Engine engine;
 	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }

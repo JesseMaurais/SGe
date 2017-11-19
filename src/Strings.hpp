@@ -12,6 +12,7 @@ enum Strings
 	,EncodingError
 	,NameNotUnique
 	,CaughtException
+	,InvalidArgumentRange
 	,InvalidArgument
 	,InvalidName
 	,InvalidEnum
