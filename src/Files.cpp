@@ -8,6 +8,13 @@ namespace fs = stl::filesystem;
 
 namespace
 {
+	// Files that provide monitoring commands
+	constexpr char const *AddedFilename = "add";
+	constexpr char const *RemovedFilename = "remove";
+	// Folder monitored for asynchronous commands
+	constexpr char const *Folder = "FileWatch";
+
+
 	class FileMonitor : public Resources
 	{
 	private:
@@ -21,24 +28,14 @@ namespace
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
-		// File names for monitor commands
-		constexpr char const *addedFilename = "add";
-		constexpr char const *removedFilename = "remove";
-		// Folder monitored for asynchronous commands
-		constexpr char const *folder = "FileMonitor";
-		fs::path const self; // folder directory
-		fs::path const removedPath;
-		fs::path const addedPath;
-
+		fs::path const self;
 
 		FileMonitor()
-		: self(sys::GetTemporaryPath(folder))
-		, removedPath(self/removedFilename)
-		, addedPath(self/addedFilename)
+		: self(sys::GetTemporaryPath(Folder))
 		{
 			if (self.empty())
 			{
-				SDL::perror(folder);
+				SDL::perror(Folder);
 				return;
 			}
 			added.push_back(self);
@@ -51,23 +48,23 @@ namespace
 		{
 			if (not self.empty())
 			{
-				Remove({self});
+				RemoveWatch({self});
 				future.wait();
 			}
 		}
 
-		void Add(std::vector<fs::path> const &paths)
+		void AddWatch(std::vector<fs::path> const &paths)
 		{
-			std::ostream stream(addedPath);
+			std::ofstream stream(self/AddedFilename);
 			for (fs::path const &path : paths)
 			{
 				stream << path;
 			}
 		}
 
-		void Remove(std::vector<fs::path> const &paths)
+		void RemoveWatch(std::vector<fs::path> const &paths)
 		{
-			std::ostream stream(removedPath);
+			std::ofstream stream(self/RemovedFilename);
 			for (fs::path const &path : paths)
 			{
 				stream << path;
@@ -78,7 +75,7 @@ namespace
 
 		using Callback = std::function<void(fs::path const &path)>;
 
-		void Update(Callback&& onAdd, Callback&& onRemove)
+		void UpdateWatchedFiles(Callback&& onAdd, Callback&& onRemove)
 		{
 			// Add before remove so that we can replace paths to watch
 
@@ -94,8 +91,9 @@ namespace
 				auto const lower = watched.lower_bound(path);
 				if (watched.end() == lower)
 				{
-					watched.insert(path);
-					onAdd(path);
+					auto pair = watched.insert(path);
+					assert(pair.second);
+					onAdd(*pair.first);
 				}
 			}
 
@@ -111,13 +109,13 @@ namespace
 			}
 		}
 
-		void Process(fs::path const &path)
+		void ProcessChange(fs::path const &path)
 		{
 			if (self < path) // update self
 			{
 				std::string string = path.filename();
 				// Filename selects the operation
-				if (string == addedFilename)
+				if (string == AddedFilename)
 				{
 					std::ifstream stream(path);
 					while (std::getline(stream, string))
@@ -129,7 +127,7 @@ namespace
 					}
 				}
 				else
-				if (string == removedFilename)
+				if (string == RemovedFilename)
 				{
 					std::ifstream stream(path);
 					while (std::getline(stream, string))
@@ -150,11 +148,11 @@ namespace
 			}
 			else
 			{
-				Notify(path);
+				NotifyChange(path);
 			}
 		}
 
-		void Notify(fs::path const &path)
+		void NotifyChange(fs::path const &path)
 		{
 			(void) path; // TODO
 		}
@@ -184,6 +182,7 @@ Resources &FileWatch::Manager()
 #if defined(__LINUX__)
 
 #include <sys/inotify.h>
+#include <unistd.h>
 
 void FileMonitor::Thread()
 {
@@ -199,9 +198,7 @@ void FileMonitor::Thread()
 
 	while (not done) try
 	{
-		// Update our list of watched directories
-
-		Update
+		UpdateWatchedFiles
 		(
 			[&](fs::path const &path) // on add
 			{
@@ -256,7 +253,7 @@ void FileMonitor::Thread()
 		};
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{
-			Process(fs::path(ev->name, ev->name + ev->len));
+			ProcessChange(fs::path(ev->name, ev->name + ev->len));
 		}
 	}
 	catch (std::exception const &exception)
@@ -268,7 +265,10 @@ void FileMonitor::Thread()
 #else // BSD
 #if defined(__BSD__)
 
+#warning "BSD interface is not complete"
+
 #include <sys/event.h>
+
 
 void FileWatcher::Thread()
 {
@@ -284,7 +284,7 @@ void FileWatcher::Thread()
 
 	while (not done) try
 	{
-		Update
+		UpdateWatchedFiles
 		(
 			[&](fs::path const &path) // on add
 			{
@@ -303,7 +303,19 @@ void FileWatcher::Thread()
 			,
 			[&](fs::path const &path) // on remove
 			{
+				auto it = stl::find_if(monitor, [&](struct kevent &ev))
+				{
+					union { void *address; char *string; };
+					address = ev.udata;
+					return path == string;
+				});
+				assert(monitor.end() != it);
+				if (monitor.end() != it)
+				{
+					EV_SET()
+					monitor.erase(it);
 
+				}
 			}
 		);
 
@@ -324,21 +336,16 @@ void FileWatcher::Thread()
 
 		for (int ev = 0; ev < nev; ++ev)
 		{
-			union
-			{
-				uintptr_t uiptr;
-				void *udata
-				char *str;
-			};
 			if (EV_ERROR == events[ev].flags)
 			{
-				uiptr = events[ev].data;
-				SDL::perror("EV_ERROR", str);
+				std::uintptr_t error = events[ev].data;
+				SDL::perror("EV_ERROR", std::strerror(error));
 			}
 			else
 			{
-				udata = events[ev].udata;
-				Process(str);
+				union { void *address; char *string; };
+				address = events[ev].udata;
+				ProcessChange(string);
 			}
 		}
 	}
@@ -350,6 +357,8 @@ void FileWatcher::Thread()
 
 #else // WINDOWS
 #if defined(__WINDOWS__)
+
+#warning "Win32 interface is not complete"
 
 namespace
 {

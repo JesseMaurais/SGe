@@ -19,14 +19,19 @@
 
 // C++ Containers
 
+//#include <string_view>
 #include <string>
 #include <vector>
 #include <array>
 #include <stack>
 #include <queue>
+#include <deque>
 #include <set>
 #include <map>
 #include <list>
+//#include <unordered_set>
+//#include <unordered_map>
+//#include <forward_list>
 #include <iterator>
 
 // C++ Numerics
@@ -35,6 +40,8 @@
 #include <numeric>
 #include <complex>
 #include <random>
+#include <ratio>
+#include <limits>
 
 // C++ Streams
 
@@ -43,13 +50,32 @@
 #include <sstream>
 #include <iomanip>
 
+// C++ Threads
+
+#include <thread>
+#include <mutex>
+#include <shared_mutex>
+#include <future>
+#include <condition_variable>
+#include <atomic>
+
 // C++ Utility
 
+#include <exception>
+#include <stdexcept>
+#include <system_error>
 #include <utility>
 #include <bitset>
+#include <tuple>
+#include <chrono>
 #include <functional>
+#include <initializer_list>
+#include <memory>
+//#include <memory_resource>
+//#include <scoped_allocator>
+#include <new>
 
-// RTTI
+// C++ Runtime Type Information
 
 #include <typeinfo>
 #include <typeindex>
@@ -74,17 +100,10 @@
 #define dDOUBLE
 #include <ode/ode.h>
 
-// Lua
-
-#include <lua5.3/lua.hpp>
-
 // SDL2
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
 
 // Make all asserts use the SDL assert window
 #undef assert
