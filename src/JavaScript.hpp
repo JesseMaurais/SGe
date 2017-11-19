@@ -14,15 +14,13 @@ namespace js
 		~Engine();
 	};
 
-	enum Parse
-	{
-		Global, Strict
-	};
-
 	using Snapshot = std::vector<std::uint32_t>;
 
-	bool ParseAndSaveSnapshot(std::string const &source, enum Parse opts, Snapshot &snapshot);
-	bool ExecuteSnapshot(Snapshot const &shapshot, bool copyBytecode);
+	enum Parse { None=0, Global=1, Strict=2 };
+	bool SaveSnapshot(std::string const &source, Snapshot &buffer, enum Parse opt = None);
+
+	constexpr bool CopyBytecode = true;
+	bool ExecuteSnapshot(Snapshot const &shapshot, bool copyBytecode = false);
 }
 
 #endif // file
