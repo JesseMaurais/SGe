@@ -4,13 +4,42 @@
 
 #include <jerryscript.h>
 
+
+
+bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::Parse opt)
+{
+	std::size_t size = buffer.size();
+	do
+	{
+		buffer.resize(size); // second loop is correct size
+		size = jerry_parse_and_save_snapshot
+			((jerry_char_ptr_t) source.data(), source.size(), opt & Global, opt & Strict,
+			                    buffer.data(), buffer.size());
+	}
+	while (buffer.size() < size);
+	buffer.resize(size);
+	return 0 == size;
+}
+
+bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
+{
+	jerry_value_t const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
+	bool ok = not jerry_value_has_error_flag(value);
+	jerry_release_value(value);
+	return ok;
+}
+
+
+
 namespace
 {
 	// Some utility classes to automate release of values according to RAII
 
-	struct ScopedValue
+	class ScopedValue
 	{
-		operator jerry_value_t()
+	public:
+
+		operator jerry_value_t() const
 		{
 			return value;
 		}
@@ -28,8 +57,10 @@ namespace
 		jerry_value_t value;
 	};
 
-	struct PropertyDescriptor : jerry_property_descriptor_t
+	class PropertyDescriptor : jerry_property_descriptor_t
 	{
+	public:
+
 		PropertyDescriptor()
 		{
 			jerry_init_property_descriptor_fields(this);
@@ -146,13 +177,79 @@ namespace
 		NativeInfo()
 		{
 			// Prototype the class
-			Prototype(GetPrototype());
+			Prototype(Prototype());
 			// Setup the deleter
 			free_cb = Free;
 		}
 	};
 
 	// Native object information for functions
+
+	template <typename Result, typename... Args>
+	class NativeInfo<Result(*)(Args...)> : jerry_object_native_info_t
+	{
+	public:
+
+		using Signature = Result(*)(Args...);
+
+		static jerry_value_t Handler(
+		       jerry_value_t const value,
+			   jerry_value_t const object,
+			   jerry_value_t const argv[],
+			   jerry_length_t const argc);
+
+		static NativeInfo &Instance()
+		{
+			static NativeInfo singleton;
+			return singleton;
+		}
+
+		jerry_value_t CreateObject(Signature function)
+		{
+			jerry_value_t const value = jerry_create_external_function(Handler);
+			SetObject(value, function);
+			return value;
+		}
+
+		void SetObject(jerry_value_t const obj, Signature function)
+		{
+			Convert cast;
+			cast.function = function;
+			jerry_set_object_native_pointer(obj, cast.address, this);
+		}
+
+		Signature GetObject(jerry_value_t const obj)
+		{
+			Convert cast;
+			jerry_object_native_info_t const *info;
+			if (jerry_get_object_native_pointer(obj, &cast.address, &info))
+			{
+				if (info == this)
+				{
+					return cast.function;
+				}
+			}
+			return nullptr;
+		}
+
+		bool IsObject(jerry_value_t const obj)
+		{
+			return GetObject(obj) != nullptr;
+		}
+
+	private:
+
+		union Convert
+		{
+			void *address;
+			Signature function;
+		};
+
+		NativeInfo()
+		{
+			free_cb = nullptr;
+		}
+	};
 
 	template <typename Object, typename Result, typename... Args>
 	class NativeInfo<Result(Object::*)(Args...)> : jerry_object_native_info_t
@@ -321,7 +418,7 @@ namespace
 	// C++ function call wrappers
 
 	template <typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const args[],
@@ -339,7 +436,7 @@ namespace
 	}
 
 	template <typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
@@ -357,7 +454,7 @@ namespace
 	}
 
 	template <typename Object, typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const args[],
@@ -375,7 +472,7 @@ namespace
 	}
 
 	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
@@ -392,8 +489,8 @@ namespace
 		return jerry_create_undefined();
 	}
 
-	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+	template <typename Object, typename Result, typename... Args>
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
@@ -403,8 +500,8 @@ namespace
 		return Handler(value, obj, argv, argc, method, std::index_sequence_for<Args...>{});
 	}
 
-	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler(
+	template <typename Object, typename Result, typename... Args>
+		jerry_value_t Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
@@ -414,8 +511,30 @@ namespace
 		return Handler(value, obj, argv, argc, method, std::index_sequence_for<Args...>{});
 	}
 
+	template <typename Result, typename... Args>
+		jerry_value_t NativeInfo<Result(*)(Args...)>::Handler(
+		jerry_value_t const value,
+		jerry_value_t const obj,
+		jerry_value_t const argv[],
+		jerry_length_t const argc)
+	{
+		if (sizeof...(Args) < argc)
+		{
+			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
+			return jerry_create_error(JERRY_ERROR_RANGE, error);
+		}
+		try
+		{
+			return ::Handler<Result, Args...>(value, obj, argv, argc);
+		}
+		catch (std::exception const &exception)
+		{
+			return jerry_create_error(JERRY_ERROR_COMMON, (jerry_char_ptr_t) exception.what());
+		}
+	}
+
 	template <typename Object, typename Result, typename... Args>
-	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler(
+		jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler(
 		jerry_value_t const value,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
@@ -440,54 +559,32 @@ namespace
 	
 	inline bool SetProperty(jerry_value_t const obj, Property const &prop)
 	{
-		ScopedValue value = jerry_set_property(obj, prop.name, prop.value);
-		return not jerry_value_has_error_flat(value);
+		ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
+		return not jerry_value_has_error_flag(value);
 	}
+}
 
-	template <typename Object, typename Signature> jerry_value_t Constructor(Signature function)
+
+namespace
+{
+	class SomeClass
 	{
-		jerry_value_t const proto = Prototype<Object>();
-		jerry_value_t const ctor = Create(function);
-	}
-}
+	public:
+		std::string Message(double n)
+		{
+			std::string message;
+			for (int i = 0; i < n; ++i)
+				message += "Hello! ";
+			return message;
+		}
+	};
 
-bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum Parse opt)
-{
-	std::size_t size = buffer.size();
-	do
+	template <> void NativeInfo<SomeClass*>::Prototype(jerry_value_t const proto)
 	{
-		buffer.resize(size); // second loop is correct size
-		size = jerry_parse_and_save_snapshot
-			((jerry_char_ptr_t) source.data(), source.size(), opt & Global, opt & Strict,
-			                    buffer.data(), buffer.size());
+		SetProperty(proto, Property(Create(&SomeClass::Message), "Message"));
 	}
-	while (buffer.size() < size);
-	buffer.resize(size);
-	return 0 == size;
 }
 
-bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
-{
-	ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
-	return not jerry_value_has_error_flag(value);
-}
-
-
-class SomeClass
-{
-	std::string Message(double n)
-	{
-		std::string message;
-		for (int i = 0; i < n; ++i)
-			message += "Hello! ";
-		return message;
-	}
-};
-
-void NativeInfo<SomeClass>::Prototype(jerry_value_t const proto)
-{
-	SetProperty(proto, Property("Message", &SomeClass::Message));
-}
 
 js::Engine::~Engine()
 {
@@ -498,6 +595,12 @@ js::Engine::Engine()
 	jerry_init(JERRY_INIT_EMPTY);
 
 	// need to make constructors here
+
+	ScopedValue someClass = Create([]()
+	{
+		return Create(new SomeClass);
+	});
+
 }
 
 
