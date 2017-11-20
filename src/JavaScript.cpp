@@ -5,6 +5,36 @@
 #include <jerryscript.h>
 
 
+namespace
+{
+	// Utility class to automate release of values according to RAII
+
+	class ScopedValue
+	{
+	public:
+
+		operator jerry_value_t() const
+		{
+			return value;
+		}
+
+		ScopedValue(jerry_value_t const release)
+		{
+			value = release;
+		}
+
+		~ScopedValue()
+		{
+			jerry_release_value(value);
+		}
+
+	private:
+
+		jerry_value_t value;
+	};
+}
+
+
 
 bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::Parse opt)
 {
@@ -23,41 +53,14 @@ bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::
 
 bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
 {
-	jerry_value_t const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
-	bool ok = not jerry_value_has_error_flag(value);
-	jerry_release_value(value);
-	return ok;
+	ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
+	return not jerry_value_has_error_flag(value);
 }
 
 
 
 namespace
 {
-	// Some utility classes to automate release of values according to RAII
-
-	class ScopedValue
-	{
-	public:
-
-		operator jerry_value_t() const
-		{
-			return value;
-		}
-		ScopedValue(jerry_value_t const release)
-		{
-			value = release;
-		}
-		~ScopedValue()
-		{
-			jerry_release_value(value);
-		}
-
-	private:
-
-		jerry_value_t value;
-	};
-
-
 	// Native object information utility template
 
 	template <typename Pointer> class NativeInfo : jerry_object_native_info_t
@@ -148,12 +151,6 @@ namespace
 
 		using Signature = Result(*)(Args...);
 
-		static jerry_value_t Handler(
-		       jerry_value_t const value,
-			   jerry_value_t const object,
-			   jerry_value_t const argv[],
-			   jerry_length_t const argc);
-
 		static NativeInfo &Instance()
 		{
 			static NativeInfo singleton;
@@ -205,7 +202,15 @@ namespace
 		{
 			free_cb = nullptr;
 		}
+
+		static jerry_value_t Handler(
+		       jerry_value_t const value,
+		       jerry_value_t const obj,
+		       jerry_value_t const argv[],
+		       jerry_length_t const argc);
 	};
+
+	// Native object information for class methods
 
 	template <typename Object, typename Result, typename... Args>
 	class NativeInfo<Result(Object::*)(Args...)> : jerry_object_native_info_t
@@ -214,12 +219,6 @@ namespace
 
 		using Signature = Result(Object::*)(Args...);
 
-		static jerry_value_t Handler(
-		       jerry_value_t const value,
-			   jerry_value_t const object,
-			   jerry_value_t const argv[],
-			   jerry_length_t const argc);
-
 		static NativeInfo &Instance()
 		{
 			static NativeInfo singleton;
@@ -271,9 +270,15 @@ namespace
 		{
 			free_cb = nullptr;
 		}
+
+		static jerry_value_t Handler(
+		       jerry_value_t const value,
+		       jerry_value_t const obj,
+		       jerry_value_t const argv[],
+		       jerry_length_t const argc);
 	};
 
-	// Simplified syntax of for the native object singleton
+	// Simplified syntax for the native object singleton
 	
 	template <typename Object> jerry_value_t Prototype()
 	{
@@ -350,7 +355,7 @@ namespace
 	
 	template <typename Type> Type As(jerry_value_t const value)
 	{
-		return static_cast<Type>(GetObject<Type>(value));
+		return GetObject<Type>(value);
 	}
 
 	template <> std::string As<std::string>(jerry_value_t const value)
@@ -419,7 +424,7 @@ namespace
 		return Create<Result>((object->*method)(As<Args>(argv[Index])...));
 	}
 
-	// C++ function wrappers second level (index sequence)
+	// C++ function wrappers second level (2 base cases)
 
 	template <typename Result, typename... Args>
 	jerry_value_t Handler
@@ -441,16 +446,16 @@ namespace
 		return Handler(method, object, argv, argc);
 	}
 
-	// C++ function wrappers third level (object and method)
+	// C++ function wrappers third level (get object and method)
 
 	template <typename Result, typename... Args>
 	jerry_value_t Handler
 	(
-		jerry_value_t const fun,
+		jerry_value_t const value,
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		auto method = Get<Result(*)(Args...)>(fun);
+		auto method = Get<Result(*)(Args...)>(value);
 		if (method)
 		{
 			return Handler(method, argv, argc);
@@ -461,11 +466,11 @@ namespace
 	template <typename Object, typename Result, typename... Args>
 	jerry_value_t Handler
 	(
-		jerry_value_t const fun, jerry_value_t const obj,
+		jerry_value_t const value, jerry_value_t const obj,
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		auto method = Get<Result(Object::*)(Args...)>(fun);
+		auto method = Get<Result(Object::*)(Args...)>(value);
 		auto object = Get<Object*>(obj);
 		if (method and object)
 		{
@@ -474,15 +479,13 @@ namespace
 		return jerry_create_undefined();
 	}
 
-	// C++ function wrappers third level
+	// C++ function wrappers fourth level (native info)
 
 	template <typename Result, typename... Args>
 	jerry_value_t NativeInfo<Result(*)(Args...)>::Handler
 	(
-		jerry_value_t const fun,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc
+		jerry_value_t const value, jerry_value_t const obj,
+		jerry_value_t const argv[],	jerry_length_t const argc
 	)
 	{
 		if (sizeof...(Args) < argc)
@@ -490,10 +493,10 @@ namespace
 			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
 			return jerry_create_error(JERRY_ERROR_RANGE, error);
 		}
-		try
+		try // report exceptions to jerry
 		{
 			(void) obj; // unused
-			return ::Handler<Result, Args...>(fun, argv, argc);
+			return ::Handler<Result, Args...>(value, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
@@ -504,10 +507,8 @@ namespace
 	template <typename Object, typename Result, typename... Args>
 	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler
 	(
-		jerry_value_t const fun,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc
+		jerry_value_t const value, jerry_value_t const obj,
+		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
 		if (sizeof...(Args) < argc)
@@ -515,9 +516,9 @@ namespace
 			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
 			return jerry_create_error(JERRY_ERROR_RANGE, error);
 		}
-		try
+		try // report exceptions to jerry
 		{
-			return ::Handler<Object, Result, Args...>(fun, obj, argv, argc);
+			return ::Handler<Object, Result, Args...>(value, obj, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
@@ -527,10 +528,8 @@ namespace
 
 	// More utility functions for setting properties
 	
-	class PropertyDescriptor : jerry_property_descriptor_t
+	struct PropertyDescriptor : jerry_property_descriptor_t
 	{
-	public:
-
 		PropertyDescriptor()
 		{
 			jerry_init_property_descriptor_fields(this);
@@ -550,26 +549,24 @@ namespace
 		{
 			return jerry_get_own_property_descriptor(obj, name, this);
 		}
-	};
 
-	struct PropertyName : ScopedValue
-	{
-		PropertyName(char const *name)
-		: ScopedValue(jerry_create_string((jerry_char_ptr_t) name))
-		{}
+		operator jerry_value_t() const
+		{
+			return value;
+		}
 	};
 
 	struct Property
 	{
-		PropertyName name;
+		ScopedValue name;
 		ScopedValue value;
 
-		Property(jerry_value_t const obj, const char *property_name)
-		: name(property_name)
-		, value(jerry_get_property(obj, name))
+		Property(char const *property_name, jerry_value_t const property_value)
+		: name(jerry_create_string((jerry_char_ptr_t) name))
+		, value(property_value)
 		{}
 
-		operator jerry_value_t()
+		operator jerry_value_t() const
 		{
 			return value;
 		}
@@ -579,6 +576,14 @@ namespace
 	{
 		ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
 		return not jerry_value_has_error_flag(value);
+	}
+
+	template <typename Signature>
+	jerry_value_t Constructor(Signature&& constructor)
+	{
+		jerry_value_t const value = Create(constructor);
+		assert(jerry_value_is_constructor(value));
+		return value;
 	}
 }
 
@@ -599,7 +604,7 @@ namespace
 
 	template <> void NativeInfo<SomeClass*>::Prototype(jerry_value_t const proto)
 	{
-		SetProperty(proto, Property(Create(&SomeClass::Message), "Message"));
+		SetProperty(proto, Property("Message", Create(&SomeClass::Message)));
 	}
 }
 
@@ -612,13 +617,16 @@ js::Engine::Engine()
 {
 	jerry_init(JERRY_INIT_EMPTY);
 
-	// need to make constructors here
-
-	ScopedValue someClass = Create([]()
+	Property const properties [] =
 	{
-		return Create(new SomeClass);
-	});
+		{ "SomeClass", Constructor(+[](){ return new SomeClass; }) }
+	};
 
+	ScopedValue global = jerry_get_global_object();
+	for (auto const &property : properties)
+	{
+		SetProperty(global, property);
+	}
 }
 
 
