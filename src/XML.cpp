@@ -2,7 +2,6 @@
 #include "SDL.hpp"
 #include "Strings.hpp"
 #include <stdexcept>
-#include <expat.h>
 
 XML::XML(const char *encoding)
 {

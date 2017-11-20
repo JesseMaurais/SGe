@@ -9,6 +9,7 @@
 #include <cerrno>
 #include <ciso646>
 #include <cstring>
+#include <cstdint>
 #include <cinttypes>
 #include <climits>
 #include <cfloat>
@@ -52,12 +53,12 @@
 
 // C++ Threads
 
+#include <atomic>
 #include <thread>
+#include <future>
 #include <mutex>
 #include <shared_mutex>
-#include <future>
 #include <condition_variable>
-#include <atomic>
 
 // C++ Utility
 
@@ -80,6 +81,14 @@
 #include <typeinfo>
 #include <typeindex>
 #include <type_traits>
+
+// JavaScript
+
+#include <jerryscript.h>
+
+// XML
+
+#include <expat.h>
 
 // OpenGL
 
@@ -104,6 +113,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 // Make all asserts use the SDL assert window
 #undef assert

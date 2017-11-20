@@ -4,6 +4,20 @@
 #include <sstream>
 #include <string>
 
+
+bool SDL::Init(Uint32 const flags)
+{
+	if (0 == SDL_Init(flags))
+	{
+		if (0 == std::atexit(SDL_Quit))
+		{
+			return true;
+		}
+		SDL::SetError(CannotMakeExit, "SDL_Quit");
+	}
+	return false;
+}
+
 bool SDL::perror(const char *origin, const char *error)
 {
 	SDL::Log(ColonSeparator, origin, error);

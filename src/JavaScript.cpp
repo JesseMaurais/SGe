@@ -2,39 +2,6 @@
 #include "Error.hpp"
 #include "std.hpp"
 
-#include <jerryscript.h>
-
-
-namespace
-{
-	// Utility class to automate release of values according to RAII
-
-	class ScopedValue
-	{
-	public:
-
-		operator jerry_value_t() const
-		{
-			return value;
-		}
-
-		ScopedValue(jerry_value_t const release)
-		{
-			value = release;
-		}
-
-		~ScopedValue()
-		{
-			jerry_release_value(value);
-		}
-
-	private:
-
-		jerry_value_t value;
-	};
-}
-
-
 
 bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::Parse opt)
 {
@@ -56,7 +23,6 @@ bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
 	ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
 	return not jerry_value_has_error_flag(value);
 }
-
 
 
 namespace
@@ -579,7 +545,7 @@ namespace
 	}
 
 	template <typename Signature>
-	jerry_value_t Constructor(Signature&& constructor)
+	jerry_value_t Constructor(Signature &&constructor)
 	{
 		jerry_value_t const value = Create(constructor);
 		assert(jerry_value_is_constructor(value));
@@ -609,14 +575,16 @@ namespace
 }
 
 
-js::Engine::~Engine()
+bool js::Init(jerry_init_flag_t const flags)
 {
-	jerry_cleanup();
-}
-js::Engine::Engine()
-{
-	jerry_init(JERRY_INIT_EMPTY);
+	jerry_init(flags);
+	if (0 != std::atexit(jerry_cleanup))
+	{
+		SDL::SetError(CannotMakeExit, "jerry_cleanup");
+		return false;
+	}
 
+	// Lambdas will require "+" to force decay to function pointers
 	Property const properties [] =
 	{
 		{ "SomeClass", Constructor(+[](){ return new SomeClass; }) }
@@ -627,6 +595,8 @@ js::Engine::Engine()
 	{
 		SetProperty(global, property);
 	}
+
+	return true;
 }
 
 

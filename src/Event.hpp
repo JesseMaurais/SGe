@@ -8,10 +8,10 @@ union SDL_Event;
 enum UserEventType
 {
 	EscapeEvent,
+	ExecuteCommand,
 	UpdateOpenAL,
 	UpdateOpenCL,
 	UpdateOpenGL,
-	ExecuteCommand,
 	UserEventCount,
 };
 
@@ -33,7 +33,7 @@ private:
 namespace SDL
 {
 	unsigned UserEvent(enum UserEventType type);
-	bool SendUserEvent(enum UserEventType type, unsigned code = 0);
+	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char *string = nullptr);
 	void ProcessEvents();
 }
 

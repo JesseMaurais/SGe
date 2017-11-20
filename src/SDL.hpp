@@ -9,22 +9,25 @@
 
 namespace SDL
 {
-	/// Logs the current error string like 'std::perror' does. Returns true when an error exists.
+	/// Initialize while also registering automatic cleanup
+	bool Init(Uint32 const flags);
+
+	/// Logs the current error string like std::perror does. Returns true when an error exists
 	bool perror(char const *origin);
 
 	/// Logs the given error string with origin as prefix. Always returns true.
 	bool perror(char const *origin, char const *error);
 
-	/// Message box with the current error asking how to proceed. Returns true when retry requested.
+	/// Message box with the current error. Returns true when retry requested
 	bool ShowError(SDL_MessageBoxFlags flags, SDL_Window *transientFor = nullptr);
 
-	/// Make SDL_assert activate a message box asking how to proceed.
+	/// Make SDL_assert activate a message box asking how to proceed
 	void SetAssertionHandler(SDL_Window *transientFor = nullptr);
 
-	/// Reset to the default error handler and flush all prior asserts.
+	/// Reset to the default error handler and flush all prior asserts
 	void ResetAssertionHandler();
 
-	/// Make assertion message box in scope transient for a window.
+	/// Make assertion message box in scope transient for a window
 	class ScopedAssertHandler
 	{
 	public:

@@ -1,58 +1,57 @@
-#include "Desktop.hpp"
 #include "JavaScript.hpp"
+#include "Console.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
-#include <cstdlib>
-#include <getopt.h>
 #include <iostream>
+#include <getopt.h>
 
 namespace
 {
-	enum Option
+	struct Option
 	{
-		Unknown  = '?',
-		Help     = 'h',
-		Quit     = 'q',
-		Configs  = 'f',
-		Media    = 'm',
-		End      = '\0'
+		enum
+		{
+			Console  = 'c',
+			ByteCode = 'b',
+			Video    = 'v',
+			Help     = 'h',
+			Quit     = 'q',
+			Unknown  = '?',
+			End      = '\0'
+		} param;
+		char *value;
 	};
 
-	struct CommandLineOption
-	{
-		int opt;
-		char const *arg;
-	};
-
-	CommandLineOption ParseCommandLine(int argc, char **argv)
+	Option ParseCommandLine(int argc, char **argv)
 	{
 		const struct option options[] =
 		{
-		{ "help"    , no_argument       , nullptr , Option::Help    },
-		{ "configs" , required_argument , nullptr , Option::Configs },
-		{ "media"   , optional_argument , nullptr , Option::Media   },
-		{ "quit"    , no_argument       , nullptr , Option::Quit    },
-		{ nullptr   , 0                 , nullptr , Option::End     }
+		{ "console"  , optional_argument , nullptr , Option::Console  },
+		{ "bytecode" , no_argument       , nullptr , Option::ByteCode },
+		{ "video"    , optional_argument , nullptr , Option::Video    },
+		{ "help"     , no_argument       , nullptr , Option::Help     },
+		{ "quit"     , no_argument       , nullptr , Option::Quit     },
+		{ nullptr    , 0                 , nullptr , Option::End      }
 		};
 
-		CommandLineOption cmd;
-		int index, opt = getopt_long_only(argc, argv, "", options, &index);
-		switch (opt)
+		Option arg;
+		int index;
+		switch (getopt_long_only(argc, argv, "", options, &index))
 		{
 		case -1:
-			cmd.opt = Option::End;
-			cmd.arg = nullptr;
+			arg.param = Option::End;
+			arg.value = nullptr;
 			break;
 		case '?':
-			cmd.opt = Option::Unknown;
-			cmd.arg = argv[index];
+			arg.param = Option::Unknown;
+			arg.value = argv[index];
 			break;
 		default:
-			cmd.opt = opt;
-			cmd.arg = optarg;
+			arg.param = opt;
+			arg.value = optarg;
 		}
-		return cmd;
+		return arg;
 	}
 
 	void PrintCommandLineOptions()
@@ -67,34 +66,63 @@ int main(int argc, char **argv)
 	{
 		if (argc > 1)
 		{
-			CommandLineOption cmd;
+			jerry_init_flags_t jerry = JERRY_INIT_EMPTY;
+			Uint32 media = SDL_INIT_EVENTS;
+			char const *video = nullptr;
+			char const *prompt = nullptr;
+
 			do
 			{
-				cmd = ParseCommandLine(argc, argv);
-				switch (cmd.opt)
+				auto arg = ParseCommandLine(argc, argv);
+				switch (arg.param)
 				{
+				case Option::Console:
+					prompt = arg.value ? arg.value : "> ";
+					break;
+
+				case Option::ByteCode:
+					jerry |= JERRY_INIT_SHOW_OPCODES;
+					break;
+
+				case Option::Video:
+					media |= SDL_INIT_VIDEO;
+					video = arg.value;
+					break;
+
+				case Option::Quit:
+					SDL::SendUserEvent(EscapeEvent);
+					break;
+
+				case Option::Unkown:
+					SDL::Log(InvalidArgument, arg.value);
+					// no break
+	
 				case Option::Help:
 					PrintCommandLineOptions();
 					return EXIT_SUCCESS;
 				}
 			}
-			while (Option::End != cmd.opt);
+			while (Option::End != arg.opt);
 		}
 
-		if (SDL_Init(SDL_INIT_EVERYTHING))
+		if (not js::Init(jerry))
 		{
-			SDL::perror("SDL_Init");
-			return EXIT_FAILURE;
+			SDL::perror("js::Init");
+			reeturn EXIT_FAILURE;
 		}
-		else
-		if (std::atexit(SDL_Quit))
+
+		if (not SDL::Init(media))
 		{
-			SDL::Log(CannotMakeExit, "SDL_Quit");
+			SDL::perror("SDL::Init");
 			return EXIT_FAILURE;
 		}
 
+		if (video and SDL_VideoInit(video))
+		{
+			SDL::perror(video);
+			return EXIT_FAILURE;
+		}
 	}
-	js::Engine engine;
 	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }

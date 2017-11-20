@@ -1,8 +1,9 @@
 #ifndef XML_hpp
 #define XML_hpp
 
+#include <expat.h>
+
 struct SDL_RWops;
-struct XML_ParserStruct;
 
 struct XML
 {
@@ -19,7 +20,7 @@ struct XML
 
   private:
 
-	XML_ParserStruct *parser;
+	XML_Parser parser;
 };
 
 #endif // file
