@@ -57,50 +57,6 @@ namespace
 		jerry_value_t value;
 	};
 
-	class PropertyDescriptor : jerry_property_descriptor_t
-	{
-	public:
-
-		PropertyDescriptor()
-		{
-			jerry_init_property_descriptor_fields(this);
-		}
-		~PropertyDescriptor()
-		{
-			jerry_free_property_descriptor_fields(this);
-		}
-		jerry_value_t DefineOwn(jerry_value_t const obj, jerry_value_t const name)
-		{
-			return jerry_define_own_property(obj, name, this);
-		}
-		jerry_value_t GetOwn(jerry_value_t const obj, jerry_value_t const name)
-		{
-			return jerry_get_own_property_descriptor(obj, name, this);
-		}
-	};
-
-	struct PropertyName : ScopedValue
-	{
-		PropertyName(char const *name)
-		: ScopedValue(jerry_create_string((jerry_char_ptr_t) name))
-		{}
-	};
-
-	struct Property
-	{
-		PropertyName name;
-		ScopedValue value;
-
-		Property(jerry_value_t const obj, const char *property_name)
-		: name(property_name)
-		, value(jerry_get_property(obj, name))
-		{}
-
-		operator jerry_value_t()
-		{
-			return value;
-		}
-	};
 
 	// Native object information utility template
 
@@ -415,108 +371,119 @@ namespace
 		return Get<double>(converted);
 	}
 
-	// C++ function call wrappers
+	// C++ function call wrappers first level (4 base cases)
 
 	template <typename... Args, std::size_t... Index>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const args[],
-		jerry_length_t const argc,
+	jerry_value_t Handler
+	(
 		void(*method)(Args...),
-		std::index_sequence<Index...>)
+		jerry_value_t const args[], jerry_length_t const argc,
+		std::index_sequence<Index...>
+	)
 	{
-		(void) value;
-		(void) obj;
-		if (argc < sizeof...(Args))
-		{
-			method(As<Args>(args[Index])...);
-		}
+		method(As<Args>(args[Index])...);
 		return jerry_create_undefined();
 	}
 
 	template <typename Result, typename... Args, std::size_t... Index>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc,
+	jerry_value_t Handler
+	(
 		Result(*method)(Args...),
-		std::index_sequence<Index...>)
+		jerry_value_t const argv[], jerry_length_t const argc,
+		std::index_sequence<Index...>
+	)
 	{
-		(void) value;
-		(void) obj;
-		if (argc < sizeof...(Args))
-		{
-			return Create<Result>(method(As<Args>(argv[Index])...));
-		}
-		return jerry_create_undefined();
+		return Create<Result>(method(As<Args>(argv[Index])...));
 	}
 
 	template <typename Object, typename... Args, std::size_t... Index>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const args[],
-		jerry_length_t const argc,
-		void(Object::*method)(Args...),
-		std::index_sequence<Index...>)
+	jerry_value_t Handler
+	(
+		void(Object::*method)(Args...), Object *object,
+		jerry_value_t const args[], jerry_length_t const argc,
+		std::index_sequence<Index...>
+	)
 	{
-		(void) value;
-		auto object = Get<Object*>(obj);
-		if (object and argc < sizeof...(Args))
-		{
-			(object->*method)(As<Args>(args[Index])...);
-		}
+		(object->*method)(As<Args>(args[Index])...);
 		return jerry_create_undefined();
 	}
 
 	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc,
-		Result(Object::*method)(Args...),
-		std::index_sequence<Index...>)
+	jerry_value_t Handler
+	(
+		Result(Object::*method)(Args...), Object *object,
+		jerry_value_t const argv[], jerry_length_t const argc,
+		std::index_sequence<Index...>
+	)
 	{
-		(void) value;
-		auto object = Get<Object*>(obj);
-		if (object and argc < sizeof...(Args))
+		return Create<Result>((object->*method)(As<Args>(argv[Index])...));
+	}
+
+	// C++ function wrappers second level (index sequence)
+
+	template <typename Result, typename... Args>
+	jerry_value_t Handler
+	(
+		Result(*method)(Args...),
+		jerry_value_t const argv[], jerry_length_t const argc
+	)
+	{
+		return Handler(method, argv, argc);
+	}
+
+	template <typename Object, typename Result, typename... Args>
+	jerry_value_t Handler
+	(
+		Result(Object::*method)(Args...), Object *object,
+		jerry_value_t const argv[], jerry_length_t const argc
+	)
+	{
+		return Handler(method, object, argv, argc);
+	}
+
+	// C++ function wrappers third level (object and method)
+
+	template <typename Result, typename... Args>
+	jerry_value_t Handler
+	(
+		jerry_value_t const fun,
+		jerry_value_t const argv[], jerry_length_t const argc
+	)
+	{
+		auto method = Get<Result(*)(Args...)>(fun);
+		if (method)
 		{
-			return Create<Result>((object->*method)(As<Args>(argv[Index])...));
+			return Handler(method, argv, argc);
 		}
 		return jerry_create_undefined();
 	}
 
 	template <typename Object, typename Result, typename... Args>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc,
-		Result(Object::*method)(Args...))
+	jerry_value_t Handler
+	(
+		jerry_value_t const fun, jerry_value_t const obj,
+		jerry_value_t const argv[], jerry_length_t const argc
+	)
 	{
-		return Handler(value, obj, argv, argc, method, std::index_sequence_for<Args...>{});
+		auto method = Get<Result(Object::*)(Args...)>(fun);
+		auto object = Get<Object*>(obj);
+		if (method and object)
+		{
+			return Handler(method, object, argv, argc);
+		}
+		return jerry_create_undefined();
 	}
 
-	template <typename Object, typename Result, typename... Args>
-		jerry_value_t Handler(
-		jerry_value_t const value,
-		jerry_value_t const obj,
-		jerry_value_t const argv[],
-		jerry_length_t const argc)
-	{
-		auto method = Get<Result(Object::*)(Args...)>(value);
-		return Handler(value, obj, argv, argc, method, std::index_sequence_for<Args...>{});
-	}
+	// C++ function wrappers third level
 
 	template <typename Result, typename... Args>
-		jerry_value_t NativeInfo<Result(*)(Args...)>::Handler(
-		jerry_value_t const value,
+	jerry_value_t NativeInfo<Result(*)(Args...)>::Handler
+	(
+		jerry_value_t const fun,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
-		jerry_length_t const argc)
+		jerry_length_t const argc
+	)
 	{
 		if (sizeof...(Args) < argc)
 		{
@@ -525,7 +492,8 @@ namespace
 		}
 		try
 		{
-			return ::Handler<Result, Args...>(value, obj, argv, argc);
+			(void) obj; // unused
+			return ::Handler<Result, Args...>(fun, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
@@ -534,11 +502,13 @@ namespace
 	}
 
 	template <typename Object, typename Result, typename... Args>
-		jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler(
-		jerry_value_t const value,
+	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler
+	(
+		jerry_value_t const fun,
 		jerry_value_t const obj,
 		jerry_value_t const argv[],
-		jerry_length_t const argc)
+		jerry_length_t const argc
+	)
 	{
 		if (sizeof...(Args) < argc)
 		{
@@ -547,7 +517,7 @@ namespace
 		}
 		try
 		{
-			return ::Handler<Object, Result, Args...>(value, obj, argv, argc);
+			return ::Handler<Object, Result, Args...>(fun, obj, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
@@ -557,6 +527,54 @@ namespace
 
 	// More utility functions for setting properties
 	
+	class PropertyDescriptor : jerry_property_descriptor_t
+	{
+	public:
+
+		PropertyDescriptor()
+		{
+			jerry_init_property_descriptor_fields(this);
+		}
+
+		~PropertyDescriptor()
+		{
+			jerry_free_property_descriptor_fields(this);
+		}
+
+		jerry_value_t DefineOwn(jerry_value_t const obj, jerry_value_t const name)
+		{
+			return jerry_define_own_property(obj, name, this);
+		}
+
+		jerry_value_t GetOwn(jerry_value_t const obj, jerry_value_t const name)
+		{
+			return jerry_get_own_property_descriptor(obj, name, this);
+		}
+	};
+
+	struct PropertyName : ScopedValue
+	{
+		PropertyName(char const *name)
+		: ScopedValue(jerry_create_string((jerry_char_ptr_t) name))
+		{}
+	};
+
+	struct Property
+	{
+		PropertyName name;
+		ScopedValue value;
+
+		Property(jerry_value_t const obj, const char *property_name)
+		: name(property_name)
+		, value(jerry_get_property(obj, name))
+		{}
+
+		operator jerry_value_t()
+		{
+			return value;
+		}
+	};
+
 	inline bool SetProperty(jerry_value_t const obj, Property const &prop)
 	{
 		ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
