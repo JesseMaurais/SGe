@@ -8,7 +8,12 @@
 
 namespace js
 {
+	/// Initialize the JavaScript engine
 	bool Init(jerry_init_flag_t const flags);
+	/// Set the SDL error string to the given error code. Always returns true
+	bool SetError(const char *origin, jerry_value_t const value);
+	/// Set the SDL error string to the current error code. Returns true when an error exists
+	bool CheckError(const char *origin, jerry_value_t const value);
 
 	using Snapshot = std::vector<std::uint32_t>;
 
@@ -41,40 +46,6 @@ namespace js
 	private:
 
 		jerry_value_t value;
-	};
-
-	template <typename Context> class ContextManager : jerry_context_data_manager_t
-	{
-		static ContextManager &Instance()
-		{
-			static ContextManager singleton;
-			return singleton;
-		}
-
-		operator Context*()
-		{
-			return static_cast<Context*>(jerry_get_context_data(this));
-		}
-
-	private:
-
-		ContextManager()
-		{
-			init_cb = Construct;
-			deinit_cb = Destruct;
-		}
-
-		static void Construct(void *data)
-		{
-			new (data) Context;
-		}
-
-		static void Destruct(void *data)
-		{
-			union { void *address; Context *object; };
-			address = data;
-			object->~Context();
-		}
 	};
 }
 

@@ -1,8 +1,9 @@
 #include "JavaScript.hpp"
-#include "Console.hpp"
+#include "Command.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
+
 #include <iostream>
 #include <getopt.h>
 
@@ -19,11 +20,12 @@ namespace
 			Quit     = 'q',
 			Unknown  = '?',
 			End      = '\0'
-		} param;
-		char *value;
+
+		} param = Unknown;
+		char *value = nullptr;
 	};
 
-	Option ParseCommandLine(int argc, char **argv)
+	Option NextOption(int argc, char **argv)
 	{
 		const struct option options[] =
 		{
@@ -37,7 +39,7 @@ namespace
 
 		Option arg;
 		int index;
-		switch (getopt_long_only(argc, argv, "", options, &index))
+		switch (getopt_long(argc, argv, "", options, &index))
 		{
 		case -1:
 			arg.param = Option::End;
@@ -54,7 +56,7 @@ namespace
 		return arg;
 	}
 
-	void PrintCommandLineOptions()
+	void PrintHelp()
 	{
 		std::cout << "I should get around to this" << std::endl;
 	}
@@ -73,11 +75,11 @@ int main(int argc, char **argv)
 
 			do
 			{
-				auto arg = ParseCommandLine(argc, argv);
+				auto arg = NextOption(argc, argv);
 				switch (arg.param)
 				{
 				case Option::Console:
-					prompt = arg.value ? arg.value : "> ";
+					prompt = arg.value ? arg.value : String(CommandPrompt);
 					break;
 
 				case Option::ByteCode:
@@ -98,11 +100,11 @@ int main(int argc, char **argv)
 					// no break
 	
 				case Option::Help:
-					PrintCommandLineOptions();
+					PrintHelpt();
 					return EXIT_SUCCESS;
 				}
 			}
-			while (Option::End != arg.opt);
+			while (Option::End != arg.param);
 		}
 
 		if (not js::Init(jerry))
@@ -120,6 +122,12 @@ int main(int argc, char **argv)
 		if (video and SDL_VideoInit(video))
 		{
 			SDL::perror(video);
+			return EXIT_FAILURE;
+		}
+
+		if (InitCommand(prompt))
+		{
+			SDL::perror("InitCommand");
 			return EXIT_FAILURE;
 		}
 	}

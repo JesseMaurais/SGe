@@ -5,7 +5,7 @@ STDFLAGS = -std=c++17 -D_POSIX_C_SOURCE -I/usr/include/lua5.3 -I/usr/include/fre
 DBGFLAGS = -Wall -Wextra -Winvalid-pch -g
 DFLAGS = -MMD -MP
 CFLAGS = $(DBGFLAGS) $(STDFLAGS) 
-LIB = -ldl -lpthread -lstdc++fs -lreadline -lX11 -lSDL2 -lSDL2_image -lGL -lGLU -lGLEW -lOpenCL -lopenal -lode -lfreetype -lexpat -ljerry-core -ljerry-ext -ljerry-port-default
+LIB = -ldl -lpthread -lstdc++fs -lX11 -lSDL2 -lSDL2_image -lGL -lGLU -lGLEW -lOpenCL -lopenal -lode -lfreetype -lexpat -ljerry-core -ljerry-ext -ljerry-port-default
 ALL = Bezier.o BSP.o Crayon.o Desktop.o Event.o Files.o FreeType.o Hedron.o Height.o JavaScript.o main.o Matrix.o Mesh.o Model.o Nurbs.o OpenAL.o OpenCL.o OpenGL.o Plane.o Quaternion.o SDL.o Shader.o Source.o Strings.o Stroke.o Surface.o Tessel.o Tree.o Vector.o XML.o
 OBJDIR = obj/
 SRCDIR = src/

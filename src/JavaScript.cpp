@@ -553,6 +553,20 @@ namespace
 	}
 }
 
+bool js::SetError(const char *origin, jerry_value_t const value)
+{
+	return SDL::SetError(ColonSeparator, origin, As<sd::string>(value));
+}
+
+bool js::CheckError(const char *origin, jerry_value_t const value)
+{
+	if (jerry_value_has_error_flag(value))
+	{
+		return js::SetError(origin, value);
+	}
+	return false;
+}
+
 
 namespace
 {

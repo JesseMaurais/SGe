@@ -13,6 +13,7 @@ char const *String(enum Strings id)
 	case Strings::None: return "";
 	case Strings::Application: return "SGe";
 	case Strings::ColonSeparator: return "%1: %2";
+	case Strings::CommandPrompt: return "> ";
 	case Strings::NoError: return "Error reported without information";
 	case Strings::UnknownError: return "Unknown error";
 	case Strings::OutOfMemory: return "Out of memory";

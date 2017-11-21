@@ -6,6 +6,7 @@ enum Strings
 	 None
 	,Application
 	,ColonSeparator
+	,CommandPrompt
 	,NoError
 	,UnknownError
 	,OutOfMemory
