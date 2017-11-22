@@ -1,5 +1,5 @@
 #include "JavaScript.hpp"
-#include "Command.hpp"
+#include "Stream.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "std.hpp"
@@ -573,9 +573,9 @@ namespace
 		return value;
 	}
 
-	void Execute(SDL_Event const &event)
+	void Evaluate(SDL_Event const &event)
 	{
-		bool const strict = 0 != event.user.code;
+		bool const strict = false != event.user.code;
 		auto const begin = (jerry_char_ptr_t) event.user.data1;
 		auto const end = (jerry_char_ptr_t) event.user.data2;
 
@@ -585,7 +585,7 @@ namespace
 			SDL::perror("jerry_parse");
 		}
 
-		SignalReady();
+		SignalStream();
 
 		js::ScopedValue const result = jerry_run(function);
 		if (js::CheckError(result))
@@ -638,7 +638,7 @@ bool js::Init(jerry_init_flag_t const flags)
 	}
 
 	static ScopedEventHandler
-		handler(SDL::UserEvent(EvaluateScript), Execute);
+		handler(SDL::UserEvent(EvaluateScript), Evaluate);
 
 	return true;
 }

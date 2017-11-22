@@ -1,8 +1,9 @@
 #include "JavaScript.hpp"
-#include "Command.hpp"
+#include "Stream.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
+#include "std.hpp"
 #include <cstdio>
 #include <cerrno>
 #include <cstring>
@@ -14,16 +15,16 @@ namespace
 	{
 		enum
 		{
-			InputFile = 'f',
-			Buffer    = 'z',
-			Strict    = 's',
-			ByteCode  = 'b',
-			Video     = 'v',
-			Help      = 'h',
-			Quit      = 'q',
-			Unknown   = '?',
-			Begin     = '*',
-			End       = '\0'
+			Path      = '*', // Path to this program
+			InputFile = 'f', // Name of a file to use for input stream
+			Buffer    = 'S', // Size of the buffer used for input stream
+			Strict    = 's', // Be strict with script
+			ByteCode  = 'b', // Dump script bytecode to output stream
+			Video     = 'v', // Enable video with optional named back-end
+			Help      = 'h', // Print command line help
+			Quit      = 'q', // Quit immediately after setup
+			Unknown   = '?', // Unknown command line option
+			End       = '\0' // End of command line options
 
 		} param = Unknown;
 		char *value = nullptr;
@@ -43,33 +44,32 @@ namespace
 
 	Option NextOption(int argc, char **argv)
 	{
-		Option arg;
-		opterr = false;
-		int opt = getopt_long_only(argc, argv, "+", options, nullptr);
-		switch (opt)
+		Option opt;
+		int arg = getopt_long_only(argc, argv, "+", options, nullptr);
+		switch (arg)
 		{
 		case -1:
-			arg.param = Option::End;
-			arg.value = nullptr;
+			opt.param = Option::End;
+			opt.value = nullptr;
 			break;
 		case '?':
-			arg.param = optind ? Option::Begin : Option::Unknown;
-			arg.value = argv[optind];
+			opt.param = 0 == optind ? Option::Name : Option::Unknown;
+			opt.value = argv[optind];
 			break;
 		default:
-			arg.param = decltype(arg.param)(opt);
-			arg.value = optarg;
+			opt.param = decltype(arg.param)(arg);
+			opt.value = optarg;
 		}
-		return arg;
+		return opt;
 	}
 
 	void PrintCommandLineOptions()
 	{
-		auto const argument = "ARG";
+		constexpr auto arg = "ARG";
 
-		for (struct option const &option : options)
+		for (struct option const &opt : options)
 		{
-			if (not option.name)
+			if (not opt.name)
 			{
 				return; // list is null terminated
 			}
@@ -77,28 +77,28 @@ namespace
 			// Give option name and indicate argument style
 
 			std::string style;
-			switch (option.has_arg)
+			switch (opt.has_arg)
 			{
 			case no_argument:
-				stl::sprintf(style, "-%1 or --%2", (char) option.val, option.name);
+				stl::sprintf(style, "-%1 or --%2", (char) opt.val, opt.name);
 				break;
 
 			case optional_argument:
-				stl::sprintf(style, "-%1 [%3] or --%2[=%3]", (char) option.val, option.name, argument);
+				stl::sprintf(style, "-%1 [%3] or --%2[=%3]", (char) opt.val, opt.name, arg);
 				break;
 
 			case required_argument:
-				stl::sprintf(style, "-%1 %3 or --%2=%3", (char) option.val, option.name, argument);
+				stl::sprintf(style, "-%1 %3 or --%2=%3", (char) opt.val, opt.name, arg);
 				break;
 			}
 
 			// Give explanation of option
 
 			std::string line;
-			switch (option.val)
+			switch (opt.val)
 			{
 			case Option::InputFile:
-				line = "Read stream from file instead of standard input";
+				line = "Stream from file instead of standard input";
 				break;
 
 			case Option::Buffer:
@@ -106,11 +106,11 @@ namespace
 				break;
 
 			case Option::Strict:
-				line = "Be strict when parsing script";
+				line = "Be strict with script";
 				break;
 
 			case Option::Video:
-				line = "Name the video driver back-end to use";
+				line = "Enable video with optional named back-end";
 				break;
 
 			case Option::Help:
@@ -118,7 +118,7 @@ namespace
 				break;
 
 			case Option::Quit:
-				line = "Send the quit message immediately";
+				line = "Quit immediately after startup";
 				break;
 
 			default: // option not documented
@@ -150,8 +150,8 @@ int main(int argc, char **argv)
 		bool done = argc < 2;
 		while (not done)
 		{
-			auto arg = NextOption(argc, argv);
-			switch (arg.param)
+			auto opt = NextOption(argc, argv);
+			switch (opt.param)
 			{
 			case Option::Begin:
 				// program name
@@ -162,11 +162,11 @@ int main(int argc, char **argv)
 				continue;
 
 			case Option::InputFile:
-				input = arg.value;
+				input = opt.value;
 				continue;
 
 			case Option::Buffer:
-				buffer = std::stoi(arg.value);
+				buffer = std::stoi(opt.value);
 				continue;
 
 			case Option::Strict:
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
 
 			case Option::Video:
 				media |= SDL_INIT_VIDEO;
-				video = arg.value;
+				video = opt.value;
 				continue;
 
 			case Option::Quit:
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 				continue;
 
 			case Option::Unknown:
-				SDL::Log(InvalidArgument, arg.value);
+				SDL::Log(InvalidArgument, opt.value);
 				// no break
 
 			case Option::Help:
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 
 		if (not js::Init(jerry))
 		{
-			SDL::perror("js::Init");
+			SDL::perror("Init Engine");
 			return EXIT_FAILURE;
 		}
 
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
 
 		if (not SDL::Init(media))
 		{
-			SDL::perror("SDL::Init");
+			SDL::perror("Init Media");
 			return EXIT_FAILURE;
 		}
 
@@ -234,11 +234,11 @@ int main(int argc, char **argv)
 			}
 		}
 
-		// Initialize the standard input stream handler
+		// Initialize the input stream thread
 
-		if (InitCommand(file, buffer, strict))
+		if (InitStream(file, buffer, strict))
 		{
-			SDL::perror("InitCommand");
+			SDL::perror("Init Stream");
 			return EXIT_FAILURE;
 		}
 	}
