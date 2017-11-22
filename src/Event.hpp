@@ -32,9 +32,9 @@ private:
 
 namespace SDL
 {
-	unsigned UserEvent(enum UserEventType type);
-	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char *string = nullptr);
 	void ProcessEvents();
+	unsigned UserEvent(enum UserEventType type);
+	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char *begin = nullptr, char *end = nullptr);
 }
 
 #endif // file

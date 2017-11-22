@@ -1,7 +1,7 @@
 #ifndef Command_hpp
 #define Command_hpp
 
-bool InitCommand(char const *prompt);
+bool InitCommand(bool strict);
 void SignalReady();
 
 #endif // file

@@ -1,6 +1,7 @@
 /**\file
  * Desktop agnostic utility functions for XDG compliant systems.
  */
+
 #ifndef Desktop_hpp
 #define Desktop_hpp
 

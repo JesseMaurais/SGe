@@ -1,7 +1,30 @@
 #include "JavaScript.hpp"
+#include "Command.hpp"
 #include "Error.hpp"
+#include "Event.hpp"
 #include "std.hpp"
 
+
+namespace
+{
+	std::string GetString(jerry_value_t const value)
+	{
+		std::string string(jerry_get_string_size(value), '\0');
+		jerry_string_to_char_buffer(value, (jerry_char_ptr_t) string.data(), string.size());
+		return string;
+	}
+}
+
+
+bool js::SetError(jerry_value_t const value)
+{
+	return SDL::SetError(GetString(value));
+}
+
+bool js::CheckError(jerry_value_t const value)
+{
+	return jerry_value_has_error_flag(value) and js::SetError(value);
+}
 
 bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::Parse opt)
 {
@@ -20,8 +43,8 @@ bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::
 
 bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
 {
-	ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
-	return not jerry_value_has_error_flag(value);
+	js::ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
+	return js::CheckError(value) or not SDL::perror("jerry_exec_snapshot");
 }
 
 
@@ -35,7 +58,7 @@ namespace
 
 		static jerry_value_t Prototype()
 		{
-			static jerry_value_t const value = jerry_create_object();
+			static js::ScopedValue const value = jerry_create_object();
 			return value;
 		}
 
@@ -302,9 +325,7 @@ namespace
 
 	template <> std::string Get<std::string>(jerry_value_t const value)
 	{
-		std::string string(jerry_get_string_size(value), '\0');
-		jerry_string_to_char_buffer(value, (jerry_char_ptr_t) string.data(), string.size());
-		return string;
+		return GetString(value);
 	}
 
 	template <> bool Get<bool>(jerry_value_t const value)
@@ -326,19 +347,19 @@ namespace
 
 	template <> std::string As<std::string>(jerry_value_t const value)
 	{
-		ScopedValue converted = jerry_value_to_string(value);
+		js::ScopedValue converted = jerry_value_to_string(value);
 		return Get<std::string>(converted);
 	}
 
 	template <> bool As<bool>(jerry_value_t const value)
 	{
-		ScopedValue converted = jerry_value_to_string(value);
+		js::ScopedValue converted = jerry_value_to_string(value);
 		return Get<bool>(converted);
 	}
 
 	template <> double As<double>(jerry_value_t const value)
 	{
-		ScopedValue converted = jerry_value_to_number(value);
+		js::ScopedValue converted = jerry_value_to_number(value);
 		return Get<double>(converted);
 	}
 
@@ -524,11 +545,11 @@ namespace
 
 	struct Property
 	{
-		ScopedValue name;
-		ScopedValue value;
+		js::ScopedValue name;
+		js::ScopedValue value;
 
 		Property(char const *property_name, jerry_value_t const property_value)
-		: name(jerry_create_string((jerry_char_ptr_t) name))
+		: name(jerry_create_string((jerry_char_ptr_t) property_name))
 		, value(property_value)
 		{}
 
@@ -538,10 +559,10 @@ namespace
 		}
 	};
 
-	inline bool SetProperty(jerry_value_t const obj, Property const &prop)
+	bool SetProperty(jerry_value_t const obj, Property const &prop)
 	{
-		ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
-		return not jerry_value_has_error_flag(value);
+		js::ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
+		return js::CheckError(value);
 	}
 
 	template <typename Signature>
@@ -551,20 +572,27 @@ namespace
 		assert(jerry_value_is_constructor(value));
 		return value;
 	}
-}
 
-bool js::SetError(const char *origin, jerry_value_t const value)
-{
-	return SDL::SetError(ColonSeparator, origin, As<sd::string>(value));
-}
-
-bool js::CheckError(const char *origin, jerry_value_t const value)
-{
-	if (jerry_value_has_error_flag(value))
+	void Execute(SDL_Event const &event)
 	{
-		return js::SetError(origin, value);
+		bool const strict = 0 != event.user.code;
+		auto const begin = (jerry_char_ptr_t) event.user.data1;
+		auto const end = (jerry_char_ptr_t) event.user.data2;
+
+		js::ScopedValue const function = jerry_parse(begin, end-begin, strict);
+		if (js::CheckError(function))
+		{
+			SDL::perror("jerry_parse");
+		}
+
+		SignalReady();
+
+		js::ScopedValue const result = jerry_run(function);
+		if (js::CheckError(result))
+		{
+			SDL::perror("jerry_run");
+		}
 	}
-	return false;
 }
 
 
@@ -592,23 +620,25 @@ namespace
 bool js::Init(jerry_init_flag_t const flags)
 {
 	jerry_init(flags);
-	if (0 != std::atexit(jerry_cleanup))
+	if (std::atexit(jerry_cleanup))
 	{
 		SDL::SetError(CannotMakeExit, "jerry_cleanup");
 		return false;
 	}
 
-	// Lambdas will require "+" to force decay to function pointers
 	Property const properties [] =
 	{
 		{ "SomeClass", Constructor(+[](){ return new SomeClass; }) }
 	};
 
-	ScopedValue global = jerry_get_global_object();
+	ScopedValue const global = jerry_get_global_object();
 	for (auto const &property : properties)
 	{
 		SetProperty(global, property);
 	}
+
+	static ScopedEventHandler
+		handler(SDL::UserEvent(ExecuteCommand), Execute);
 
 	return true;
 }

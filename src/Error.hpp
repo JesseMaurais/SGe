@@ -14,7 +14,7 @@ namespace SDL
 	}
 
 	/// Overload of SDL::perror that takes Strings enum
-	inline	bool perror(enum Strings prefix)
+	inline bool perror(enum Strings prefix)
 	{
 		return perror(String(prefix));
 	}

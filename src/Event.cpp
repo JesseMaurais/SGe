@@ -14,12 +14,13 @@ unsigned SDL::UserEvent(enum UserEventType type)
 	return static_cast<unsigned>(type) + base;
 }
 
-bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *string)
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *begin, char *end)
 {
 	SDL_Event event;
 	event.user.type = SDL::UserEvent(type);
 	event.user.code = code;
-	event.user.data1 = string;
+	event.user.data1 = begin;
+	event.user.data2 = end;
 	return 0 == SDL_PushEvent(&event);
 }
 

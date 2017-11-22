@@ -13,7 +13,7 @@ namespace
 	{
 		enum
 		{
-			Console  = 'c',
+			Strict   = 's',
 			ByteCode = 'b',
 			Video    = 'v',
 			Help     = 'h',
@@ -29,7 +29,7 @@ namespace
 	{
 		const struct option options[] =
 		{
-		{ "console"  , optional_argument , nullptr , Option::Console  },
+		{ "strict "  , no_argument       , nullptr , Option::Strict   },
 		{ "bytecode" , no_argument       , nullptr , Option::ByteCode },
 		{ "video"    , optional_argument , nullptr , Option::Video    },
 		{ "help"     , no_argument       , nullptr , Option::Help     },
@@ -38,8 +38,8 @@ namespace
 		};
 
 		Option arg;
-		int index;
-		switch (getopt_long(argc, argv, "", options, &index))
+		int index, opt = getopt_long(argc, argv, "", options, &index);
+		switch (opt)
 		{
 		case -1:
 			arg.param = Option::End;
@@ -50,7 +50,7 @@ namespace
 			arg.value = argv[index];
 			break;
 		default:
-			arg.param = opt;
+			arg.param = decltype(arg.param)(opt);
 			arg.value = optarg;
 		}
 		return arg;
@@ -66,51 +66,52 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		if (argc > 1)
+		jerry_init_flag_t jerry = JERRY_INIT_EMPTY;
+		unsigned media = SDL_INIT_EVENTS;
+		char *video = nullptr;
+		bool strict = false;
+
+		bool done = argc > 1;
+		while (not done)
 		{
-			jerry_init_flags_t jerry = JERRY_INIT_EMPTY;
-			Uint32 media = SDL_INIT_EVENTS;
-			char const *video = nullptr;
-			char const *prompt = nullptr;
-
-			do
+			auto arg = NextOption(argc, argv);
+			switch (arg.param)
 			{
-				auto arg = NextOption(argc, argv);
-				switch (arg.param)
-				{
-				case Option::Console:
-					prompt = arg.value ? arg.value : String(CommandPrompt);
-					break;
+			case Option::End:
+				done = true;
+				break;
 
-				case Option::ByteCode:
-					jerry |= JERRY_INIT_SHOW_OPCODES;
-					break;
+			case Option::Strict:
+				strict = true;
+				break;
 
-				case Option::Video:
-					media |= SDL_INIT_VIDEO;
-					video = arg.value;
-					break;
+			case Option::ByteCode:
+				jerry = JERRY_INIT_SHOW_OPCODES;
+				break;
 
-				case Option::Quit:
-					SDL::SendUserEvent(EscapeEvent);
-					break;
+			case Option::Video:
+				media |= SDL_INIT_VIDEO;
+				video = arg.value;
+				break;
 
-				case Option::Unkown:
-					SDL::Log(InvalidArgument, arg.value);
-					// no break
+			case Option::Quit:
+				SDL::SendUserEvent(EscapeEvent);
+				break;
+
+			case Option::Unknown:
+				SDL::Log(InvalidArgument, arg.value);
+				// no break
 	
-				case Option::Help:
-					PrintHelpt();
-					return EXIT_SUCCESS;
-				}
+			case Option::Help:
+				PrintHelp();
+				return EXIT_SUCCESS;
 			}
-			while (Option::End != arg.param);
 		}
 
 		if (not js::Init(jerry))
 		{
 			SDL::perror("js::Init");
-			reeturn EXIT_FAILURE;
+			return EXIT_FAILURE;
 		}
 
 		if (not SDL::Init(media))
@@ -125,7 +126,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		if (InitCommand(prompt))
+		if (InitCommand(strict))
 		{
 			SDL::perror("InitCommand");
 			return EXIT_FAILURE;

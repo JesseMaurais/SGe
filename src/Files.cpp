@@ -1,6 +1,7 @@
 #include "Files.hpp"
 #include "System.hpp"
 #include "Desktop.hpp"
+#include "Manager.hpp"
 #include "Error.hpp"
 #include "std.hpp"
 
@@ -15,7 +16,7 @@ namespace
 	constexpr char const *Folder = "FileWatch";
 
 
-	class FileMonitor : public Resources
+	class FileMonitor : public ManagedResources
 	{
 	private:
 

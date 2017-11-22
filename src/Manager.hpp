@@ -4,7 +4,29 @@
 #include "Source.hpp"
 #include "std.hpp"
 
-template <typename Type> class Manager : public Resources
+class ManagedResources : public Resources
+{
+public:
+
+	virtual ~ManagedResources() = default;
+	unsigned Add(Source *that) override;
+	Source *Remove(unsigned id) override;
+	bool Has(unsigned id);
+	unsigned Size();
+
+protected:
+
+	unsigned UpdateSources();
+	unsigned UpdateSources(std::vector<Source*> const &sources);
+	unsigned UpdateSources(std::vector<unsigned> const &ids);
+
+private:
+
+	std::vector<Source*> sources;
+};
+
+
+template <typename Type> class Manager : public ManagedResources
 {
 public:
 

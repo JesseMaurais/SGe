@@ -1,7 +1,7 @@
-#include "Source.hpp"
+#include "Manager.hpp"
 #include "std.hpp"
 
-unsigned Resources::Add(Source *that)
+unsigned ManagedResources::Add(Source *that)
 {
 	assert(that);
 	unsigned id = Size();
@@ -9,7 +9,7 @@ unsigned Resources::Add(Source *that)
 	return id;
 }
 
-Source *Resources::Remove(unsigned id)
+Source *ManagedResources::Remove(unsigned id)
 {
 	assert(Has(id));
 	Source *that = sources.at(id);
@@ -20,22 +20,22 @@ Source *Resources::Remove(unsigned id)
 }
 
 
-bool Resources::Has(unsigned id)
+bool ManagedResources::Has(unsigned id)
 {
 	return id < sources.size() and sources.at(id);
 }
 
-unsigned Resources::Size()
+unsigned ManagedResources::Size()
 {
 	return to_unsigned(sources.size());
 }
 
-unsigned Resources::UpdateSources()
+unsigned ManagedResources::UpdateSources()
 {
 	return UpdateSources(sources);
 }
 
-unsigned Resources::UpdateSources(std::vector<Source*> const &sources)
+unsigned ManagedResources::UpdateSources(std::vector<Source*> const &sources)
 {
 	unsigned count = 0;
 	for (auto const that : sources)
@@ -48,7 +48,7 @@ unsigned Resources::UpdateSources(std::vector<Source*> const &sources)
 	return count;
 }
 
-unsigned Resources::UpdateSources(std::vector<unsigned> const &ids)
+unsigned ManagedResources::UpdateSources(std::vector<unsigned> const &ids)
 {
 	unsigned count = 0;
 	for (unsigned const id : ids)
