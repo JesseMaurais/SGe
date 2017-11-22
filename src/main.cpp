@@ -14,6 +14,7 @@ namespace
 		enum
 		{
 			Strict   = 's',
+			Buffer   = 'z',
 			ByteCode = 'b',
 			Video    = 'v',
 			Help     = 'h',
@@ -29,7 +30,8 @@ namespace
 	{
 		const struct option options[] =
 		{
-		{ "strict "  , no_argument       , nullptr , Option::Strict   },
+		{ "strict"   , no_argument       , nullptr , Option::Strict   },
+		{ "buffer"   , required_argument , nullptr , Option::Buffer   },
 		{ "bytecode" , no_argument       , nullptr , Option::ByteCode },
 		{ "video"    , optional_argument , nullptr , Option::Video    },
 		{ "help"     , no_argument       , nullptr , Option::Help     },
@@ -68,6 +70,7 @@ int main(int argc, char **argv)
 	{
 		jerry_init_flag_t jerry = JERRY_INIT_EMPTY;
 		unsigned media = SDL_INIT_EVENTS;
+		std::size_t buffer = BUFSIZ;
 		char *video = nullptr;
 		bool strict = false;
 
@@ -83,6 +86,10 @@ int main(int argc, char **argv)
 
 			case Option::Strict:
 				strict = true;
+				break;
+
+			case Option::Buffer:
+				buffer = std::stoi(arg.value);
 				break;
 
 			case Option::ByteCode:
@@ -126,7 +133,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		if (InitCommand(strict))
+		if (InitCommand(strict, buffer))
 		{
 			SDL::perror("InitCommand");
 			return EXIT_FAILURE;

@@ -15,10 +15,9 @@ namespace
 	// Flag to signal thread can continue
 	bool Ready;
 
-	void Thread(bool const strict)
+	void Thread(bool const strict, std::size_t buffer)
 	{
-		std::vector<char> line;
-		line.reserve(BUFSIZ);
+		std::vector<char> line(buffer);
 
 		while (true)
 		{
@@ -42,9 +41,9 @@ namespace
 	}
 }
 
-bool InitCommand(bool const strict)
+bool InitCommand(bool const strict, std::size_t const buffer)
 {
-	std::async(Thread, strict);
+	std::async(Thread, strict, buffer);
 	return true;
 }
 
