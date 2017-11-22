@@ -9,7 +9,7 @@ bool SDL::Init(Uint32 const flags)
 {
 	if (0 == SDL_Init(flags))
 	{
-		if (std::atexit(SDL_Quit))
+		if (0 == std::atexit(SDL_Quit))
 		{
 			return true;
 		}

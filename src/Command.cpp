@@ -15,25 +15,25 @@ namespace
 	// Flag to signal thread can continue
 	bool Ready;
 
-	void Thread(bool const strict, std::size_t buffer)
+	void Thread(std::FILE *file, std::size_t buffer, bool strict)
 	{
 		std::vector<char> line(buffer);
 
 		while (true)
 		{
-			if (std::feof(stdin) or std::ferror(stdin))
+			if (std::feof(file) or std::ferror(file))
 			{
 				break;
 			}
 			else
-			if (not std::fgets(line.data(), line.size(), stdin))
+			if (not std::fgets(line.data(), line.size(), file))
 			{
 				continue;
 			}
 
 			Ready = false; // reset signal flag
 			// SDL_PushEvent is already thread safe
-			SDL::SendUserEvent(ExecuteCommand, strict, line.data(), line.data() + line.size());
+			SDL::SendUserEvent(EvaluateScript, strict, line.data(), line.data() + line.size());
 			// Wait for main thread to signal it's done processing
 			std::unique_lock<std::mutex> lock(Mutex);
 			Condition.wait(lock, []{ return Ready; });
@@ -41,9 +41,9 @@ namespace
 	}
 }
 
-bool InitCommand(bool const strict, std::size_t const buffer)
+bool InitCommand(std::FILE *file, std::size_t buffer, bool strict)
 {
-	std::async(Thread, strict, buffer);
+	std::async(Thread, file, buffer, strict);
 	return true;
 }
 

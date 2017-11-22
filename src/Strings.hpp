@@ -6,7 +6,8 @@ enum Strings
 	 None
 	,Application
 	,ColonSeparator
-	,CommandPrompt
+	,Optional
+	,Required
 	,NoError
 	,UnknownError
 	,OutOfMemory

@@ -638,7 +638,7 @@ bool js::Init(jerry_init_flag_t const flags)
 	}
 
 	static ScopedEventHandler
-		handler(SDL::UserEvent(ExecuteCommand), Execute);
+		handler(SDL::UserEvent(EvaluateScript), Execute);
 
 	return true;
 }
