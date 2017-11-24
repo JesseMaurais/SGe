@@ -28,7 +28,8 @@ namespace
 
 		void End(char const *element) override
 		{
-
+			js::ScopedValue const obj = stack.top();
+			stack.pop();
 		}
 
 	private:
