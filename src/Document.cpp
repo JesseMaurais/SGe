@@ -1,15 +1,56 @@
 #include "Document.hpp"
 #include "JavaScript.hpp"
+#include "XML.hpp"
+#include <stack>
 
-
-void Document::Start(char const *name, char const **attributes)
+namespace
 {
+	class DOM : public XML
+	{
+	public:
 
+		DOM(jerry_value_t const scheme)
+		: schema(scheme)
+		{}
+
+		bool Load(jerry_value_t obj, SDL_RWops *ops)
+		{
+			stack.push(obj);
+			return XML::Load(ops);
+		}
+
+	protected:
+
+		void Start(char const *element, char const **attributes) override
+		{
+
+		}
+
+		void End(char const *element) override
+		{
+
+		}
+
+	private:
+
+		std::stack<jerry_value_t> stack;
+		jerry_value_t const schema;
+	};
 }
 
-void Document::End(char const *name)
-{
+Document::Document()
+: self(jerry_create_object())
+{}
 
+Document::~Document()
+{
+	jerry_release_value(self);
+}
+
+bool Document::Load(SDL_RWops *ops)
+{
+	js::ScopedValue global = jerry_get_global_object();
+	return DOM(global).Load(self, ops);
 }
 
 /*

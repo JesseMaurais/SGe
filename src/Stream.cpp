@@ -1,4 +1,4 @@
-#include "Command.hpp"
+#include "Stream.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
 #include <cstdio>
@@ -41,13 +41,13 @@ namespace
 	}
 }
 
-bool InitCommand(std::FILE *file, std::size_t buffer, bool strict)
+bool InitStream(std::FILE *file, std::size_t buffer, bool strict)
 {
 	std::async(Thread, file, buffer, strict);
 	return true;
 }
 
-void SignalReady()
+void SignalStream()
 {
 	std::lock_guard<std::mutex> lock(Mutex);
 	Ready = true;

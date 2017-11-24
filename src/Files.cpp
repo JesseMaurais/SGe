@@ -155,7 +155,7 @@ namespace
 
 		void NotifyChange(fs::path const &path)
 		{
-			(void) path; // TODO
+			(void) path;
 		}
 
 		void QueryError(std::exception const &exception)

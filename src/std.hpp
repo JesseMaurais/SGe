@@ -24,8 +24,8 @@
 
 namespace stl
 {
-	template <typename Type>
-	void append(std::vector<Type> &to, std::vector<Type> const &from)
+	template <typename Type, typename Alloc, template <typename, typename> class Container>
+	void append(Container<Type, Alloc> &to, Container<Type, Alloc> const &from)
 	{
 		auto const size_from = from.size();
 		auto const size_to = to.size();
@@ -33,32 +33,11 @@ namespace stl
 		to.insert(to.end(), from.begin(), from.end());
 	}
 
-	template <typename Container>
-	Container &max(Container &a, Container &b)
-	{
-		return a.size() > b.size() ? a : b;
-	}
-
-	template <typename Container>
-	Container &min(Container &a, Container &b)
-	{
-		return a.size() < b.size() ? a : b;
-	}
-
-	template <typename Type> using pair = std::pair<Type, Type>;
-
-	template <typename Container>
-	pair<Container&> minmax(Container &a, Container &b)
-	{
-		return std::make_pair(stl::min(a, b), stl::max(a, b));
-	}
-
 	// Basic string formatting tools
 
-	template <typename Char, template <typename> class String = std::basic_string<Char>>
-	void replace(String &string, String const &search, String const &replace)
+	inline void replace(std::string &string, std::string const &search, std::string const &replace)
 	{
-		constexpr auto npos = String::npos;
+		constexpr auto npos = std::string::npos;
 		auto const length = search.length();
 		for (auto pos = string.find(search); npos != pos; pos = string.find(search, pos+length))
 		{
@@ -66,19 +45,21 @@ namespace stl
 		}
 	}
 
-	template <typename Char, template <typename, typename> class Container>
-	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string const &string, std::string const &delimiter)
+	template <class Alloc, template <typename, typename> class Container>
+	void split(Container<std::string, Alloc> &tokens, std::string const &string, std::string const &delimiter)
 	{
-		std::string::size_type const length = delimiter.length();
-		for (std::string::size_type next = string.find(delimiter), last = 0; std::string::npos != last; next = string.find(delimiter, last))
+		using size_type = std::string::size_type;
+		constexpr auto npos = std::string::npos;
+		auto const length = delimiter.length();
+		for (size_type next = string.find(delimiter), last = 0; npos != last; next = string.find(delimiter, last))
 		{
 			tokens.emplace_back(string.substr(last, next - last));
-			last = std::string::npos == next ? next : next + length;
+			last = npos == next ? next : next + length;
 		}
 	}
 
-	template <template <typename, typename> class Container>
-	std::string merge(Container<std::string, std::allocator<std::string>> const &tokens, std::string const &delimiter)
+	template <class Alloc, template <typename, typename> class Container>
+	std::string merge(Container<std::string, Alloc> const &tokens, std::string const &delimiter)
 	{
 		std::stringstream stream;
 		auto it = std::ostream_iterator<std::string>(stream, delimiter.c_str());
@@ -168,7 +149,7 @@ namespace stl
 	std::size_t fprintf(std::ostream &stream, std::string const &format, Args... args)
 	{
 		std::string string;
-		std::size_t const subs = sprintf(string, format, args...);
+		auto const subs = sprintf(string, format, args...);
 		stream << string;
 		return subs;
 	}
@@ -192,6 +173,8 @@ namespace stl
 		sprintf(result, "%1=%2", param, value);
 		return result;
 	}
+
+	template <typename Type> using pair = std::pair<Type, Type>;
 
 	inline pair<std::string> param_value(std::string const &string)
 	{

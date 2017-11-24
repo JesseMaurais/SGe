@@ -224,7 +224,7 @@ bool SourceString::UpdateSource()
 	{
 		// Split the code into lines.
 		std::vector<std::string> lines;
-		stl::split(lines, sourceString, "\n");
+		stl::split(lines, sourceString, std::string("\n"));
 		// Compile the source code lines into a shader.
 		GLuint const shader = OpenGL::GetShader(Source::id);
 		bool const ok = CompileShaderSource(shader, lines);

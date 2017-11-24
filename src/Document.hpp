@@ -1,19 +1,20 @@
 #ifndef Document_hpp
 #define Document_hpp
 
-#include "XML.hpp"
+#include <jerryscript.h>
 
-class Document : public XML
+class Document
 {
 public:
 
-	bool Load(unsigned schema, SDL_RWops *ops);
-	bool Load(unsigned schema, char const *path);
+	Document();
+	~Document();
+	bool Load(SDL_RWops *ops);
+	bool Load(char const *path);
 
-protected:
+private:
 
-	void Start(char const *name, char const **attributes) override;
-	void End(char const *name) override;
+	jerry_value_t const self;
 };
 
 #endif // file

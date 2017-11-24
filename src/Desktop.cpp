@@ -196,24 +196,29 @@ sys::ini sys::LoadConfigs(std::string const &path)
 	{
 		if (IsSection(line))
 		{
-			sys::init::value_type group;
-			group.first = line; // group name
-			auto pair = config.insert(group);
+			sys::ini::mapped_type empty;
+			auto pair = config.emplace(line, empty);
 			section = pair.first;
+			if (not pair.second)
+			{
+				// Section not unique
+				config.clear();
+				break;
+			}
 			continue;
 		}
 
-		if (config.end() == it)
+		if (config.end() == section)
 		{
-			// Key/values before section
+			// Missing section
 			config.clear();
 			break;
 		}
 
-		auto pair = section->emplace(stl::param_value(line));
+		auto pair = section->second.emplace(stl::param_value(line));
 		if (not pair.second)
 		{
-			// Key is not unique
+			// Key not unique
 			config.clear();
 			break;
 		}
@@ -234,7 +239,7 @@ namespace
 		{
 			// Write stdout to a temporary file
 			fs::path path = sys::GetTemporaryPath(args.front());
-			args.push_back(">" + stl::quote(path));
+			args.push_back(">" + stl::quote(std::string(path)));
 			// Execute and acquire return value
 			std::string const command = stl::merge(args, " ");
 			int const status = std::system(command.c_str());
@@ -338,17 +343,18 @@ std::vector<std::string> xdg::GetIconDirs()
 	std::vector<std::string> paths;
 
 	// Look in HOME/.icons first
-	
-	fs::path path = sys::GetHomeDir();
-	path /= ".icons";
-	if (fs::exists(path))
 	{
-		paths.push_back(path);
+		fs::path path = sys::GetHomeDir();
+		path /= ".icons";
+		if (fs::exists(path))
+		{
+			paths.push_back(path);
+		}
 	}
 
 	// Then in XDG_DATA_DIRS/icons
 	
-	for (path : xdg::GetDataDirs())
+	for (fs::path path : xdg::GetDataDirs())
 	{
 		path /= "icons";
 		if (fs::exists(path))
@@ -359,7 +365,7 @@ std::vector<std::string> xdg::GetIconDirs()
 
 	// Last in shared pixmaps
 	
-	for (path : sys::GetDataDirs())
+	for (fs::path path : sys::GetDataDirs())
 	{
 		path /= "pixmaps";
 		if (fs::exists(path))

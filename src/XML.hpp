@@ -7,8 +7,8 @@ struct SDL_RWops;
 
 struct XML
 {
-	XML(char const *encoding = nullptr);
 	virtual ~XML();
+	XML(char const *encoding = nullptr);
 
 	bool Load(SDL_RWops *ops);
 	bool Load(char const *path);

@@ -19,7 +19,7 @@ namespace
 			InputFile = 'f', // Name of a file to use for input stream
 			Buffer    = 'S', // Size of the buffer used for input stream
 			Strict    = 's', // Be strict with script
-			ByteCode  = 'b', // Dump script bytecode to output stream
+			ByteCode  = 'b', // Dump script byte code to output stream
 			Video     = 'v', // Enable video with optional named back-end
 			Help      = 'h', // Print command line help
 			Quit      = 'q', // Quit immediately after setup
@@ -53,11 +53,11 @@ namespace
 			opt.value = nullptr;
 			break;
 		case '?':
-			opt.param = 0 == optind ? Option::Name : Option::Unknown;
+			opt.param = 0 == optind ? Option::Path : Option::Unknown;
 			opt.value = argv[optind];
 			break;
 		default:
-			opt.param = decltype(arg.param)(arg);
+			opt.param = decltype(opt.param)(arg);
 			opt.value = optarg;
 		}
 		return opt;
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 			auto opt = NextOption(argc, argv);
 			switch (opt.param)
 			{
-			case Option::Begin:
+			case Option::Path:
 				// program name
 				continue;
 
