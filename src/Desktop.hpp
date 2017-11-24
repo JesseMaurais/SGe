@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace sys
 {
@@ -33,6 +34,10 @@ namespace sys
 
 	/// Get the application base directory
 	std::string GetBaseDir();
+
+	using ini = std::map<std::string, std::map<std::string, std::string>>;
+	/// Get the content of a configuration file
+	ini LoadConfigs(std::string const &path);
 }
 
 namespace xdg
@@ -51,6 +56,9 @@ namespace xdg
 
 	/// Get the directory to cache data
 	std::string GetCacheHome();
+
+	/// Get directories to search for icons
+	std::vector<std::string> GetIconDirs();
 
 	/// Determine whether a given path is a desktop application file
 	bool IsDesktop(std::string const &path);

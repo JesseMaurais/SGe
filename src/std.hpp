@@ -45,24 +45,28 @@ namespace stl
 		return a.size() < b.size() ? a : b;
 	}
 
+	template <typename Type> using pair = std::pair<Type, Type>;
+
 	template <typename Container>
-	std::pair<Container&, Container&> minmax(Container &a, Container &b)
+	pair<Container&> minmax(Container &a, Container &b)
 	{
 		return std::make_pair(stl::min(a, b), stl::max(a, b));
 	}
 
 	// Basic string formatting tools
 
-	inline void replace(std::string &string, std::string const &search, std::string const &replace)
+	template <typename Char, template <typename> class String = std::basic_string<Char>>
+	void replace(String &string, String const &search, String const &replace)
 	{
-		std::string::size_type const length = search.length();
-		for (std::string::size_type pos = string.find(search); std::string::npos != pos; pos = string.find(search, pos + length))
+		constexpr auto npos = String::npos;
+		auto const length = search.length();
+		for (auto pos = string.find(search); npos != pos; pos = string.find(search, pos+length))
 		{
 			string.replace(pos, length, replace);
 		}
 	}
 
-	template <template <typename, typename> class Container>
+	template <typename Char, template <typename, typename> class Container>
 	void split(Container<std::string, std::allocator<std::string>> &tokens, std::string const &string, std::string const &delimiter)
 	{
 		std::string::size_type const length = delimiter.length();
@@ -187,6 +191,15 @@ namespace stl
 		std::string result;
 		sprintf(result, "%1=%2", param, value);
 		return result;
+	}
+
+	inline pair<std::string> param_value(std::string const &string)
+	{
+		constexpr auto npos = std::string::npos;
+		const auto pos = string.find('=');
+		auto param = string.substr(0, pos);
+		auto value = npos == pos ? std::string() : string.substr(pos+1);
+		return std::make_pair(param, value);
 	}
 }
 

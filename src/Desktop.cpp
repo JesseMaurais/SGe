@@ -41,6 +41,47 @@ namespace
 			out.push_back(line);
 		}
 	}
+
+	// Get the next non empty line from an input stream
+	bool GetNextLine(std::istream &stream, std::string &line)
+	{
+		while (std::getline(stream, line))
+		{
+			constexpr auto is_blank = [](char c) { return std::isblank(c); };
+			auto it = stl::find_if_not(line, is_blank);
+			if (line.end() != it) // not an empty line
+			{
+				if (*it != '#') // not a comment
+				{
+					line = line.substr(0, line.find('#')); // strip comment
+					stl::trim(line); // strip whitespace
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool IsSection(std::string &line)
+	{
+		constexpr auto npos = std::string::npos;
+
+		auto const begin = line.find_first_of('[');
+		auto const end = line.find_last_of(']');
+		
+		if (begin < end and npos != end)
+		{
+			if (line.find_first_of(']', begin) == end)
+			{
+				if (line.find_last_of('[', end) == begin)
+				{
+					line = line.substr(begin+1, end-begin-2);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
 
 std::vector<std::string> sys::GetSystemDirs()
@@ -144,6 +185,43 @@ std::string sys::GetBaseDir()
 	return SDL_GetBasePath();
 }
 
+sys::ini sys::LoadConfigs(std::string const &path)
+{
+	sys::ini config;
+	auto section = config.end();
+
+	std::string line;
+	std::ifstream stream(path);
+	while (GetNextLine(stream, line))
+	{
+		if (IsSection(line))
+		{
+			sys::init::value_type group;
+			group.first = line; // group name
+			auto pair = config.insert(group);
+			section = pair.first;
+			continue;
+		}
+
+		if (config.end() == it)
+		{
+			// Key/values before section
+			config.clear();
+			break;
+		}
+
+		auto pair = section->emplace(stl::param_value(line));
+		if (not pair.second)
+		{
+			// Key is not unique
+			config.clear();
+			break;
+		}
+	}
+
+	return config;
+}
+
 namespace
 {
 	// Wrapper around a system call to catch output in a text file
@@ -181,26 +259,6 @@ namespace
 			open = sys::GetProgramPath("start");
 		}
 		return open;
-	}
-
-	// Get the next non empty line from an input stream
-	bool GetNextLine(std::istream &stream, std::string &line)
-	{
-		while (std::getline(stream, line))
-		{
-			constexpr auto is_blank = [](char c) { return std::isblank(c); };
-			auto it = stl::find_if_not(line, is_blank);
-			if (line.end() != it) // not an empty line
-			{
-				if (*it != '#') // not a comment
-				{
-					line = line.substr(0, line.find('#')); // strip comment
-					stl::trim(line); // strip whitespace
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	// Determine whether the text file at path has the magic identifier
@@ -273,6 +331,44 @@ std::string xdg::GetCacheHome()
 		path /= ".cache";
 	}
 	return path;
+}
+
+std::vector<std::string> xdg::GetIconDirs()
+{	
+	std::vector<std::string> paths;
+
+	// Look in HOME/.icons first
+	
+	fs::path path = sys::GetHomeDir();
+	path /= ".icons";
+	if (fs::exists(path))
+	{
+		paths.push_back(path);
+	}
+
+	// Then in XDG_DATA_DIRS/icons
+	
+	for (path : xdg::GetDataDirs())
+	{
+		path /= "icons";
+		if (fs::exists(path))
+		{
+			paths.push_back(path);
+		}
+	}
+
+	// Last in shared pixmaps
+	
+	for (path : sys::GetDataDirs())
+	{
+		path /= "pixmaps";
+		if (fs::exists(path))
+		{
+			paths.push_back(path);
+		}
+	}
+
+	return paths;
 }
 
 bool xdg::IsDesktop(std::string const &string)
