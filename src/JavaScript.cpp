@@ -43,7 +43,7 @@ bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::
 
 bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
 {
-	js::ScopedValue const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
+	js::Value const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
 	return js::CheckError(value) or not SDL::perror("jerry_exec_snapshot");
 }
 
@@ -58,7 +58,7 @@ namespace
 
 		static jerry_value_t Prototype()
 		{
-			static js::ScopedValue const value = jerry_create_object();
+			static js::Value const value = jerry_create_object();
 			return value;
 		}
 
@@ -347,19 +347,19 @@ namespace
 
 	template <> std::string As<std::string>(jerry_value_t const value)
 	{
-		js::ScopedValue converted = jerry_value_to_string(value);
+		js::Value converted = jerry_value_to_string(value);
 		return Get<std::string>(converted);
 	}
 
 	template <> bool As<bool>(jerry_value_t const value)
 	{
-		js::ScopedValue converted = jerry_value_to_string(value);
+		js::Value converted = jerry_value_to_string(value);
 		return Get<bool>(converted);
 	}
 
 	template <> double As<double>(jerry_value_t const value)
 	{
-		js::ScopedValue converted = jerry_value_to_number(value);
+		js::Value converted = jerry_value_to_number(value);
 		return Get<double>(converted);
 	}
 
@@ -545,8 +545,8 @@ namespace
 
 	struct Property
 	{
-		js::ScopedValue name;
-		js::ScopedValue value;
+		js::Value name;
+		js::Value value;
 
 		Property(char const *property_name, jerry_value_t const property_value)
 		: name(jerry_create_string((jerry_char_ptr_t) property_name))
@@ -561,7 +561,7 @@ namespace
 
 	bool SetProperty(jerry_value_t const obj, Property const &prop)
 	{
-		js::ScopedValue const value = jerry_set_property(obj, prop.name, prop.value);
+		js::Value const value = jerry_set_property(obj, prop.name, prop.value);
 		return js::CheckError(value);
 	}
 
@@ -579,7 +579,7 @@ namespace
 		auto const begin = (jerry_char_ptr_t) event.user.data1;
 		auto const end = (jerry_char_ptr_t) event.user.data2;
 
-		js::ScopedValue const function = jerry_parse(begin, end-begin, strict);
+		js::Value const function = jerry_parse(begin, end-begin, strict);
 		if (js::CheckError(function))
 		{
 			SDL::perror("jerry_parse");
@@ -587,7 +587,7 @@ namespace
 
 		SignalStream();
 
-		js::ScopedValue const result = jerry_run(function);
+		js::Value const result = jerry_run(function);
 		if (js::CheckError(result))
 		{
 			SDL::perror("jerry_run");
@@ -631,7 +631,7 @@ bool js::Init(jerry_init_flag_t const flags)
 		{ "SomeClass", Constructor(+[](){ return new SomeClass; }) }
 	};
 
-	ScopedValue const global = jerry_get_global_object();
+	Value const global = jerry_get_global_object();
 	for (auto const &property : properties)
 	{
 		SetProperty(global, property);

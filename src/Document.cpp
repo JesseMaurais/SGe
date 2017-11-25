@@ -1,6 +1,7 @@
 #include "Document.hpp"
 #include "JavaScript.hpp"
 #include "XML.hpp"
+#include <vector>
 #include <stack>
 
 namespace
@@ -9,13 +10,15 @@ namespace
 	{
 	public:
 
-		DOM(jerry_value_t const scheme)
-		: schema(scheme)
+		DOM(jerry_value_t const value)
+		: schema(value)
 		{}
 
 		bool Load(jerry_value_t obj, SDL_RWops *ops)
 		{
 			stack.push(obj);
+			std::vector<jerry_value_t> empty;
+			nodes.push(empty);
 			return XML::Load(ops);
 		}
 
@@ -23,16 +26,69 @@ namespace
 
 		void Start(char const *element, char const **attributes) override
 		{
+			js::Value type = element;
+			js::Value function = jerry_get_property(schema, type);
+			if (jerry_value_is_constructor(function))
+			{
+				js::Value args = jerry_create_object();
+				for (auto i=0, j=1; attributes[j]; ++i, ++j)
+				{
+					js::Value name = attributes[i];
+					js::Value value = attributes[j];
+					js::Value err = jerry_set_property(args, name, value);
+					if (js::CheckError(err))
+					{
+						// handle error
+					}
+				}
 
+				auto obj = jerry_construct_object(function, &args.value, 1);
+				if (js::CheckError(obj))
+				{
+					// handle error
+				}
+
+				nodes.top().push_back(obj);
+				std::vector<jerry_value_t> empty;
+				nodes.push(empty);
+				stack.push(obj);
+			}
+			else
+			{
+				// handle error
+			}
 		}
 
 		void End(char const *element) override
 		{
+			auto obj = stack.top();
+			auto size = nodes.top().size();
 
+			js::Value array = jerry_create_array(size);
+			for (auto index = 0; index < size; ++index)
+			{
+				js::Value node = nodes.top().at(index);
+				js::Value err = jerry_set_property_by_index(array, index, node);
+				if (js::CheckError(err))
+				{
+					// handle error
+				}
+			}
+
+			js::Value name = "child";
+			js::Value error = jerry_set_property(obj, name, array);
+			if (js::CheckError(error))
+			{
+				// handle error
+			}
+
+			nodes.pop();
+			stack.pop();
 		}
 
 	private:
 
+		std::stack<std::vector<jerry_value_t>> nodes;
 		std::stack<jerry_value_t> stack;
 		jerry_value_t const schema;
 	};
@@ -49,103 +105,6 @@ Document::~Document()
 
 bool Document::Load(SDL_RWops *ops)
 {
-	js::ScopedValue global = jerry_get_global_object();
+	js::Value global = jerry_get_global_object();
 	return DOM(global).Load(self, ops);
 }
-
-/*
-
--bool Document::Load(lua_State *state, int schema, SDL_RWops *ops)
--{
--       // New result
--       lua_newtable(state);
--       root = lua_gettop(state);
--       // Use global if no table given
--       if (lua_isnoneornil(state, schema))
--       {
--               lua_pushglobaltable(state);
--               schema = lua_gettop(state);
--       }
--       // Prepare
--       index.push(0);
--       this->state = state;
--       this->schema = schema;
--       // Start parsing input
--       bool okay = XML::Load(ops);
--       // Save only the result
--       lua_settop(state, root);
--       index.pop();
--       return okay;
--}
-
--bool Document::Load(lua_State *state, int schema, const char *path)
--{
--       // New result
--       lua_newtable(state);
--       root = lua_gettop(state);
--       // Use global if no table given
--       if (lua_isnoneornil(state, schema))
--       {
--               lua_pushglobaltable(state);
--               schema = lua_gettop(state);
--       }
--       // Prepare
--       index.push(0);
--       this->state = state;
--       this->schema = schema;
--       // Start parsing input
--       bool okay = XML::Load(path);
--       // Save only the result
--       lua_settop(state, root);
--       index.pop();
--       return okay;
--}
-
--void Document::Start(const char *name, const char **attributes)
--{
--       // Node index in the parent
--       lua_pushinteger(state, ++index.top());
--       lua_newtable(state);
--       // Table index in the stack
--       int table = lua_gettop(state);
--       // Using named meta-table from the schema
--       if (luaL_getsubtable(state, schema, name))
--       {
--               SDL_Log(String(CannotFindSchema), name);
--       }
--       lua_setmetatable(state, table);
--       // Set all key/value pairs as fields in this table
--       for (int key = 0, value = 1; attributes[key]; key += 2, value += 2)
--       {
--               // Value 'id' is a unique name for this node
--               if (not SDL_strcasecmp(attributes[key], "id"))
--               {
--                       // Check that name is not already being used
--                       if (lua_getfield(state, root, attributes[value]))
--                       {
--                               SDL_Log(String(NameNotUnique), attributes[value]);
--                       }
--                       lua_pop(state, 1);
--                       // Make root.value = table
--                       lua_pushvalue(state, table);
--                       lua_setfield(state, root, attributes[value]);
--               }
--               // Make table.key = value
--               lua_pushstring(state, attributes[value]);
--               lua_setfield(state, table, attributes[key]);
--       }
--       index.push(0);
--}
-
--void Document::End(const char *name)
--{
--       (void) name;
--       // Position under stack
--       constexpr int table = -3;
--       // Make parent[index] = table
--       lua_settable(state, table);
--       index.pop(); // unwind
--}
-
-
- */

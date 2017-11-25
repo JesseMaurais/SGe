@@ -24,26 +24,34 @@ namespace js
 	bool ExecuteSnapshot(Snapshot const &shapshot, bool copyBytecode = false);
 
 	/// Utility class to automate release of values according to RAII
-	class ScopedValue
+	struct Value
 	{
-	public:
-
 		operator jerry_value_t() const
 		{
 			return value;
 		}
 
-		ScopedValue(jerry_value_t const release)
+		Value(jerry_value_t const release)
 		{
 			value = release;
 		}
 
-		~ScopedValue()
+		Value(char const *string)
+		: Value(jerry_create_string((jerry_char_ptr_t) string))
+		{}
+
+		Value(double number)
+		: Value(jerry_create_number(number))
+		{}
+
+		Value(bool boolean)
+		: Value(jerry_create_boolean(boolean))
+		{}
+
+		~Value()
 		{
 			jerry_release_value(value);
 		}
-
-	private:
 
 		jerry_value_t value;
 	};
