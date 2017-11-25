@@ -15,14 +15,6 @@ namespace js
 	/// Set the SDL error string to the current error code. Returns true when an error exists
 	bool CheckError(jerry_value_t const value);
 
-	using Snapshot = std::vector<std::uint32_t>;
-
-	enum Parse { None=0, Global=1, Strict=2 };
-	bool SaveSnapshot(std::string const &source, Snapshot &buffer, enum Parse opt = None);
-
-	constexpr bool CopyBytecode = true;
-	bool ExecuteSnapshot(Snapshot const &shapshot, bool copyBytecode = false);
-
 	/// Utility class to automate release of values according to RAII
 	struct Value
 	{
@@ -46,6 +38,10 @@ namespace js
 
 		Value(bool boolean)
 		: Value(jerry_create_boolean(boolean))
+		{}
+
+		Value(js::Value const &acquire)
+		: Value(jerry_acquire_value(acquire))
 		{}
 
 		~Value()

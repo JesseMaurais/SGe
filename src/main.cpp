@@ -16,6 +16,7 @@ namespace
 		enum
 		{
 			Path      = '*', // Path to this program
+			Prompt    = 'p', // Feed lines from console into input stream
 			InputFile = 'f', // Name of a file to use for input stream
 			Buffer    = 'S', // Size of the buffer used for input stream
 			Strict    = 's', // Be strict with script
@@ -30,8 +31,9 @@ namespace
 		char *value = nullptr;
 	};
 
-	struct option const options[] =
+	struct option const Options[] =
 	{
+		{ "prompt"   , optional_argument , nullptr , Option::Prompt    },
 		{ "file"     , required_argument , nullptr , Option::InputFile },
 		{ "buffer"   , required_argument , nullptr , Option::Buffer    },
 		{ "strict"   , no_argument       , nullptr , Option::Strict    },
@@ -45,7 +47,7 @@ namespace
 	Option NextOption(int argc, char **argv)
 	{
 		Option opt;
-		int arg = getopt_long_only(argc, argv, "+", options, nullptr);
+		int arg = getopt_long_only(argc, argv, "+", Options, nullptr);
 		switch (arg)
 		{
 		case -1:
@@ -67,7 +69,7 @@ namespace
 	{
 		constexpr auto arg = "ARG";
 
-		for (struct option const &opt : options)
+		for (struct option const &opt : Options)
 		{
 			if (not opt.name)
 			{
@@ -97,6 +99,10 @@ namespace
 			std::string line;
 			switch (opt.val)
 			{
+			case Option::Prompt:
+				line = "Use a command prompt to feed the input stream";
+				break;
+
 			case Option::InputFile:
 				line = "Stream from file instead of standard input";
 				break;
@@ -143,6 +149,7 @@ int main(int argc, char **argv)
 		std::size_t buffer = BUFSIZ;
 		std::string input;
 		std::string video;
+		std::string prompt;
 		bool strict = false;
 
 		// Parse command line options
@@ -159,6 +166,10 @@ int main(int argc, char **argv)
 
 			case Option::End:
 				done = true;
+				continue;
+
+			case Option::Prompt:
+				prompt = opt.value ? opt.value : "> ";
 				continue;
 
 			case Option::InputFile:
@@ -236,7 +247,7 @@ int main(int argc, char **argv)
 
 		// Initialize the input stream thread
 
-		if (InitStream(file, buffer, strict))
+		if (InitStream(file, prompt, buffer, strict))
 		{
 			SDL::perror("Init Stream");
 			return EXIT_FAILURE;

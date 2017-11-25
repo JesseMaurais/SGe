@@ -5,20 +5,18 @@
 
 struct SDL_RWops;
 
-struct XML
+class XML
 {
+public:
+
 	virtual ~XML();
 	XML(char const *encoding = nullptr);
-
-	bool Load(SDL_RWops *ops);
-	bool Load(char const *path);
+	bool Parse(SDL_RWops *ops);
 
   protected:
 
 	virtual void Start(char const *name, char const **attributes) = 0;
 	virtual void End(char const *name) = 0;
-
-  private:
 
 	XML_Parser parser;
 };

@@ -26,28 +26,6 @@ bool js::CheckError(jerry_value_t const value)
 	return jerry_value_has_error_flag(value) and js::SetError(value);
 }
 
-bool js::SaveSnapshot(std::string const &source, js::Snapshot &buffer, enum js::Parse opt)
-{
-	std::size_t size = buffer.size();
-	do
-	{
-		buffer.resize(size); // second loop is correct size
-		size = jerry_parse_and_save_snapshot
-			((jerry_char_ptr_t) source.data(), source.size(), opt & Global, opt & Strict,
-			                    buffer.data(), buffer.size());
-	}
-	while (buffer.size() < size);
-	buffer.resize(size);
-	return 0 == size;
-}
-
-bool js::ExecuteSnapshot(js::Snapshot const &buffer, bool copyBytecode)
-{
-	js::Value const value = jerry_exec_snapshot(buffer.data(), buffer.size(), copyBytecode);
-	return js::CheckError(value) or not SDL::perror("jerry_exec_snapshot");
-}
-
-
 namespace
 {
 	// Native object information utility template
