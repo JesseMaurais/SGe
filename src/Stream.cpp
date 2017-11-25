@@ -65,7 +65,7 @@ namespace
 
 bool InitStream(std::FILE *file, std::string prompt, std::size_t buffer, bool strict)
 {
-	if (not prompt.empty())
+	if (not file)
 	{
 		std::async(Readline, prompt, strict);
 	}

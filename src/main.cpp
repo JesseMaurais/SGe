@@ -34,7 +34,7 @@ namespace
 	struct option const Options[] =
 	{
 		{ "prompt"   , optional_argument , nullptr , Option::Prompt    },
-		{ "file"     , required_argument , nullptr , Option::InputFile },
+		{ "file"     , optional_argument , nullptr , Option::InputFile },
 		{ "buffer"   , required_argument , nullptr , Option::Buffer    },
 		{ "strict"   , no_argument       , nullptr , Option::Strict    },
 		{ "bytecode" , no_argument       , nullptr , Option::ByteCode  },
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 		jerry_init_flag_t jerry = JERRY_INIT_EMPTY;
 		unsigned media = SDL_INIT_EVENTS;
 		std::size_t buffer = BUFSIZ;
-		std::string input;
+		std::FILE *file = nullptr;
 		std::string video;
 		std::string prompt;
 		bool strict = false;
@@ -173,7 +173,12 @@ int main(int argc, char **argv)
 				continue;
 
 			case Option::InputFile:
-				input = opt.value;
+				file = opt.value ? std::fopen(opt.value, "r") : stdin;
+				if (not file)
+				{
+					SDL::perror(opt.value, std::strerror(errno));
+					return EXIT_FAILURE;
+				}
 				continue;
 
 			case Option::Buffer:
@@ -229,20 +234,6 @@ int main(int argc, char **argv)
 		{
 			SDL::perror(video);
 			return EXIT_FAILURE;
-		}
-
-		// Allow redirection of input from file given on command line
-
-		auto file = stdin;
-		if (not input.empty())
-		{
-			auto path = input.c_str();
-			file = std::fopen(path, "r");
-			if (not file)
-			{
-				SDL::perror(path, std::strerror(errno));
-				return EXIT_FAILURE;
-			}
 		}
 
 		// Initialize the input stream thread
