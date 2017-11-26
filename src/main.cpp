@@ -100,11 +100,11 @@ namespace
 			switch (opt.val)
 			{
 			case Option::Prompt:
-				line = "Use a command prompt to feed the input stream";
+				line = "Customize the text used for command prompt";
 				break;
 
 			case Option::InputFile:
-				line = "Stream from file instead of standard input";
+				line = "Stream from named file or standard input if no file name is given";
 				break;
 
 			case Option::Buffer:
@@ -142,15 +142,21 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		// Option defaults without command line specification
+		// Defaults for the javascript engine
 
 		jerry_init_flag_t jerry = JERRY_INIT_EMPTY;
-		unsigned media = SDL_INIT_EVENTS;
+		bool strict = false;
+
+		// Defaults for the multimedia back-end
+
+		Uint32 media = SDL_INIT_EVENTS;
+		std::string video;
+
+		// Defaults for the input stream
+
+		std::string prompt = String(CommandPrompt);
 		std::size_t buffer = BUFSIZ;
 		std::FILE *file = nullptr;
-		std::string video;
-		std::string prompt;
-		bool strict = false;
 
 		// Parse command line options
 
@@ -160,20 +166,20 @@ int main(int argc, char **argv)
 			auto opt = NextOption(argc, argv);
 			switch (opt.param)
 			{
-			case Option::Path:
-				// program name
-				continue;
-
 			case Option::End:
 				done = true;
 				continue;
 
+			case Option::Path:
+				// program name
+				continue;
+
 			case Option::Prompt:
-				prompt = opt.value ? opt.value : "> ";
+				prompt = opt.value;
 				continue;
 
 			case Option::InputFile:
-				file = opt.value ? std::fopen(opt.value, "r") : stdin;
+				file = opt.value ? std::fopen(opt.value, "r") : std::stdin;
 				if (not file)
 				{
 					SDL::perror(opt.value, std::strerror(errno));
@@ -238,7 +244,7 @@ int main(int argc, char **argv)
 
 		// Initialize the input stream thread
 
-		if (InitStream(file, prompt, buffer, strict))
+		if (InitStream(prompt, file, buffer, strict))
 		{
 			SDL::perror("Init Stream");
 			return EXIT_FAILURE;

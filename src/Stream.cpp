@@ -27,7 +27,7 @@ namespace
 		Condition.wait(lock, []{ return Ready; });
 	}
 
-	void Thread(std::FILE *input, std::size_t buffer, bool strict)
+	void Readfile(std::FILE *input, std::size_t buffer, bool strict)
 	{
 		std::vector<char> line(buffer);
 
@@ -63,7 +63,7 @@ namespace
 	}
 }
 
-bool InitStream(std::FILE *file, std::string prompt, std::size_t buffer, bool strict)
+bool InitStream(std::string const &prompt, std::FILE *file, std::size_t buffer, bool strict)
 {
 	if (not file)
 	{
@@ -71,7 +71,7 @@ bool InitStream(std::FILE *file, std::string prompt, std::size_t buffer, bool st
 	}
 	else
 	{
-		std::async(Thread, file, buffer, strict);
+		std::async(Readfile, file, buffer, strict);
 	}
 	return true;
 }

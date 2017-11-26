@@ -49,8 +49,8 @@ void DOM::Start(char const *element, char const **attributes)
 
 	// Construct the node from schema's element reference
 
-	js::Value type = element;
-	js::Value function = jerry_get_property(schema, type);
+	js::Value construct = element;
+	js::Value function = jerry_get_property(schema, construct);
 	if (not jerry_value_is_constructor(function))
 	{
 		// handle error

@@ -5,9 +5,8 @@ enum Strings
 {
 	 None
 	,Application
+	,CommandPrompt
 	,ColonSeparator
-	,Optional
-	,Required
 	,NoError
 	,UnknownError
 	,OutOfMemory
