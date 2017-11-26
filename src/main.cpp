@@ -65,15 +65,57 @@ namespace
 		return opt;
 	}
 
-	void PrintCommandLineOptions()
+	void PrintCommandLineOptions(std::string const &programName)
 	{
-		constexpr auto arg = "ARG";
+		stl::printf("%1 a scene graph engine for soft geometry\n", programName);
 
 		for (struct option const &opt : Options)
 		{
 			if (not opt.name)
 			{
 				return; // list is null terminated
+			}
+
+			// Give explanation of option
+
+			std::string arg = "ARG";
+			std::string line;
+			switch (opt.val)
+			{
+			case Option::Prompt:
+				arg = "TEXT";
+				line = "Customize the text used for command prompt";
+				break;
+
+			case Option::InputFile:
+				arg = "FILE";
+				line = "Stream from named file or standard input if no file name is given";
+				break;
+
+			case Option::Buffer:
+				arg = "SIZE";
+				line = "Size of buffer used to read from input stream";
+				break;
+
+			case Option::Strict:
+				line = "Be strict with script";
+				break;
+
+			case Option::Video:
+				arg = "DRIVER";
+				line = "Enable video with optional named back-end";
+				break;
+
+			case Option::Help:
+				line = "Show this help message";
+				break;
+
+			case Option::Quit:
+				line = "Quit immediately after startup";
+				break;
+
+			default: // option not documented
+				continue;
 			}
 
 			// Give option name and indicate argument style
@@ -94,46 +136,9 @@ namespace
 				break;
 			}
 
-			// Give explanation of option
-
-			std::string line;
-			switch (opt.val)
-			{
-			case Option::Prompt:
-				line = "Customize the text used for command prompt";
-				break;
-
-			case Option::InputFile:
-				line = "Stream from named file or standard input if no file name is given";
-				break;
-
-			case Option::Buffer:
-				line = "Size of buffer used to read from input stream";
-				break;
-
-			case Option::Strict:
-				line = "Be strict with script";
-				break;
-
-			case Option::Video:
-				line = "Enable video with optional named back-end";
-				break;
-
-			case Option::Help:
-				line = "Show this help message";
-				break;
-
-			case Option::Quit:
-				line = "Quit immediately after startup";
-				break;
-
-			default: // option not documented
-				continue;
-			}
-
 			// Print formatted line to stdout
 
-			stl::printf("%1\n\t%2\n", style, line);
+			stl::printf("\n%1\n\t%2\n", style, line);
 		}
 	}
 }
@@ -142,12 +147,14 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		// Defaults for the javascript engine
+		std::string programName = stl::filesystem::path(argv[0]).filename();
+
+		// Defaults for the JavaScript engine
 
 		jerry_init_flag_t jerry = JERRY_INIT_EMPTY;
 		bool strict = false;
 
-		// Defaults for the multimedia back-end
+		// Defaults for the media back-end
 
 		Uint32 media = SDL_INIT_EVENTS;
 		std::string video;
@@ -179,7 +186,7 @@ int main(int argc, char **argv)
 				continue;
 
 			case Option::InputFile:
-				file = opt.value ? std::fopen(opt.value, "r") : std::stdin;
+				file = opt.value ? std::fopen(opt.value, "r") : stdin;
 				if (not file)
 				{
 					SDL::perror(opt.value, std::strerror(errno));
@@ -213,7 +220,7 @@ int main(int argc, char **argv)
 				// no break
 
 			case Option::Help:
-				PrintCommandLineOptions();
+				PrintCommandLineOptions(programName);
 				return EXIT_SUCCESS;
 			}
 		}
@@ -244,7 +251,7 @@ int main(int argc, char **argv)
 
 		// Initialize the input stream thread
 
-		if (InitStream(prompt, file, buffer, strict))
+		if (not InitStream(prompt, file, buffer, strict))
 		{
 			SDL::perror("Init Stream");
 			return EXIT_FAILURE;

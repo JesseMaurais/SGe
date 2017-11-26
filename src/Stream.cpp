@@ -48,9 +48,10 @@ namespace
 
 	void Readline(std::string prompt, bool strict)
 	{
+		char const *string = prompt.empty() ? nullptr : prompt.c_str();
 		while (true)
 		{
-			auto line = readline(prompt.c_str());
+			auto line = readline(string);
 			if (not line)
 			{
 				break;
@@ -67,13 +68,15 @@ bool InitStream(std::string const &prompt, std::FILE *file, std::size_t buffer, 
 {
 	if (not file)
 	{
-		std::async(Readline, prompt, strict);
+		static auto future = std::async(Readline, prompt, strict);
+		return future.valid();
 	}
 	else
 	{
-		std::async(Readfile, file, buffer, strict);
+		static auto future = std::async(Readfile, file, buffer, strict);
+		return future.valid();
 	}
-	return true;
+	return false;
 }
 
 void SignalStream()

@@ -3,15 +3,17 @@
 #include "Error.hpp"
 #include "Event.hpp"
 #include "std.hpp"
-
+#include <ctime>
+#include <jerryscript-port.h>
 
 namespace
 {
 	std::string GetString(jerry_value_t const value)
 	{
-		std::string string(jerry_get_string_size(value), '\0');
-		jerry_string_to_char_buffer(value, (jerry_char_ptr_t) string.data(), string.size());
-		return string;
+		js::Value const string = jerry_value_to_string(value);
+		std::string buffer(jerry_get_string_size(string), '\0');
+		jerry_string_to_char_buffer(string, (jerry_char_ptr_t) buffer.data(), buffer.size());
+		return buffer;
 	}
 }
 
@@ -621,4 +623,40 @@ bool js::Init(jerry_init_flag_t const flags)
 	return true;
 }
 
+// Implementation of the JerryScript port API
+
+void jerry_port_fatal(jerry_fatal_code_t code)
+{
+	SDL::Log("Fatal: %1", code);
+	std::exit(0);
+}
+
+void jerry_port_log(jerry_log_level_t level, const char *format, ...)
+{
+	SDL::Log("Log: %1", level);
+
+	va_list args;
+	va_start (args, format);
+	char string[BUFSIZ];
+	std::vsnprintf(string, sizeof(string), format, args);
+	va_end (args);
+	SDL_Log("%s", string);
+}
+
+bool jerry_port_get_time_zone(jerry_time_zone_t *tz)
+{
+	SDL::Log("TZ data");
+
+	tzset();
+	tz->offset = timezone;
+	tz->daylight_saving_time = daylight;
+	return true;
+}
+
+double jerry_port_get_current_time()
+{
+	SDL::Log("Time");
+
+	return static_cast<double>(std::time(nullptr));
+}
 
