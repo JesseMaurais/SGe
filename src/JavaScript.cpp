@@ -18,12 +18,20 @@ namespace
 }
 
 
-bool js::SetError(jerry_value_t const value)
+bool js::SetError(jerry_value_t value)
 {
-	return SDL::SetError(GetString(value));
+	if (jerry_is_feature_enabled(JERRY_FEATURE_ERROR_MESSAGES))
+	{
+		jerry_value_clear_error_flag(&value);
+		return SDL::SetError(GetString(value));
+	}
+	else
+	{
+		return SDL::SetError(NoDebugger);
+	}
 }
 
-bool js::CheckError(jerry_value_t const value)
+bool js::CheckError(jerry_value_t value)
 {
 	return jerry_value_has_error_flag(value) and js::SetError(value);
 }
@@ -559,19 +567,33 @@ namespace
 		auto const begin = (jerry_char_ptr_t) event.user.data1;
 		auto const end = (jerry_char_ptr_t) event.user.data2;
 
+		struct ScopedSignal
+		{
+			~ScopedSignal()
+			{
+				SignalStream(); // notify thread to continue
+			}
+
+		} scopedSignal;
+
+		// Parse the input string into an executable function
 		js::Value const function = jerry_parse(begin, end-begin, strict);
 		if (js::CheckError(function))
 		{
 			SDL::perror("jerry_parse");
+			return;
 		}
 
-		SignalStream();
-
+		// Execute the function argument
 		js::Value const result = jerry_run(function);
 		if (js::CheckError(result))
 		{
 			SDL::perror("jerry_run");
+			return;
 		}
+
+		// Print the result value as string and flush
+		std::cout << GetString(result) << std::endl;
 	}
 }
 

@@ -11,6 +11,7 @@ enum Strings
 	,UnknownError
 	,OutOfMemory
 	,EncodingError
+	,NoDebugger
 	,NameNotUnique
 	,CaughtException
 	,InvalidArgumentRange

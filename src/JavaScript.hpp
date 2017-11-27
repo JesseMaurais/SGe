@@ -11,9 +11,9 @@ namespace js
 	/// Initialize the JavaScript engine
 	bool Init(jerry_init_flag_t const flags);
 	/// Set the SDL error string to the given error code. Always returns true
-	bool SetError(jerry_value_t const value);
+	bool SetError(jerry_value_t value);
 	/// Set the SDL error string to the current error code. Returns true when an error exists
-	bool CheckError(jerry_value_t const value);
+	bool CheckError(jerry_value_t value);
 
 	/// Utility class to automate release of values according to RAII
 	struct Value

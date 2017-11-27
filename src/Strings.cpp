@@ -18,6 +18,7 @@ char const *String(enum Strings id)
 	case Strings::UnknownError: return "Unknown error";
 	case Strings::OutOfMemory: return "Out of memory";
 	case Strings::EncodingError: return "Encoding error";
+	case Strings::NoDebugger: return "There is no debugger";
 	case Strings::NameNotUnique: return "The name \"%1\" is not unique";
 	case Strings::CaughtException: return "C++ exception was caught";
 	case Strings::InvalidArgumentRange: return "Invalid argument range";
