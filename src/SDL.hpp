@@ -9,7 +9,7 @@
 
 namespace SDL
 {
-	/// Initialize while also registering automatic cleanup
+	/// Initialize and register automatic cleanup
 	bool Init(Uint32 const flags);
 
 	/// Logs the current error string. Returns true when an error exists
@@ -18,10 +18,13 @@ namespace SDL
 	/// Logs the given error string with origin as prefix. Always returns true
 	bool LogError(char const *origin, char const *error);
 
-	/// Sets the system errno as the current error string. Returns true when errno is set
-	bool perror(char const *string);
+	/// Sets the system errno as the current error string. Returns true when errno is non zero
+	bool SetErrno(int errno);
 
-	/// Message box with the current error. Returns true when retry requested
+	/// Sets the global errno as the current error string
+	bool SetErrno();
+
+	/// Show message box with the current error string. Returns true when retry requested
 	bool ShowError(SDL_MessageBoxFlags flags, SDL_Window *transientFor = nullptr);
 
 	/// Make SDL_assert activate a message box asking how to proceed

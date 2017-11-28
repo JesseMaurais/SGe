@@ -160,7 +160,7 @@ namespace
 
 		void QueryError(std::exception const &exception)
 		{
-			SDL::LogError(String(CaughtException), exception.what());
+			SDL::SetError(CaughtException, exception.what());
 			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 		}
 
@@ -183,7 +183,6 @@ Resources &FileWatch::Manager()
 #if defined(__LINUX__)
 
 #include <sys/inotify.h>
-#include <unistd.h>
 
 void FileMonitor::Thread()
 {
@@ -229,8 +228,7 @@ void FileMonitor::Thread()
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
 		{
-			SDL::perror("inotify read");
-			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+			if (SDL::perror("inotify read") and SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
 				continue;
 			}
@@ -266,10 +264,7 @@ void FileMonitor::Thread()
 #else // BSD
 #if defined(__BSD__)
 
-#warning "BSD interface is not complete"
-
 #include <sys/event.h>
-
 
 void FileWatcher::Thread()
 {
@@ -280,8 +275,8 @@ void FileWatcher::Thread()
 		return;
 	}
 
-	std::vector<struct kevent> monitor;
-	std::vector<struct kevent> events;
+	std::vector<struct kevent> all;
+	std::vector<struct kevent> ev;
 
 	while (not done) try
 	{
@@ -298,34 +293,30 @@ void FileWatcher::Thread()
 				{
 					struct kevent ev;
 					EV_SET(&ev, fd, EVFILT_VNODE, EV_ADD|EV_CLEAR, NOTE_WRITE, 0, path.c_str());
-					monitor.push_back(ev);
+					all.push_back(ev);
 				}
 			}
 			,
 			[&](fs::path const &path) // on remove
 			{
-				auto it = stl::find_if(monitor, [&](struct kevent &ev))
+				all.erase(stl::find_if(all, [&](struct kevent &ev))
 				{
-					union { void *address; char *string; };
+					union 
+					{
+						void *address;
+						char *string; 
+					};
 					address = ev.udata;
 					return path == string;
-				});
-				assert(monitor.end() != it);
-				if (monitor.end() != it)
-				{
-					EV_SET()
-					monitor.erase(it);
-
-				}
+				}));
 			}
 		);
 
 		// Block until there are events to process
-		int const nev = kevent(kq, monitor.data(), monitor.size(), events.data(), events.size(), nullptr);
+		int const nev = kevent(kq, all.data(), all.size(), ev.data(), ev.size(), nullptr);
 		if (-1 == nev)
 		{
-			SDL::SetError(ColonSeparator, "kevent", std::strerror(errno));
-			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+			if (SDL::perror("kevent") and SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
 				continue;
 			}
@@ -335,17 +326,23 @@ void FileWatcher::Thread()
 			}
 		}
 
-		for (int ev = 0; ev < nev; ++ev)
+		for (int it = 0; it < nev; ++it)
 		{
-			if (EV_ERROR == events[ev].flags)
+			if (EV_ERROR == ev[it].flags)
 			{
-				std::uintptr_t error = events[ev].data;
-				SDL::perror("EV_ERROR", std::strerror(error));
+				if (SDL::SetErrno(ev[it].data))
+				{
+					SDL::perror("EV_ERROR");
+				}
 			}
 			else
 			{
-				union { void *address; char *string; };
-				address = events[ev].udata;
+				union
+				{
+					void *address;
+					char *string; 
+				};
+				address = kev[ev].udata;
 				ProcessChange(string);
 			}
 		}
@@ -363,16 +360,24 @@ void FileWatcher::Thread()
 
 namespace
 {
-	bool SetLastError(std::string const &prefix)
+	bool LogLastError(char const *prefix)
 	{
 		LPSTR buffer = nullptr;
-		size_t size = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &buffer, 0, nullptr);
+		std::size_t const size = FormatMessage
+		( FORMAT_MESSAGE_ALLOCATE_BUFFER 
+		| FORMAT_MESSAGE_FROM_SYSTEM 
+		| FORMAT_MESSAGE_IGNORE_INSERTS
+		, nullptr
+		, GetLastError()
+		, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT)
+		, &buffer
+		, 0
+		, nullptr
+		);
 
 		std::string message(buffer, size);
 		LocalFree(buffer);
-		return SDL::perror(prefix, message);
+		return SDL::SetError(message) and SDL::LogError(prefix);
 	}
 }
 
@@ -392,7 +397,7 @@ void FileMonitor::Thread()
 				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, filter);
 				if (INVALID_HANDLE_VALUE == handle)
 				{
-					SetLastError("FindFirstChangeNotification");
+					LogLastError("FindFirstChangeNotification");
 				}
 				else
 				{
@@ -405,7 +410,7 @@ void FileMonitor::Thread()
 				HANDLE const handle = data.at(path);
 				if (FALSE == FindCloseChangeNotification(handle))
 				{
-					SetLastError("FindCloseChangeNotification");
+					LogLastError("FindCloseChangeNotification");
 				}
 				else
 				{
@@ -421,14 +426,14 @@ void FileMonitor::Thread()
 		DWORD const status = WaitForMultipleObjects(obj.size(), obj.data(), FALSE, INFINITE);
 		if (WAIT_FAILED == status)
 		{
-			SetLastError("WaitForMultipleObjects");
+			LogLastError("WaitForMultipleObjects");
 			return;
 		}
 		
 		HANDLE const handle = obj.at(status - WAIT_OBJECT_0);
 		if (FALSE == FindNextChangeNotification(handle))
 		{
-			SetLastError("FindNextChangeNotification");
+			LogLastError("FindNextChangeNotification");
 			continue;
 		}
 

@@ -3,12 +3,11 @@
 #include "OpenGL.hpp"
 #include "Error.hpp"
 #include "SDL.hpp"
-
-#include "stl/algorithm.hpp"
+#include "std.hpp"
 
 namespace
 {
-	// Get the shader info log and set it as the SDL error string.
+	// Get the shader info log and set it as the SDL error string
 	bool SetShaderError(GLuint const shader)
 	{
 		GLint length;
@@ -20,7 +19,7 @@ namespace
 		else if (length > 1)
 		{
 			std::vector<char> info(length);
-			glGetShaderInfoLog(shader, length, &length, info.data());
+			glGetShaderInfoLog(shader, info.size(), &length, info.data());
 			if (OpenGL::CheckError("glGetShaderInfoLog"))
 			{
 				SDL::LogError(CannotQueryShader);
@@ -33,7 +32,7 @@ namespace
 		return false;
 	}
 
-	// Get the program info log and set it as the SDL error string.
+	// Get the program info log and set it as the SDL error string
 	bool SetProgramError(GLuint const program)
 	{
 		GLint length;
@@ -45,7 +44,7 @@ namespace
 		else if (length > 1)
 		{
 			std::vector<char> info(length);
-			glGetProgramInfoLog(program, length, &length, info.data());
+			glGetProgramInfoLog(program, info.size(), &length, info.data());
 			if (OpenGL::CheckError("glGetProgramInfoLog"))
 			{
 				SDL::LogError(CannotQueryProgram);
@@ -58,10 +57,10 @@ namespace
 		return false;
 	}
 
-	// Set the shader source code, cut into \n delimited lines, and compile it.
+	// Set the shader source code, cut into \n delimited lines, and compile it
 	bool CompileShaderSource(GLuint const shader, std::vector<std::string> const &lines)
 	{
-		// Collect raw C strings.
+		// Collect raw C strings
 		std::vector<GLint> lengths;
 		std::vector<GLchar const *> strings;
 		for (auto const &line : lines)
@@ -69,7 +68,7 @@ namespace
 			lengths.emplace_back(line.size());
 			strings.emplace_back(line.data());
 		}
-		// Send the raw C strings to the OpenGL object and compile it.
+		// Send the raw C strings to the OpenGL object and compile it
 		glShaderSource(shader, lines.size(), strings.data(), lengths.data());
 		if (OpenGL::CheckError("glShaderSource"))
 		{
@@ -90,10 +89,10 @@ namespace
 		return false;
 	}
 
-	// Guess the shader type by inspecting the source code.
+	// Guess the shader type by inspecting the source code
 	GLenum GuessShaderType(std::string const &sourceCode)
 	{
-		// Inspect the first line (usually a comment) for a keyword.
+		// Inspect the first line (usually a comment) for a keyword
 		auto line = sourceCode.substr(0, sourceCode.find("\n"));
 		line = stl::to_upper(line); // case insensitive match
 

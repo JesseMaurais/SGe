@@ -1,32 +1,34 @@
 #include "FreeType.hpp"
-#include <SDL2/SDL.h>
-#include <cassert>
+#include "SDL.hpp"
 
-static const char *ErrorString(FT_Error error)
+namespace
 {
-	#undef __FTERRORS_H__
-	#define FT_ERRORDEF(e, v, s) { e, s },
-	#define FT_ERROR_START_LIST {
-	#define FT_ERROR_END_LIST { 0, NULL } };
-	const struct
+	char const *ErrorString(FT_Error const error)
 	{
-	 int error;
-	 const char *string;
-	} list[] =
-	#include <freetype2/freetype/fterrors.h>
-	for (unsigned it = 0; list[it].error; ++it)
-	{
-		if (error == list[it].error)
+		#undef __FTERRORS_H__
+		#define FT_ERRORDEF(e, v, s) { e, s },
+		#define FT_ERROR_START_LIST {
+		#define FT_ERROR_END_LIST { 0, NULL } };
+		const struct
 		{
-			return list[it].string;
+			int error;
+			char const *string;
+		} list[] =
+		#include <freetype2/freetype/fterrors.h>
+		for (unsigned it = 0; list[it].error; ++it)
+		{
+			if (error == list[it].error)
+			{
+				return list[it].string;
+			}
 		}
+		return "unknown";
 	}
-	return "unknown";
 }
 
-void FT_perror(const char *string, FT_Error error)
+void FT::SetError(FT_Error const error)
 {
-	return SDL_Log("%s: %s", string, ErrorString(error));
+	return SDL::SetError(ErrorString(error));
 }
 
 static FT_Library library;
@@ -35,28 +37,53 @@ static struct FreeType
 {
 	FreeType()
 	{
-		FT_Error error = FT_Init_FreeType(&library);
-		if (error) FT_perror("FT_InitFreeType", error);
+		FT_Error const error = FT_Init_FreeType(&library);
+		if (error)
+		{
+			if (FT::SetError(error))
+			{
+				SDL::perror("FT_InitFreeType");
+			}
+		}
 	}	
 
 	~FreeType()
 	{
-		FT_Error error = FT_Done_FreeType(library);
-		if (error) FT_perror("FT_Done_FreeType", error);
+		FT_Error const error = FT_Done_FreeType(library);
+		if (error) 
+		{
+			if (SDL::SetError(error))
+			{
+				FT::perror("FT_Done_FreeType");
+			}
+		}
 	}
+
 } FT;
 
 bool FontStruct::Load(const char *path)
 {
-	FT_Error error = FT_New_Face(library, path, 0, &face);
-	if (error) FT_perror("FT_New_Face", error);
-	return !error;
+	FT_Error const error = FT_New_Face(library, path, 0, &face);
+	if (error)
+	{
+		if (FT::SetError(error))
+		{
+			SDL::perror("FT_New_Face");
+		}
+	}
+	return not error;
 }
 
 void FontStruct::Free()
 {
-	FT_Error error = FT_Done_Face(face);
-	if (error) FT_perror("FT_Done_Face", error);
+	FT_Error const error = FT_Done_Face(face);
+	if (error)
+	{
+		if (FT::SetError(error))
+		{
+			SDL::perror("FT_Done_Face");
+		}
+	}
 }
 
 

@@ -5,7 +5,10 @@
 #include <freetype2/freetype/ftglyph.h>
 #include <freetype2/freetype/ftoutln.h>
 
-void FT_perror(const char *string, FT_Error);
+namespace FT
+{
+	void SetError(FT_Error const error);
+}
 
 struct CharStruct
 {

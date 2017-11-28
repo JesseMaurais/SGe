@@ -53,7 +53,7 @@ bool SourceCode::CreateProgram()
 		program = clCreateProgramWithSource(context, lines.size(), strings.data(), lengths.data(), &error);
 		if (OpenCL::CheckError("clCreateProgramWithSource", error))
 		{
-			SDL::perror(CannotAllocateResource);
+			SDL::LogError(CannotAllocateResource);
 		}
 	}
 	return program;
@@ -69,7 +69,7 @@ bool Kernel::Program::UpdateSource()
 		{
 			return true;
 		}
-		SDL::perror(CannotBuildProgram);
+		SDL::LogError(CannotBuildProgram);
 	}
 	return false;
 }

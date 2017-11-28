@@ -19,16 +19,22 @@ namespace SDL
 		return LogError(String(prefix));
 	}
 
-	/// Overload of SDL::perror that takes std::string
-	inline bool perror(std::string const &prefix)
+	/// Overload of SDL::SetErrno that takes std::string
+	inline bool SetErrno(std::string const &prefix)
 	{
-		return perror(prefix.c_str());
+		return SetErrno(prefix.c_str());
 	}
 
-	/// Overload of SDL::perror that takes Strings enumeration
-	inline bool perror(enum Strings prefix)
+	/// Overload of SDL::SetErrno that takes Strings enumeration
+	inline bool SetErrno(enum Strings prefix)
 	{
-		return perror(String(prefix));
+		return SetErrno(String(prefix));
+	}
+
+	/// Set error string with current errno and log it like perror does
+	inline bool perror(std::string const &prefix)
+	{
+		return SDL::SetErrno() and SDL::LogError(prefix);
 	}
 
 	/// Type-safe and format-safe version of SDL_SetError. Always returns true

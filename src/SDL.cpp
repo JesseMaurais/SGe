@@ -36,13 +36,18 @@ bool SDL::LogError(const char *origin)
 	return false;
 }
 
-bool SDL::perror(char const *origin)
+bool SDL::SetErrno(int errno)
 {
-	if (0 != errno) // some system calls also return -1 for no error
+	if (errno)
 	{
-		return SDL::SetError(ColonSeparator, origin, std::strerror(errno));
+		return SDL::SetError(std::strerror(errno));
 	}
 	return false;
+}
+
+bool SDL::SetErrno()
+{
+	return SDL::SetErrno(errno);
 }
 
 namespace

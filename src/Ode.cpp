@@ -61,23 +61,23 @@ static int SimulationThread(void *unused)
 	dAllocateODEDataForThread(dAllocateFlagCollisionData);
 	if (SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH))
 	{
-	 //SDL_perror("SDL_SetThreadPriority");
+	 //SDL::LogError("SDL_SetThreadPriority");
 	}
 	while (!Quit)
 	{
 		if (SDL_LockMutex(Mutex))
 		{
-			SDL::perror("SDL_LockMutex");
+			SDL::LogError("SDL_LockMutex");
 			break;
 		}
 		if (SDL_CondWait(Cond, Mutex))
 		{
-			SDL::perror("SDL_CondWait");
+			SDL::LogError("SDL_CondWait");
 			break;
 		}
 		if (not SDL::SendUserEvent(UpdateSpace))
 		{
-			SDL::perror("UpdateSpace");
+			SDL::LogError("UpdateSpace");
 			break;
 		}
 		dSpaceCollide(Space, 0, &Near);
@@ -93,12 +93,12 @@ static Uint32 SimulationTimer(Uint32 interval, void *unused)
 {
 	if (SDL_LockMutex(Mutex))
 	{
-		SDL::perror("SDL_LockMutex");
+		SDL::LogError("SDL_LockMutex");
 	}
 	else
 	if (SDL_CondSignal(Cond))
 	{
-		SDL::perror("SDL_CondSignal");
+		SDL::LogError("SDL_CondSignal");
 	}
 	else
 	{
@@ -236,7 +236,7 @@ signed Ode_Init()
 	 dWorldDestroy(World);
 	 dSpaceDestroy(Space);
 	 dJointGroupDestroy(Group);
-	 SDL::perror("SDL_CreateCond");
+	 SDL::LogError("SDL_CreateCond");
 	 return SDL_SetError("cannot create simulation signal");
 	}
 	Mutex = SDL_CreateMutex();
@@ -246,7 +246,7 @@ signed Ode_Init()
 	 dSpaceDestroy(Space);
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
-	 SDL::perror("SDL_CreateMutex");
+	 SDL::LogError("SDL_CreateMutex");
 	 return SDL_SetError("cannot create simulation mutex");
 	}
 	Thread = SDL_CreateThread(SimulationThread, "ODE", NULL);
@@ -257,7 +257,7 @@ signed Ode_Init()
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL::perror("SDL_CreateThread");
+	 SDL::LogError("SDL_CreateThread");
 	 return SDL_SetError("cannot create simulation thread");
 	}
 	TimerID = SDL_AddTimer(Uint32(1000*Step), SimulationTimer, NULL);
@@ -268,7 +268,7 @@ signed Ode_Init()
 	 dJointGroupDestroy(Group);
 	 SDL_DestroyCond(Cond);
 	 SDL_DestroyMutex(Mutex);
-	 SDL::perror("SDL_AddTimer");
+	 SDL::LogError("SDL_AddTimer");
 	 return SDL_SetError("cannot create simulation timer");
 	}
 	return 0;
@@ -291,7 +291,7 @@ signed Ode::Lock()
 {
 	if (SDL_LockMutex(Mutex))
 	{
-		SDL::perror("SDL_LockMutex");
+		SDL::LogError("SDL_LockMutex");
 		return -1;
 	}
 	return 0;
@@ -301,7 +301,7 @@ signed Ode::Unlock()
 {
 	if (SDL_UnlockMutex(Mutex))
 	{
-		SDL::perror("SDL_UnlockMutex");
+		SDL::LogError("SDL_UnlockMutex");
 		return -1;
 	}
 	return 0;
