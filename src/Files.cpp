@@ -273,7 +273,7 @@ void FileMonitor::Thread()
 
 void FileWatcher::Thread()
 {
-	int kq = kqueue();
+	int const kq = kqueue();
 	if (-1 == kq)
 	{
 		SDL::perror("kqueue", std::strerror(errno));
@@ -289,7 +289,7 @@ void FileWatcher::Thread()
 		(
 			[&](fs::path const &path) // on add
 			{
-				int fd = open(path.c_str(), O_EVTONLY);
+				int const fd = open(path.c_str(), O_EVTONLY);
 				if (-1 == fd)
 				{
 					SDL::perror("kqueue open", std::strerror(errno));
@@ -363,16 +363,16 @@ void FileWatcher::Thread()
 
 namespace
 {
-	std::string GetLastErrorAsString()
+	bool SetLastError(std::string const &prefix)
 	{
 		LPSTR buffer = nullptr;
 		size_t size = FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				nullptr, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &buffer, 0, nullptr);
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			nullptr, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &buffer, 0, nullptr);
 
 		std::string message(buffer, size);
 		LocalFree(buffer);
-		return message;
+		return SDL::perror(prefix, message);
 	}
 }
 
@@ -384,14 +384,15 @@ void FileMonitor::Thread()
 	{
 		// Update our list of directories watched
 
-		Update
+		UpdateWatchedFiles
 		(
 			[&](fs::path const &path) // on add
 			{
-				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+				constexpr DWORD filter = FILE_NOTIFY_CHANGE_LAST_WRITE;
+				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, filter);
 				if (INVALID_HANDLE_VALUE == handle)
 				{
-					SDL::perror("FindFirstChangeNotification", GetLastErrorAsString());
+					SetLastError("FindFirstChangeNotification");
 				}
 				else
 				{
@@ -404,7 +405,7 @@ void FileMonitor::Thread()
 				HANDLE const handle = data.at(path);
 				if (FALSE == FindCloseChangeNotification(handle))
 				{
-					SDL::perror("FindCloseChangeNotification", GetLastErrorAsString());
+					SetLastError("FindCloseChangeNotification");
 				}
 				else
 				{
@@ -420,14 +421,14 @@ void FileMonitor::Thread()
 		DWORD const status = WaitForMultipleObjects(obj.size(), obj.data(), FALSE, INFINITE);
 		if (WAIT_FAILED == status)
 		{
-			SDL::perror("WaitForMultipleObjects", GetLastErrorAsString());
+			SetLastError("WaitForMultipleObjects");
 			return;
 		}
 		
 		HANDLE const handle = obj.at(status - WAIT_OBJECT_0);
-		if (FALSE == FindNextChangeNotification(hChanged))
+		if (FALSE == FindNextChangeNotification(handle))
 		{
-			SDL::perror("FindNextChangeNotification", GetLastErrorAsString());
+			SetLastError("FindNextChangeNotification");
 			continue;
 		}
 
