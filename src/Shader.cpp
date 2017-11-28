@@ -15,7 +15,7 @@ namespace
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 		if (OpenGL::CheckError("glGetShaderiv"))
 		{
-			SDL::perror(CannotQueryShader);
+			SDL::LogError(CannotQueryShader);
 		}
 		else if (length > 1)
 		{
@@ -23,7 +23,7 @@ namespace
 			glGetShaderInfoLog(shader, length, &length, info.data());
 			if (OpenGL::CheckError("glGetShaderInfoLog"))
 			{
-				SDL::perror(CannotQueryShader);
+				SDL::LogError(CannotQueryShader);
 			}
 			else
 			{
@@ -40,7 +40,7 @@ namespace
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 		if (OpenGL::CheckError("glGetProgramiv"))
 		{
-			SDL::perror(CannotQueryProgram);
+			SDL::LogError(CannotQueryProgram);
 		}
 		else if (length > 1)
 		{
@@ -48,7 +48,7 @@ namespace
 			glGetProgramInfoLog(program, length, &length, info.data());
 			if (OpenGL::CheckError("glGetProgramInfoLog"))
 			{
-				SDL::perror(CannotQueryProgram);
+				SDL::LogError(CannotQueryProgram);
 			}
 			else
 			{
@@ -73,14 +73,14 @@ namespace
 		glShaderSource(shader, lines.size(), strings.data(), lengths.data());
 		if (OpenGL::CheckError("glShaderSource"))
 		{
-			SDL::perror(CannotCompileShader);
+			SDL::LogError(CannotCompileShader);
 		}
 		else
 		{
 			glCompileShader(shader);
 			if (OpenGL::CheckError("glCompileShader"))
 			{
-				SDL::perror(CannotCompileShader);
+				SDL::LogError(CannotCompileShader);
 			}
 			else
 			{
@@ -274,7 +274,7 @@ bool Shader::SourceCode::Attach(unsigned id)
 	glAttachShader(program, shader);
 	if (OpenGL::CheckError("glAttachShader"))
 	{
-		SDL::perror(CannotUseShader);
+		SDL::LogError(CannotUseShader);
 		return false;
 	}
 	return true;
@@ -287,7 +287,7 @@ bool Shader::SourceCode::Detach(unsigned id)
 	glDetachShader(program, shader);
 	if (OpenGL::CheckError("glDetachShader"))
 	{
-		SDL::perror(CannotUseShader);
+		SDL::LogError(CannotUseShader);
 		return false;
 	}
 	return true;
@@ -307,7 +307,7 @@ bool Shader::Link()
 				{
 					continue; // retry
 				}
-				SDL::perror(CannotLinkProgram);
+				SDL::LogError(CannotLinkProgram);
 			}
 			return false;
 		}
@@ -321,7 +321,7 @@ bool Shader::Use()
 	glUseProgram(program);
 	if (OpenGL::CheckError("glUseProgram"))
 	{
-		SDL::perror(CannotUseProgram);
+		SDL::LogError(CannotUseProgram);
 		return false;
 	}
 	return true;

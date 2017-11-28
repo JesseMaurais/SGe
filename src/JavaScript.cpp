@@ -580,7 +580,7 @@ namespace
 		js::Value const function = jerry_parse(begin, end-begin, strict);
 		if (js::CheckError(function))
 		{
-			SDL::perror("jerry_parse");
+			SDL::LogError("jerry_parse");
 			return;
 		}
 
@@ -588,7 +588,7 @@ namespace
 		js::Value const result = jerry_run(function);
 		if (js::CheckError(result))
 		{
-			SDL::perror("jerry_run");
+			SDL::LogError("jerry_run");
 			return;
 		}
 

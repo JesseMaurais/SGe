@@ -43,7 +43,7 @@ namespace
 			alGenBuffers(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenBuffers"))
 			{
-				SDL::perror(CannotAllocateResource);
+				SDL::LogError(CannotAllocateResource);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace
 			alDeleteBuffers(ids.size(), ids.data());
 			if (OpenAL::LogError("alDeleteBuffers"))
 			{
-				SDL::perror(CannotFreeResource);
+				SDL::LogError(CannotFreeResource);
 			}
 		}
 	};
@@ -76,16 +76,16 @@ namespace
 			alGenSources(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenSources"))
 			{
-				SDL::perror(CannotAllocateResource);
+				SDL::LogError(CannotAllocateResource);
 			}
 		}
 
 		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteSources(ids.size(), ids.data());
-			if (OpenAL::LogError("alDeleteSources"))
+			if (OpenAL::CheckError("alDeleteSources"))
 			{
-				SDL::perror(CannotFreeResource);
+				SDL::LogError(CannotFreeResource);
 			}
 		}
 	};
@@ -295,7 +295,7 @@ bool OpenAL::CheckError(const char *origin)
 bool OpenAL::LogError(const char *origin)
 {
 	ALenum const error = alGetError();
-	return error or SDL::perror(origin, alGetString(error));
+	return error or SDL::LogError(origin, alGetString(error));
 }
 
 // ALC error utility functions
@@ -314,5 +314,5 @@ bool OpenAL::CheckError(ALCdevice *device, const char *origin)
 bool OpenAL::LogError(ALCdevice *device, const char *origin)
 {
 	ALCenum const error = alcGetError(device);
-	return error or SDL::perror(origin, alcGetString(device, error));
+	return error or SDL::LogError(origin, alcGetString(device, error));
 }
