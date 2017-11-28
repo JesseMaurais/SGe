@@ -2,7 +2,9 @@
 #include "Error.hpp"
 #include "Strings.hpp"
 #include <sstream>
+#include <cstring>
 #include <string>
+#include <cerrno>
 
 
 bool SDL::Init(Uint32 const flags)
@@ -18,18 +20,27 @@ bool SDL::Init(Uint32 const flags)
 	return false;
 }
 
-bool SDL::perror(const char *origin, const char *error)
+bool SDL::LogError(const char *origin, const char *error)
 {
 	SDL::Log(ColonSeparator, origin, error);
 	return true;
 }
 
-bool SDL::perror(const char *origin)
+bool SDL::LogError(const char *origin)
 {
 	auto error = SDL_GetError();
 	if (error)
 	{
-		return SDL::perror(origin, error);
+		return SDL::LogError(origin, error);
+	}
+	return false;
+}
+
+bool SDL::perror(char const *origin)
+{
+	if (0 != errno) // some system calls also return -1 for no error
+	{
+		return SDL::SetError(ColonSeparator, origin, std::strerror(errno));
 	}
 	return false;
 }
@@ -81,9 +92,9 @@ namespace
 				auto const error = SDL_GetError();
 				if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, String(CannotShowMessageBox), error, window))
 				{
-					SDL::perror(CannotShowMessageBox);
+					SDL::LogError(CannotShowMessageBox);
 				}
-				SDL::perror(title, message);
+				SDL::LogError(title, message);
 			}
 			return static_cast<SDL_AssertState>(id);
 		}

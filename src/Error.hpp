@@ -7,13 +7,25 @@
 
 namespace SDL
 {
+	/// Overload of SDL::LogError that takes std::string
+	inline bool LogError(std::string const &prefix)
+	{
+		return LogError(prefix.c_str());
+	}
+
+	/// Overload of SDL::LogError that takes Strings enumeration
+	inline bool LogError(enum Strings prefix)
+	{
+		return LogError(String(prefix));
+	}
+
 	/// Overload of SDL::perror that takes std::string
 	inline bool perror(std::string const &prefix)
 	{
 		return perror(prefix.c_str());
 	}
 
-	/// Overload of SDL::perror that takes Strings enum
+	/// Overload of SDL::perror that takes Strings enumeration
 	inline bool perror(enum Strings prefix)
 	{
 		return perror(String(prefix));

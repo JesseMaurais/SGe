@@ -121,14 +121,14 @@ SDL_Surface *LoadSurface(const char *path, unsigned format)
 	SDL_Surface *image = IMG_Load(path);
 	if (not image)
 	{
-		SDL::perror("IMG_Load");
+		SDL::LogError("IMG_Load");
 		return nullptr;
 	}
 	SDL_Surface *convert = SDL_ConvertSurfaceFormat(image, format, 0);
 	SDL_FreeSurface(image);
 	if (not convert)
 	{
-		SDL::perror("SDL_ConvertSurfaceFormat");
+		SDL::LogError("SDL_ConvertSurfaceFormat");
 		return nullptr;
 	}
 	return convert;
@@ -139,7 +139,7 @@ signed LoadMipmaps(SDL_Surface *surface, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL::perror("FindFormat");
+		return SDL::LogError("FindFormat");
 	}
 	GLint error = gluBuild2DMipmaps
 	( GL_TEXTURE_2D
@@ -158,7 +158,7 @@ signed LoadTexture(SDL_Surface *surface, unsigned level, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL::perror("FindFormat");
+		return SDL::LogError("FindFormat");
 	}
 	glTexImage2D
 	( GL_TEXTURE_2D
@@ -179,7 +179,7 @@ signed LoadCubeMap(SDL_Surface *surface, unsigned face, unsigned internal)
 	GLenum format, type;
 	if (FindFormat(surface->format, &format, &type) < 0)
 	{
-		return SDL::perror("FindFormat");
+		return SDL::LogError("FindFormat");
 	}
 	glTexImage2D
 	( face

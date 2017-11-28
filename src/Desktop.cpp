@@ -250,7 +250,7 @@ namespace
 		}
 		catch (std::exception const &exception)
 		{
-			SDL::perror(exception.what());
+			SDL::LogError(String(CaughtException), exception.what());
 		}
 		return ~0;
 	}

@@ -36,7 +36,7 @@ namespace
 		{
 			if (self.empty())
 			{
-				SDL::perror(Folder);
+				SDL::LogError(Folder);
 				return;
 			}
 			added.push_back(self);
@@ -160,7 +160,7 @@ namespace
 
 		void QueryError(std::exception const &exception)
 		{
-			SDL::SetError(CaughtException, exception.what());
+			SDL::LogError(String(CaughtException), exception.what());
 			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 		}
 
@@ -190,7 +190,7 @@ void FileMonitor::Thread()
 	int const fd = inotify_init();
 	if (-1 == fd)
 	{
-		SDL::perror("inotify_init", std::strerror(errno));
+		SDL::perror("inotify_init");
 		return;
 	}
 
@@ -206,7 +206,7 @@ void FileMonitor::Thread()
 				int const wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
 				if (-1 == wd)
 				{
-					SDL::perror("inotify_add_watch", std::strerror(errno));
+					SDL::perror("inotify_add_watch");
 				}
 				else
 				{
@@ -219,7 +219,7 @@ void FileMonitor::Thread()
 				int const wd = data.at(path);
 				if (-1 == inotify_rm_watch(fd, wd))
 				{
-					SDL::perror("inotify_rm_watch", std::strerror(errno));
+					SDL::perror("inotify_rm_watch");
 				}
 				data.erase(path);
 			}
@@ -229,7 +229,7 @@ void FileMonitor::Thread()
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
 		{
-			SDL::SetError(ColonSeparator, "inotify read", std::strerror(errno));
+			SDL::perror("inotify read");
 			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
 			{
 				continue;
@@ -276,7 +276,7 @@ void FileWatcher::Thread()
 	int const kq = kqueue();
 	if (-1 == kq)
 	{
-		SDL::perror("kqueue", std::strerror(errno));
+		SDL::perror("kqueue");
 		return;
 	}
 
@@ -292,7 +292,7 @@ void FileWatcher::Thread()
 				int const fd = open(path.c_str(), O_EVTONLY);
 				if (-1 == fd)
 				{
-					SDL::perror("kqueue open", std::strerror(errno));
+					SDL::perror("kqueue open");
 				}
 				else
 				{

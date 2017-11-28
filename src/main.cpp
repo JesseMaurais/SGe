@@ -189,7 +189,7 @@ int main(int argc, char **argv)
 				file = opt.value ? std::fopen(opt.value, "r") : stdin;
 				if (not file)
 				{
-					SDL::perror(opt.value, std::strerror(errno));
+					SDL::LogError(opt.value, std::strerror(errno));
 					return EXIT_FAILURE;
 				}
 				continue;
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
 
 		if (not js::Init(jerry))
 		{
-			SDL::perror("Init Engine");
+			SDL::LogError("Init Engine");
 			return EXIT_FAILURE;
 		}
 
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
 
 		if (not SDL::Init(media))
 		{
-			SDL::perror("Init Media");
+			SDL::LogError("Init Media");
 			return EXIT_FAILURE;
 		}
 
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 
 		if (not video.empty() and SDL_VideoInit(video.c_str()))
 		{
-			SDL::perror(video);
+			SDL::LogError(video);
 			return EXIT_FAILURE;
 		}
 
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
 
 		if (not InitStream(prompt, file, buffer, strict))
 		{
-			SDL::perror("Init Stream");
+			SDL::LogError("Init Stream");
 			return EXIT_FAILURE;
 		}
 	}

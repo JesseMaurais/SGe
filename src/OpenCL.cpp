@@ -148,7 +148,7 @@ bool OpenCL::CheckError(const char *origin, cl_int error)
 
 bool OpenCL::LogError(const char *origin, cl_int error)
 {
-	return error and SDL::perror(origin, ErrorString(error));
+	return error and SDL::LogError(origin, ErrorString(error));
 }
 
 
@@ -166,7 +166,7 @@ std::vector<cl_platform_id> const &OpenCL::GetPlatformIDs()
 				cl_int error = clGetPlatformIDs(num_platforms, platforms, &num_platforms);
 				if (OpenCL::CheckError("clGetPlatformIDs", error))
 				{
-					SDL::perror(CannotQueryValue);
+					SDL::LogError(CannotQueryValue);
 					clear();
 					break;
 				}
@@ -195,7 +195,7 @@ std::vector<cl_device_id> const &OpenCL::GetDeviceIDs(cl_device_type type)
 				cl_int error = clGetDeviceIDs(platform, type, num_devices, devices, &num_devices);
 				if (OpenCL::CheckError("clGetDeviceIDs", error))
 				{
-					SDL::perror(CannotQueryValue);
+					SDL::LogError(CannotQueryValue);
 					clear();
 					break;
 				}
@@ -238,7 +238,7 @@ std::vector<cl_device_id> OpenCL::GetDeviceIDs(cl_context context)
 				cl_int error = clGetContextInfo(context, CL_CONTEXT_DEVICES, bytes, devices, &bytes);
 				if (OpenCL::CheckError("clGetContextInfo", error))
 				{
-					SDL::perror(CannotQueryValue);
+					SDL::LogError(CannotQueryValue);
 					clear();
 					break;
 				}
@@ -269,7 +269,7 @@ cl_context OpenCL::GetContext(std::vector<cl_context_properties> const &properti
 				context = clCreateContext(properties.data(), devices.size(), devices.data(), OnNotify, this, &error);
 				if (OpenCL::CheckError("clCreateContext", error))
 				{
-					SDL::perror(CannotAllocateResource);
+					SDL::LogError(CannotAllocateResource);
 				}
 			}
 		}
@@ -280,7 +280,7 @@ cl_context OpenCL::GetContext(std::vector<cl_context_properties> const &properti
 				cl_int error = clReleaseContext(context);
 				if (OpenCL::CheckError("clReleaseContext", error))
 				{
-					SDL::perror(CannotFreeResource);
+					SDL::LogError(CannotFreeResource);
 				}
 			}
 		}
@@ -292,7 +292,7 @@ cl_context OpenCL::GetContext(std::vector<cl_context_properties> const &properti
 			(void) info;
 			(void) size;
 			(void) that;
-			SDL::perror(__func__, error);
+			SDL::LogError(__func__, error);
 		}
 
 	} singleton;
@@ -325,7 +325,7 @@ cl_command_queue OpenCL::GetCommandQueue(std::vector<unsigned long> const &prope
 					queue = clCreateCommandQueueWithProperties(context, device, properties.data(), &error);
 					if (OpenCL::CheckError("clCreateCommandQueueWithProperties", error))
 					{
-						SDL::perror(CannotAllocateResource);
+						SDL::LogError(CannotAllocateResource);
 					}
 					else if (queue)
 					{
@@ -339,7 +339,7 @@ cl_command_queue OpenCL::GetCommandQueue(std::vector<unsigned long> const &prope
 			cl_int error = clReleaseCommandQueue(queue);
 			if (OpenCL::CheckError("glReleaseCommandQueue", error))
 			{
-				SDL::perror(CannotFreeResource);
+				SDL::LogError(CannotFreeResource);
 			}
 		}
 

@@ -74,7 +74,7 @@ void SDL::ProcessEvents()
 		}
 		else
 		{
-			SDL::perror("SDL_WaitEvent");
+			SDL::LogError("SDL_WaitEvent");
 		}
 
 		done |= SDL_QuitRequested() == SDL_TRUE;

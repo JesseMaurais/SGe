@@ -52,7 +52,7 @@ namespace
 			glGenTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glGenTextures"))
 			{
-				SDL::perror(CannotAllocateResource);
+				SDL::LogError(CannotAllocateResource);
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace
 			glDeleteTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glDeleteTextures"))
 			{
-				SDL::perror(CannotFreeResource);
+				SDL::LogError(CannotFreeResource);
 			}
 		}
 	};
@@ -85,7 +85,7 @@ namespace
 			glGenBuffers(ids.size(), ids.data());
 			if (OpenGL::CheckError("glGenBuffers"))
 			{
-				SDL::perror(CannotAllocateResource);
+				SDL::LogError(CannotAllocateResource);
 			}
 		}
 
@@ -94,7 +94,7 @@ namespace
 			glDeleteBuffers(ids.size(), ids.data());
 			if (OpenGL::CheckError("glDeleteTextures"))
 			{
-				SDL::perror(CannotFreeResource);
+				SDL::LogError(CannotFreeResource);
 			}
 		}
 	};
@@ -120,7 +120,7 @@ namespace
 				GLuint const program = glCreateProgram();
 				if (OpenGL::CheckError("glCreateProgram"))
 				{
-					SDL::perror(CannotAllocateResource);
+					SDL::LogError(CannotAllocateResource);
 				}
 				return program;
 			});
@@ -133,7 +133,7 @@ namespace
 				glDeleteProgram(program);
 				if (OpenGL::CheckError("glDeleteProgram"))
 				{
-					SDL::perror(CannotFreeResource);
+					SDL::LogError(CannotFreeResource);
 				}
 			});
 		}
@@ -166,7 +166,7 @@ namespace
 				pair.shader = glCreateShader(pair.type);
 				if (OpenGL::CheckError("glCreateShader"))
 				{
-					SDL::perror(CannotAllocateResource);
+					SDL::LogError(CannotAllocateResource);
 				}
 			});
 		}
@@ -178,7 +178,7 @@ namespace
 				glDeleteShader(pair.shader);
 				if (OpenGL::CheckError("glDeleteShader"))
 				{
-					SDL::perror(CannotFreeResource);
+					SDL::LogError(CannotFreeResource);
 				}
 			});
 		}
@@ -213,7 +213,7 @@ bool OpenGL::CheckError(const char *origin)
 bool OpenGL::LogError(const char *origin)
 {
 	GLenum const error = glGetError();
-	return error and SDL::perror(origin, ErrorString(error));
+	return error and SDL::LogError(origin, ErrorString(error));
 }
 
 // OpenGL resource utility functions
@@ -333,7 +333,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 					// Attach if creation succeeded
 					if (SDL_GL_MakeCurrent(window, context))
 					{
-						SDL::perror("SDL_GL_MakeCurrent");
+						SDL::LogError("SDL_GL_MakeCurrent");
 					}
 					// Once only
 					static bool init = false;
@@ -349,7 +349,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 							};
 							// Log without setting error string
 							bytes = glewGetErrorString(error);
-							SDL::perror("glewInit", string);
+							SDL::LogError("glewInit", string);
 						}
 						else init = true;
 					}
@@ -358,7 +358,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 				else
 				{
 					// Set error string and return null
-					SDL::perror("SDL_GL_CreateContext");
+					SDL::LogError("SDL_GL_CreateContext");
 				}
 			}
 		}
@@ -373,7 +373,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 				{
 					if (SDL_GL_MakeCurrent(nullptr, nullptr))
 					{
-						SDL::perror("SDL_GL_MakeCurrent");
+						SDL::LogError("SDL_GL_MakeCurrent");
 					}
 				}
 				SDL_GL_DeleteContext(context);
