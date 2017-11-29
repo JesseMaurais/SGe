@@ -8,8 +8,7 @@
 #include <deque>
 #include <set>
 
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+namespace fs = stl::filesystem;
 
 namespace
 {
@@ -42,7 +41,7 @@ namespace
 		}
 	}
 
-	// Get the next non empty line from an input stream
+	// Get the next non empty line from an INI format input stream
 	bool GetNextLine(std::istream &stream, std::string &line)
 	{
 		while (std::getline(stream, line))
@@ -62,6 +61,7 @@ namespace
 		return false;
 	}
 
+	// Determine if line is an INI section and strip it
 	bool IsSection(std::string &line)
 	{
 		constexpr auto npos = std::string::npos;
@@ -90,20 +90,46 @@ std::vector<std::string> sys::GetSystemDirs()
 	return SplitDirs(path);
 }
 
+
+std::string sys::GetBaseDir()
+{
+	return SDL_GetBasePath();
+}
+
+std::string sys::GetHomeDir()
+{
+	std::string dir = std::getenv("HOME");
+	if (dir.empty())
+	{
+		dir = std::getenv("USERPROFILE");
+	}
+	return dir;
+}
+
 std::vector<std::string> sys::GetDataDirs()
 {
-	using strings = std::vector<std::string>;
-	return POSIX ? strings{ "/usr/local/share", "/usr/share" }
-		: strings{ std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
+	if (POSIX)
+	{
+		return { "/usr/local/share", "/usr/share" };
+	}
+	else
+	{
+		return { std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
+	}
 }
 
 std::vector<std::string> sys::GetConfigDirs()
 {
-	using strings = std::vector<std::string>;
-	return POSIX ? strings{ "/etc" }
-		: strings{ std::getenv("COMMONPROGRAMFILES") };
+	if (POSIX)
+	{
+		return { "/etc" };
+	}
+	else
+	{
+		return { std::getenv("COMMONPROGRAMFILES") };
+	}
 }
-	
+
 std::string sys::GetProgramPath(std::string const &name)
 {
 	// Unless extension is given, assume it's a binary
@@ -170,24 +196,8 @@ std::string sys::GetTemporaryPath(std::string const &filename)
 	return dir;
 }
 
-std::string sys::GetHomeDir()
+bool sys::LoadConfigs(std::string const &path, sys::ini &config, bool replace)
 {
-	std::string dir = std::getenv("HOME");
-	if (dir.empty())
-	{
-		dir = std::getenv("USERPROFILE");
-	}
-	return dir;
-}
-
-std::string sys::GetBaseDir()
-{
-	return SDL_GetBasePath();
-}
-
-sys::ini sys::LoadConfigs(std::string const &path)
-{
-	sys::ini config;
 	auto section = config.end();
 
 	std::string line;
@@ -199,32 +209,32 @@ sys::ini sys::LoadConfigs(std::string const &path)
 			sys::ini::mapped_type empty;
 			auto pair = config.emplace(line, empty);
 			section = pair.first;
-			if (not pair.second)
+			if (not replace and not pair.second)
 			{
-				// Section not unique
+				SDL::SetError(IniSectionNotUnique, line);
 				config.clear();
-				break;
+				return false;
 			}
 			continue;
 		}
 
 		if (config.end() == section)
 		{
-			// Missing section
+			SDL::SetError(IniKeyBeforeSection, line);
 			config.clear();
-			break;
+			return false;
 		}
 
 		auto pair = section->second.emplace(stl::param_value(line));
-		if (not pair.second)
+		if (not replace and not pair.second)
 		{
-			// Key not unique
+			SDL::SetError(IniKeyNotUnique, line);
 			config.clear();
-			break;
+			return false;
 		}
 	}
 
-	return config;
+	return true;
 }
 
 namespace

@@ -5,6 +5,7 @@ namespace
 {
 	char const *ErrorString(FT_Error const error)
 	{
+		#ifndef __CDT_PARSER__
 		#undef __FTERRORS_H__
 		#define FT_ERRORDEF(e, v, s) { e, s },
 		#define FT_ERROR_START_LIST {
@@ -22,6 +23,7 @@ namespace
 				return list[it].string;
 			}
 		}
+		#endif // CDT PARSER
 		return "unknown";
 	}
 }

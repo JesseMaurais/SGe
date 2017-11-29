@@ -38,7 +38,7 @@ namespace SDL
 	}
 
 	/// Type-safe and format-safe version of SDL_SetError. Always returns true
-	template <typename... Args>	bool SetError(std::string const &format, Args&&... args)
+	template <typename... Args> bool SetError(std::string const &format, Args&&... args)
 	{
 		std::string message;
 		stl::sprintf(message, format, args...);
@@ -46,13 +46,13 @@ namespace SDL
 	}
 
 	/// Type-safe and format-safe version taking Strings enum. Always returns true
-	template <typename... Args>	bool SetError(enum Strings format, Args&&... args)
+	template <typename... Args> bool SetError(enum Strings format, Args&&... args)
 	{
 		return SetError(String(format), args...);
 	}
 
 	/// Type-safe and format-safe version of SDL_Log
-	template <typename... Args>	void Log(std::string const &format, Args&&... args)
+	template <typename... Args> void Log(std::string const &format, Args&&... args)
 	{
 		std::string message;
 		stl::sprintf(message, format, args...);
@@ -60,7 +60,7 @@ namespace SDL
 	}
 
 	// Type-safe and format-safe version taking Strings enum
-	template <typename... Args>	void Log(enum Strings format, Args&&... args)
+	template <typename... Args> void Log(enum Strings format, Args&&... args)
 	{
 		Log(String(format), args...);
 	}

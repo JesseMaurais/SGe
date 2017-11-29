@@ -14,6 +14,12 @@ namespace sys
 	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
 
+	/// Get the application base directory
+	std::string GetBaseDir();
+
+	/// Get an absolute path to the user's home directory
+	std::string GetHomeDir();
+
 	/// Get absolute paths to folders for sharing application data
 	std::vector<std::string> GetDataDirs();
 
@@ -29,15 +35,9 @@ namespace sys
 	/// Get an absolute path to a temporary file name
 	std::string GetTemporaryPath(std::string const &filename);
 
-	/// Get an absolute path to the user's home directory
-	std::string GetHomeDir();
-
-	/// Get the application base directory
-	std::string GetBaseDir();
-
 	using ini = std::map<std::string, std::map<std::string, std::string>>;
 	/// Get the content of a configuration file
-	ini LoadConfigs(std::string const &path);
+	bool LoadConfigs(std::string const &path, ini &configs, bool replace=true);
 }
 
 namespace xdg

@@ -14,6 +14,9 @@ enum Strings
 	,NoDebugger
 	,NameNotUnique
 	,CaughtException
+	,IniSectionNotUnique
+	,IniKeyBeforeSection
+	,IniKeyNotUnique
 	,InvalidArgumentRange
 	,InvalidArgument
 	,InvalidName

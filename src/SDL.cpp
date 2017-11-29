@@ -55,7 +55,7 @@ namespace
 	{
 	public:
 
-		MessageBox(const char *message, SDL_Window *window, SDL_MessageBoxFlags flags)
+		MessageBox(std::string const &message, SDL_Window *window, SDL_MessageBoxFlags flags)
 		{
 			constexpr unsigned buttonCount = 5;
 
@@ -83,7 +83,7 @@ namespace
 			this->numbuttons = ButtonsUsedFor(flags);
 			this->buttons = buttons;
 			this->colorScheme = &colorScheme;
-			this->message = message;
+			this->message = message.c_str();
 			this->title = TitleUsedFor(flags);
 			this->window = window;
 		}
