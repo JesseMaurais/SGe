@@ -19,7 +19,7 @@ namespace SDL
 	bool LogError(char const *origin, char const *error);
 
 	/// Sets the system errno as the current error string. Returns true when errno is non zero
-	bool SetErrno(int errno);
+	bool SetErrno(int const error);
 
 	/// Sets the global errno as the current error string
 	bool SetErrno();

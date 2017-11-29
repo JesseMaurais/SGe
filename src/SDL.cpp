@@ -1,9 +1,8 @@
 #include "SDL.hpp"
+#include "std.hpp"
 #include "Error.hpp"
 #include "Strings.hpp"
-#include <sstream>
 #include <cstring>
-#include <string>
 #include <cerrno>
 
 
@@ -20,13 +19,13 @@ bool SDL::Init(Uint32 const flags)
 	return false;
 }
 
-bool SDL::LogError(const char *origin, const char *error)
+bool SDL::LogError(char const *origin, const char *error)
 {
 	SDL::Log(ColonSeparator, origin, error);
 	return true;
 }
 
-bool SDL::LogError(const char *origin)
+bool SDL::LogError(char const *origin)
 {
 	auto error = SDL_GetError();
 	if (error)
@@ -36,11 +35,11 @@ bool SDL::LogError(const char *origin)
 	return false;
 }
 
-bool SDL::SetErrno(int errno)
+bool SDL::SetErrno(int const error)
 {
-	if (errno)
+	if (error)
 	{
-		return SDL::SetError(std::strerror(errno));
+		return SDL::SetError(std::strerror(error));
 	}
 	return false;
 }
@@ -139,21 +138,27 @@ namespace
 
 	SDL_AssertState AssertionHandler(const SDL_AssertData *data, void *user)
 	{
-		if (data->always_ignore) return SDL_ASSERTION_IGNORE;
+		if (data->always_ignore)
+		{
+			return SDL_ASSERTION_IGNORE;
+		}
 
-		std::stringstream stream;
-		stream << "Assertion failure at " << data->function;
-		stream << " in " << data->filename << " on line " << data->linenum << ", ";
-		stream << "triggered " << data->trigger_count << " times\n";
-		stream << "\t'" << data->condition << "'\n";
+		std::string message;
+		stl::sprintf
+		( message
+		, "Assert failed at %1 in %2 on line %3, %4 times\t\t%5\n"
+		, data->function
+		, data->filename
+		, data->linenum
+		, data->trigger_count
+		, data->condition
+		);
 
 		union {
 		 SDL_Window *window;
 		 void *address;
 		};
 		if (user) address = user;
-		auto const string = stream.str();
-		auto const message = string.c_str();
 		return MessageBox(message, window, SDL_MESSAGEBOX_ERROR);
 	}
 }

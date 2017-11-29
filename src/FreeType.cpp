@@ -1,5 +1,5 @@
 #include "FreeType.hpp"
-#include "SDL.hpp"
+#include "Error.hpp"
 
 namespace
 {
@@ -26,16 +26,16 @@ namespace
 	}
 }
 
-void FT::SetError(FT_Error const error)
+bool FT::SetError(FT_Error const error)
 {
 	return SDL::SetError(ErrorString(error));
 }
 
-static FT_Library library;
-
-static struct FreeType
+static struct FreeTypeClass
 {
-	FreeType()
+	FT_Library library;
+
+	FreeTypeClass()
 	{
 		FT_Error const error = FT_Init_FreeType(&library);
 		if (error)
@@ -45,25 +45,24 @@ static struct FreeType
 				SDL::perror("FT_InitFreeType");
 			}
 		}
-	}	
-
-	~FreeType()
+	}
+	~FreeTypeClass()
 	{
 		FT_Error const error = FT_Done_FreeType(library);
 		if (error) 
 		{
-			if (SDL::SetError(error))
+			if (FT::SetError(error))
 			{
-				FT::perror("FT_Done_FreeType");
+				SDL::perror("FT_Done_FreeType");
 			}
 		}
 	}
 
-} FT;
+} FreeType;
 
-bool FontStruct::Load(const char *path)
+FT::FontStruct::FontStruct(std::string const &path)
 {
-	FT_Error const error = FT_New_Face(library, path, 0, &face);
+	FT_Error const error = FT_New_Face(FreeType.library, path.c_str(), 0, &face);
 	if (error)
 	{
 		if (FT::SetError(error))
@@ -71,10 +70,9 @@ bool FontStruct::Load(const char *path)
 			SDL::perror("FT_New_Face");
 		}
 	}
-	return not error;
 }
 
-void FontStruct::Free()
+FT::FontStruct::~FontStruct()
 {
 	FT_Error const error = FT_Done_Face(face);
 	if (error)
