@@ -18,20 +18,20 @@ namespace SDL
 	/// Logs the given error string with origin as prefix. Always returns true
 	bool LogError(char const *origin, char const *error);
 
-	/// Sets the system errno as the current error string. Returns true when errno is non zero
+	/// Sets the given errno as the current error string. Returns true when errno is non zero
 	bool SetErrno(int const error);
 
-	/// Sets the global errno as the current error string
+	/// Sets the system errno as the current error string. Returns true when errno is non zero
 	bool SetErrno();
 
 	/// Show message box with the current error string. Returns true when retry requested
-	bool ShowError(SDL_MessageBoxFlags flags, SDL_Window *transientFor = nullptr);
+	bool ShowError(SDL_MessageBoxFlags const flags, SDL_Window *transientFor = nullptr);
 
 	/// Make SDL_assert activate a message box asking how to proceed
-	void SetAssertionHandler(SDL_Window *transientFor = nullptr);
+	void SetAssertHandler(SDL_Window *transientFor = nullptr);
 
 	/// Reset to the default error handler and flush all prior asserts
-	void ResetAssertionHandler();
+	void ResetAssertHandler();
 
 	/// Make assertion message box in scope transient for a window
 	class ScopedAssertHandler

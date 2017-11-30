@@ -98,15 +98,17 @@ std::string sys::GetBaseDir()
 
 std::string sys::GetHomeDir()
 {
-	std::string dir = std::getenv("HOME");
-	if (dir.empty())
+	if (POSIX)
 	{
-		dir = std::getenv("USERPROFILE");
+		return std::getenv("HOME");
 	}
-	return dir;
+	else
+	{
+		return std::getenv("USERPROFILE");
+	}
 }
 
-std::vector<std::string> sys::GetDataDirs()
+std::vector<std::string> sys::GetSharedDirs()
 {
 	if (POSIX)
 	{
@@ -114,7 +116,7 @@ std::vector<std::string> sys::GetDataDirs()
 	}
 	else
 	{
-		return { std::getenv("APPDATA"), std::getenv("LOCALAPPDATA") };
+		return { std::getenv("ALLUSERSPROFILE") };
 	}
 }
 
@@ -249,7 +251,7 @@ namespace
 		{
 			// Write stdout to a temporary file
 			fs::path path = sys::GetTemporaryPath(args.front());
-			args.push_back(">" + stl::quote(std::string(path)));
+			args.push_back(">" + stl::quote(path));
 			// Execute and acquire return value
 			std::string const command = stl::merge(args, " ");
 			int const status = std::system(command.c_str());
@@ -454,8 +456,8 @@ bool xdg::Open(std::string const &path)
 		std::deque<std::string> args;
 		args.push_back(open);
 		args.push_back(path);
-		std::vector<std::string> out; // dummy
-		return 0 == SystemCommand(args, out);
+		std::vector<std::string> dummy;
+		return 0 == SystemCommand(args, dummy);
 	}
 	return false;
 }

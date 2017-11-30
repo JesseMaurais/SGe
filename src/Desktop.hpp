@@ -45,8 +45,8 @@ namespace xdg
 	/// Get the home data directory
 	std::string GetDataHome();
 
-	/// Get the system data directories
-	std::vector<std::string> GetDataDirs();
+	/// Get the shared data directories
+	std::vector<std::string> GetSharedDirs();
 
 	/// Get the configuration home directory
 	std::string GetConfigHome();

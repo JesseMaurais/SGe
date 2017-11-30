@@ -51,39 +51,39 @@ bool SDL::SetErrno()
 
 namespace
 {
+	constexpr unsigned ButtonCount = 5;
+
+	SDL_MessageBoxButtonData const buttons[ButtonCount] =
+	{
+	{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, SDL_ASSERTION_IGNORE, String(MessageBoxContinue) },
+	{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, SDL_ASSERTION_ABORT, String(MessageBoxAbort) },
+	{ 0, SDL_ASSERTION_RETRY, String(MessageBoxRetry) },
+	{ 0, SDL_ASSERTION_BREAK, String(MessageBoxBreak) },
+	{ 0, SDL_ASSERTION_ALWAYS_IGNORE, String(MessageBoxIgnore) },
+	};
+
+	SDL_MessageBoxColorScheme const colorScheme =
+	{
+		{
+			{  47,  52,  63 }, // SDL_MESSAGEBOX_COLOR_BACKGROUND
+			{ 211, 218, 227 }, // SDL_MESSAGEBOX_COLOR_TEXT
+			{  56,  60,  74 }, // SDL_MESSAGEBOX_COLOR_BUTTON_BORDER
+			{  64,  69,  82 }, // SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND
+			{  64, 132, 214 }, // SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED
+		}
+	};
+
 	class MessageBox : SDL_MessageBoxData
 	{
 	public:
 
-		MessageBox(std::string const &message, SDL_Window *window, SDL_MessageBoxFlags flags)
+		MessageBox(std::string const &text, SDL_Window *window, SDL_MessageBoxFlags const flags)
 		{
-			constexpr unsigned buttonCount = 5;
-
-			const SDL_MessageBoxButtonData buttons[buttonCount] =
-			{
-				{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, SDL_ASSERTION_IGNORE, String(MessageBoxContinue) },
-				{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, SDL_ASSERTION_ABORT, String(MessageBoxAbort) },
-				{ 0, SDL_ASSERTION_RETRY, String(MessageBoxRetry) },
-				{ 0, SDL_ASSERTION_BREAK, String(MessageBoxBreak) },
-				{ 0, SDL_ASSERTION_ALWAYS_IGNORE, String(MessageBoxIgnore) },
-			};
-
-			const SDL_MessageBoxColorScheme colorScheme =
-			{
-				{
-					{  47,  52,  63 }, // SDL_MESSAGEBOX_COLOR_BACKGROUND
-					{ 211, 218, 227 }, // SDL_MESSAGEBOX_COLOR_TEXT
-					{  56,  60,  74 }, // SDL_MESSAGEBOX_COLOR_BUTTON_BORDER
-					{  64,  69,  82 }, // SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND
-					{  64, 132, 214 }, // SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED
-				}
-			};
-
 			this->flags = flags;
 			this->numbuttons = ButtonsUsedFor(flags);
 			this->buttons = buttons;
 			this->colorScheme = &colorScheme;
-			this->message = message.c_str();
+			this->message = text.c_str();
 			this->title = TitleUsedFor(flags);
 			this->window = window;
 		}
@@ -94,7 +94,7 @@ namespace
 			if (SDL_ShowMessageBox(this, &id))
 			{
 				auto const error = SDL_GetError();
-				if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, String(CannotShowMessageBox), error, window))
+				if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, error, window))
 				{
 					SDL::LogError(CannotShowMessageBox);
 				}
@@ -136,7 +136,7 @@ namespace
 		}
 	};
 
-	SDL_AssertState AssertionHandler(const SDL_AssertData *data, void *user)
+	SDL_AssertState AssertionHandler(SDL_AssertData const *data, void *user)
 	{
 		if (data->always_ignore)
 		{
@@ -146,7 +146,7 @@ namespace
 		std::string message;
 		stl::sprintf
 		( message
-		, "Assert failed at %1 in %2 on line %3, %4 times\t\t%5\n"
+		, "Assert failed at %1 in %2 on line %3, %4 times\n\t%5\n"
 		, data->function
 		, data->filename
 		, data->linenum
@@ -163,7 +163,7 @@ namespace
 	}
 }
 
-bool SDL::ShowError(SDL_MessageBoxFlags flags, SDL_Window *window)
+bool SDL::ShowError(SDL_MessageBoxFlags const flags, SDL_Window *window)
 {
 	auto message = SDL_GetError();
 	if (message)
