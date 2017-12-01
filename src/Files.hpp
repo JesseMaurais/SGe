@@ -3,11 +3,16 @@
 
 #include "Source.hpp"
 
-class FileWatch : ManagedSource<FileWatch>
+class ManagedFile : public ManagedSource<ManagedFile>
 {
+public:
+
+	ManagedFile(std::string const &path);
+	~ManagedFile();
+
 private:
 
-	friend ManagedSource<FileWatch>;
+	friend ManagedSource<ManagedFile>;
 	static Resources &Manager();
 };
 

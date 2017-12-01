@@ -19,7 +19,6 @@ Source *ManagedResources::Remove(unsigned id)
 	return that;
 }
 
-
 bool ManagedResources::Has(unsigned id)
 {
 	return id < sources.size() and sources.at(id);

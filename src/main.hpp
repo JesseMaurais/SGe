@@ -18,6 +18,12 @@
 #include <cstdio>
 #include <cmath>
 
+// POSIX
+
+#if defined(_POSIX_VERSION)
+#include <pthread.h>
+#endif 
+
 // C++ Containers
 
 //#include <string_view>
@@ -57,7 +63,7 @@
 #include <thread>
 #include <future>
 #include <mutex>
-#include <shared_mutex>
+//#include <shared_mutex>
 #include <condition_variable>
 
 // C++ Utility
@@ -75,12 +81,6 @@
 //#include <memory_resource>
 //#include <scoped_allocator>
 #include <new>
-
-// C++ Runtime Type Information
-
-#include <typeinfo>
-#include <typeindex>
-#include <type_traits>
 
 // JavaScript
 
@@ -103,11 +103,6 @@
 // OpenCL
 
 #include <CL/cl.h>
-
-// Ode
-
-#define dDOUBLE
-#include <ode/ode.h>
 
 // SDL2
 

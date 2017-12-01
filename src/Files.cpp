@@ -45,6 +45,7 @@ namespace
 				Thread(); 
 			});
 		}
+
 		~FileMonitor()
 		{
 			if (not self.empty())
@@ -54,7 +55,7 @@ namespace
 			}
 		}
 
-		void AddWatch(std::vector<fs::path> const &paths)
+		void AddWatch(fs::path const &paths)
 		{
 			std::ofstream stream(self/AddedFilename);
 			for (fs::path const &path : paths)
@@ -63,7 +64,7 @@ namespace
 			}
 		}
 
-		void RemoveWatch(std::vector<fs::path> const &paths)
+		void RemoveWatch(fs::path const &paths)
 		{
 			std::ofstream stream(self/RemovedFilename);
 			for (fs::path const &path : paths)
@@ -149,13 +150,7 @@ namespace
 			}
 			else
 			{
-				NotifyChange(path);
 			}
-		}
-
-		void NotifyChange(fs::path const &path)
-		{
-			(void) path;
 		}
 
 		void QueryError(std::exception const &exception)
@@ -174,9 +169,19 @@ namespace
 	};
 }
 
-Resources &FileWatch::Manager()
+Resources &ManagedFile::Manager()
 {
 	return FileMonitor::Instance();
+}
+
+ManagedFile::ManagedFile(std::string const &path)
+{
+	
+}
+
+ManagedFile::~ManagedFile()
+{
+
 }
 
 

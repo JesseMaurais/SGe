@@ -9,6 +9,7 @@ enum UserEventType
 {
 	EscapeEvent,
 	EvaluateScript,
+	FileChanged,
 	UpdateOpenAL,
 	UpdateOpenCL,
 	UpdateOpenGL,

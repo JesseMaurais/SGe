@@ -1,7 +1,7 @@
 CC = g++
 RM = rm
 MKDIR = mkdir
-STDFLAGS = -std=c++17 -D_POSIX_C_SOURCE -I/usr/include/freetype2
+STDFLAGS = -std=c++17
 DBGFLAGS = -Wall -Wextra -Winvalid-pch -g
 DFLAGS = -MMD -MP
 CFLAGS = $(DBGFLAGS) $(STDFLAGS) 
