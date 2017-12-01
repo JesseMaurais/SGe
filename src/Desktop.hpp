@@ -24,7 +24,7 @@ namespace sys
 	std::vector<std::string> GetDataDirs();
 
 	/// Get absolute paths to folders for configuration data
-	std::vector<std::string> GetConfigDirs();
+	std::vector<std::string> GetSharedDirs();
 
 	/// Get an absolute path to an executable found in the system PATH
 	std::string GetProgramPath(std::string const &program);

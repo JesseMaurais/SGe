@@ -8,7 +8,6 @@ class ManagedFile : public ManagedSource<ManagedFile>
 public:
 
 	ManagedFile(std::string const &path);
-	~ManagedFile();
 
 private:
 

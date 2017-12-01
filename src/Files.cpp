@@ -3,20 +3,19 @@
 #include "Desktop.hpp"
 #include "Manager.hpp"
 #include "Error.hpp"
+#include "Event.hpp"
 #include "std.hpp"
 
 namespace fs = stl::filesystem;
 
 namespace
 {
-	// Files that provide monitoring commands
-	constexpr char const *AddedFilename = "add";
-	constexpr char const *RemovedFilename = "remove";
-	// Folder monitored for asynchronous commands
+	constexpr char const *AddedFilename = "Add";
+	constexpr char const *RemovedFilename = "Remove";
 	constexpr char const *Folder = "FileWatch";
 
 
-	class FileMonitor : public ManagedResources
+	class FileManager : public Manager<fs::path>
 	{
 	private:
 
@@ -25,14 +24,21 @@ namespace
 		bool done = false;
 
 		// Monitored file data
-		std::set<fs::path> watched;
+		std::map<fs::path, unsigned> watched;
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
 		fs::path const self;
 
-		FileMonitor()
-		: self(sys::GetTemporaryPath(Folder))
+		ScopedEventHandler updater;
+		static void UpdateHandler(SDL_Event const &event)
+		{
+			Instance().Update();
+		}
+
+		FileManager()
+		: updater(SDL::UserEvent(UpdateFiles), UpdateHandler)
+		, self(sys::GetTemporaryPath(Folder))
 		{
 			if (self.empty())
 			{
@@ -46,30 +52,12 @@ namespace
 			});
 		}
 
-		~FileMonitor()
+		~FileManager()
 		{
 			if (not self.empty())
 			{
-				RemoveWatch({self});
+				stl::touch(self);
 				future.wait();
-			}
-		}
-
-		void AddWatch(fs::path const &paths)
-		{
-			std::ofstream stream(self/AddedFilename);
-			for (fs::path const &path : paths)
-			{
-				stream << path;
-			}
-		}
-
-		void RemoveWatch(fs::path const &paths)
-		{
-			std::ofstream stream(self/RemovedFilename);
-			for (fs::path const &path : paths)
-			{
-				stream << path;
 			}
 		}
 
@@ -159,11 +147,34 @@ namespace
 			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 		}
 
+		bool SendUpdate() override
+		{
+			return SDL::SendUserEvent(FileChanged);
+		}
+
+		void Generate(std::vector<fs::path> &ids) override
+		{
+			std::ofstream stream(self/AddedFilename);
+			for (fs::path const &path : ids)
+			{
+				stream << path;
+			}
+		}
+
+		void Destroy(std::vector<fs::path> const &ids) override
+		{
+			std::ofstream stream(self/RemovedFilename);
+			for (fs::path const &path : ids)
+			{
+				stream << path;
+			}
+		}
+
 	public:
 
-		static FileMonitor &Instance()
+		static FileManager &Instance()
 		{
-			static FileMonitor singleton;
+			static FileManager singleton;
 			return singleton;
 		}
 	};
@@ -171,25 +182,21 @@ namespace
 
 Resources &ManagedFile::Manager()
 {
-	return FileMonitor::Instance();
+	return FileManager::Instance();
 }
 
 ManagedFile::ManagedFile(std::string const &path)
 {
-	
+	FileManager::Instance().Data(id) = path;
 }
 
-ManagedFile::~ManagedFile()
-{
-
-}
 
 
 #if defined(__LINUX__)
 
 #include <sys/inotify.h>
 
-void FileMonitor::Thread()
+void FileManager::Thread()
 {
 	int const fd = inotify_init();
 	if (-1 == fd)
@@ -271,7 +278,7 @@ void FileMonitor::Thread()
 
 #include <sys/event.h>
 
-void FileWatcher::Thread()
+void FileManager::Thread()
 {
 	int const kq = kqueue();
 	if (-1 == kq)
@@ -386,7 +393,7 @@ namespace
 	}
 }
 
-void FileMonitor::Thread()
+void FileManager::Thread()
 {
 	std::map<fs::path, HANDLE> data;
 
