@@ -5,6 +5,8 @@
 
 namespace stl
 {
+	// Non-modifying sequence operations
+
 	template <typename Container, typename Operation>
 	inline void for_each(Container &&c, Operation &&op)
 	{
@@ -22,6 +24,8 @@ namespace stl
 	{
 		return std::find_if_not(std::begin(c), std::end(c), p);
 	}
+
+	// Modifying sequence operations
 
 	template <typename Container, typename Iterator>
 	inline auto copy(Container &&c, Iterator &&it) -> decltype(c.end())
@@ -52,6 +56,16 @@ namespace stl
 	{
 		std::replace(c.begin(), c.end(), a, b);
 	}
+
+	// Sorting operations
+	
+	template <typename Container, typename Compare>
+	inline void sort(Container &&c, Compare &&cmp)
+	{
+		std::sort(c.begin(), c.end(), cmp);
+	}
+
+	// Binary search operations (on sorted ranges)
 
 	template <typename Container, typename Value>
 	inline auto lower_bound(Container&& c, Value const &a) -> decltype(c.end())

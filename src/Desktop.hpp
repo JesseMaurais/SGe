@@ -11,6 +11,9 @@
 
 namespace sys
 {
+	/// Get name of the current user
+	std::string GetCurrentUserName();
+
 	/// System PATH environment variable separated into components
 	std::vector<std::string> GetSystemDirs();
 
@@ -21,10 +24,10 @@ namespace sys
 	std::string GetHomeDir();
 
 	/// Get absolute paths to folders for sharing application data
-	std::vector<std::string> GetDataDirs();
+	std::vector<std::string> GetSharedDirs();
 
 	/// Get absolute paths to folders for configuration data
-	std::vector<std::string> GetSharedDirs();
+	std::vector<std::string> GetConfigDirs();
 
 	/// Get an absolute path to an executable found in the system PATH
 	std::string GetProgramPath(std::string const &program);
@@ -96,7 +99,7 @@ namespace zen
 
 	enum SelectFile { None, Multiple=1, Directory=2, Save=4 };
 	/// Open a file selection dialog
-	bool SelectFile(std::vector<std::string> &out, enum SelectFile options=None, std::string const &path="", std::string const &title="");
+	bool SelectFile(std::vector<std::string> &out, enum SelectFile opt=None, std::string const &path="", std::string const &title="");
 }
 
 #endif // file

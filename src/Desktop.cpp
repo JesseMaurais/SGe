@@ -31,7 +31,7 @@ namespace
 	}
 
 	// Read all the lines from a text file
-	void ReadLinesFromFile(fs::path const &path, std::vector<std::string> &out)
+	void ReadLinesFromFile(std::string const &path, std::vector<std::string> &out)
 	{
 		std::string line;
 		std::ifstream istream(path);
@@ -82,6 +82,19 @@ namespace
 		}
 		return false;
 	}
+}
+
+std::string sys::GetCurrentUserName()
+{
+	for (auto const env : { "LOGNAME", "USER", "USERNAME" })
+	{
+		auto const var = std::getenv(env);
+		if (var)
+		{
+			return var;
+		}
+	}
+	return std::string();
 }
 
 std::vector<std::string> sys::GetSystemDirs()
@@ -147,12 +160,12 @@ std::string sys::GetProgramPath(std::string const &name)
 		if (fs::exists(path))
 		{
 			// Check executable status
-			auto status = fs::status(path);
-			auto permissions = status.permissions();
-			permissions &= fs::perms::group_exec;
-			if (fs::perms::none != permissions)
+			//auto status = fs::status(path);
+			//auto permissions = status.permissions();
+			//permissions &= fs::perms::group_exec;
+			//if (fs::perms::none != permissions)
 			{
-				return path; // usable
+				return path.string(); // usable
 			}
 		}
 	}
@@ -164,15 +177,14 @@ std::string sys::GetTemporaryDir()
 	static struct TemporaryDir
 	{
 		fs::path dir;
-		std::error_code error;
 		TemporaryDir(std::string const &foldername)
 		{
-			fs::path path = fs::temp_directory_path(error);
-			if (not error)
+			fs::path path = fs::temp_directory_path();
+			//if (not error)
 			{
 				path /= foldername;
-				fs::remove_all(path, error);
-				if (fs::create_directory(path, error))
+				fs::remove_all(path);
+				if (fs::create_directory(path))
 				{
 					dir = path;
 				}
@@ -180,22 +192,17 @@ std::string sys::GetTemporaryDir()
 		}
 
 	} temp(String(Application));
-
-	if (temp.error)
-	{
-		SDL::SetError(temp.error.message());
-	}
-	return temp.dir;
+	return temp.dir.string();
 }
 
 std::string sys::GetTemporaryPath(std::string const &filename)
 {
-	static fs::path const dir = sys::GetTemporaryDir();
-	if (not dir.empty())
+	static fs::path const path = sys::GetTemporaryDir();
+	if (not path.empty())
 	{
-		return dir/filename;
+		return (path/filename).string();
 	}
-	return dir;
+	return path.string();
 }
 
 bool sys::LoadConfigs(std::string const &path, sys::ini &config, bool replace)
@@ -250,7 +257,7 @@ namespace
 		if (HasProcessor) try
 		{
 			// Write stdout to a temporary file
-			fs::path path = sys::GetTemporaryPath(args.front());
+			std::string path = sys::GetTemporaryPath(args.front());
 			args.push_back(">" + stl::quote(path));
 			// Execute and acquire return value
 			std::string const command = stl::merge(args, " ");

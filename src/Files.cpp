@@ -24,7 +24,6 @@ namespace
 		bool done = false;
 
 		// Monitored file data
-		std::map<fs::path, unsigned> watched;
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
@@ -138,6 +137,7 @@ namespace
 			}
 			else
 			{
+
 			}
 		}
 

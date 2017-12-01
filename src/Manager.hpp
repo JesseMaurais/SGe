@@ -101,7 +101,7 @@ private:
 	// Capture the id and generate in queue later
 	unsigned Add(Source* that) override
 	{
-		unsigned index = Manager::Add(that);
+		unsigned index = ManagedResources::Add(that);
 		added.push_back(index);
 		QueueUpdate();
 		return index;
@@ -110,7 +110,7 @@ private:
 	// Capture the id and destroy in queue later
 	Source* Remove(unsigned index) override
 	{
-		Source *that = Manager::Remove(index);
+		Source *that = ManagedResources::Remove(index);
 		removed.push_back(data.at(index));
 		stl::replace(added, Size(), index);
 		data.at(index) = data.back();
