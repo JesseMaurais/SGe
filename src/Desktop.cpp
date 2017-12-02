@@ -160,10 +160,7 @@ std::string sys::GetProgramPath(std::string const &name)
 		if (fs::exists(path))
 		{
 			// Check executable status
-			//auto status = fs::status(path);
-			//auto permissions = status.permissions();
-			//permissions &= fs::perms::group_exec;
-			//if (fs::perms::none != permissions)
+			if (stl::is_exe(path))
 			{
 				return path.string(); // usable
 			}
@@ -177,14 +174,15 @@ std::string sys::GetTemporaryDir()
 	static struct TemporaryDir
 	{
 		fs::path dir;
+		stl::error_code err;
 		TemporaryDir(std::string const &foldername)
 		{
-			fs::path path = fs::temp_directory_path();
-			//if (not error)
+			fs::path path = fs::temp_directory_path(err);
+			if (not err)
 			{
 				path /= foldername;
-				fs::remove_all(path);
-				if (fs::create_directory(path))
+				fs::remove_all(path, err);
+				if (fs::create_directory(path, err))
 				{
 					dir = path;
 				}
@@ -306,7 +304,7 @@ std::string xdg::GetDataHome()
 		path = sys::GetHomeDir();
 		path /= ".local/share";
 	}
-	return path;
+	return path.string();
 }
 
 std::vector<std::string> xdg::GetDataDirs()
@@ -314,7 +312,7 @@ std::vector<std::string> xdg::GetDataDirs()
 	std::string dirs = std::getenv("XDG_DATA_DIRS");
 	if (dirs.empty())
 	{
-		return sys::GetDataDirs();
+		return sys::GetSharedDirs();
 	}
 	return SplitDirs(dirs);
 }
@@ -327,7 +325,7 @@ std::string xdg::GetConfigHome()
 		path = sys::GetHomeDir();
 		path /= ".config";
 	}
-	return path;
+	return path.string();
 }
 
 std::vector<std::string> xdg::GetConfigDirs()
@@ -339,7 +337,7 @@ std::vector<std::string> xdg::GetConfigDirs()
 		for (fs::path path : sys::GetConfigDirs())
 		{
 			path /= "xdg";
-			dirs.emplace_back(path);
+			dirs.emplace_back(path.string());
 		}
 		return dirs;
 	}
@@ -354,7 +352,7 @@ std::string xdg::GetCacheHome()
 		path = sys::GetHomeDir();
 		path /= ".cache";
 	}
-	return path;
+	return path.string();
 }
 
 std::vector<std::string> xdg::GetIconDirs()
@@ -367,7 +365,7 @@ std::vector<std::string> xdg::GetIconDirs()
 		path /= ".icons";
 		if (fs::exists(path))
 		{
-			paths.push_back(path);
+			paths.push_back(path.string());
 		}
 	}
 
@@ -378,30 +376,29 @@ std::vector<std::string> xdg::GetIconDirs()
 		path /= "icons";
 		if (fs::exists(path))
 		{
-			paths.push_back(path);
+			paths.push_back(path.string());
 		}
 	}
 
 	// Last in shared pixmaps
 	
-	for (fs::path path : sys::GetDataDirs())
+	for (fs::path path : sys::GetSharedDirs())
 	{
 		path /= "pixmaps";
 		if (fs::exists(path))
 		{
-			paths.push_back(path);
+			paths.push_back(path.string());
 		}
 	}
 
 	return paths;
 }
 
-bool xdg::IsDesktop(std::string const &string)
+bool xdg::IsDesktop(std::string const &path)
 {
 	static std::set<std::string> const set = { ".desktop", ".directory" };
 
-	fs::path const path = string;
-	fs::path const extension = path.extension();
+	std::string const extension = fs::path(path).extension().string();
 
 	// With no extension use magic
 	if (extension.empty())
@@ -423,7 +420,7 @@ std::vector<std::string> xdg::FindApplicationMenus()
 		path /= applications_menu;
 		if (fs::exists(path))
 		{
-			paths.push_back(path);
+			paths.push_back(path.string());
 		}
 	}
 	return paths;
@@ -443,11 +440,11 @@ std::vector<std::string> xdg::FindDesktopApplications()
 
 			while (it != end)
 			{
-				fs::path const &path = *it;
+				path = *it;
 
-				if (xdg::IsDesktop(path))
+				if (xdg::IsDesktop(path.string()))
 				{
-					paths.push_back(path);
+					paths.push_back(path.string());
 				}
 			}
 		}

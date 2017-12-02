@@ -82,7 +82,7 @@ namespace
 			this->flags = flags;
 			this->numbuttons = ButtonsUsedFor(flags);
 			this->buttons = buttons;
-			this->colorScheme = &colorScheme;
+			this->colorScheme = colorScheme;
 			this->message = text.c_str();
 			this->title = TitleUsedFor(flags);
 			this->window = window;
@@ -187,12 +187,12 @@ bool SDL::ShowError(SDL_MessageBoxFlags const flags, SDL_Window *window)
 	return false;
 }
 
-void SDL::SetAssertionHandler(SDL_Window *window)
+void SDL::SetAssertHandler(SDL_Window *window)
 {
 	SDL_SetAssertionHandler(AssertionHandler, window);
 }
 
-void SDL::ResetAssertionHandler()
+void SDL::ResetAssertHandler()
 {
 	SDL_ResetAssertionReport();
 	SDL_AssertionHandler handler = SDL_GetDefaultAssertionHandler();
@@ -202,7 +202,7 @@ void SDL::ResetAssertionHandler()
 SDL::ScopedAssertHandler::ScopedAssertHandler(SDL_Window *window)
 {
 	handler = SDL_GetAssertionHandler(&userdata);
-	SetAssertionHandler(window);
+	SDL::SetAssertHandler(window);
 }
 
 SDL::ScopedAssertHandler::~ScopedAssertHandler()

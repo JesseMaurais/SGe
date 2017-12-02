@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		std::string programName = stl::filesystem::path(argv[0]).filename();
+		std::string programName = stl::filesystem::path(argv[0]).filename().string();
 
 		// Defaults for the JavaScript engine
 

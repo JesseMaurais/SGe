@@ -19,21 +19,23 @@ namespace
 	{
 	private:
 
+		ScopedEventHandler updater;
+		static void UpdateHandler(SDL_Event const &event)
+		{
+			(void)event;
+			verify(Instance().Update());
+		}
+
 		// Thread control data
 		std::future<void> future;
 		bool done = false;
 
 		// Monitored file data
+		std::set<fs::path> watched;
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
 		fs::path const self;
-
-		ScopedEventHandler updater;
-		static void UpdateHandler(SDL_Event const &event)
-		{
-			Instance().Update();
-		}
 
 		FileManager()
 		: updater(SDL::UserEvent(UpdateFiles), UpdateHandler)
@@ -55,7 +57,7 @@ namespace
 		{
 			if (not self.empty())
 			{
-				stl::touch(self);
+				stl::touch(self.string());
 				future.wait();
 			}
 		}
@@ -102,11 +104,11 @@ namespace
 		{
 			if (self < path) // update self
 			{
-				std::string string = path.filename();
+				std::string string = path.filename().string();
 				// Filename selects the operation
 				if (string == AddedFilename)
 				{
-					std::ifstream stream(path);
+					std::ifstream stream(path.string());
 					while (std::getline(stream, string))
 					{
 						if (not (self < string))
@@ -118,7 +120,7 @@ namespace
 				else
 				if (string == RemovedFilename)
 				{
-					std::ifstream stream(path);
+					std::ifstream stream(path.string());
 					while (std::getline(stream, string))
 					{
 						if (not (self < string))
@@ -133,7 +135,7 @@ namespace
 					}
 				}
 				// Clear contents
-				stl::truncate(path);
+				stl::truncate(path.string());
 			}
 			else
 			{
@@ -154,7 +156,8 @@ namespace
 
 		void Generate(std::vector<fs::path> &ids) override
 		{
-			std::ofstream stream(self/AddedFilename);
+			fs::path const path = self/AddedFilename;
+			std::ofstream stream(path.string());
 			for (fs::path const &path : ids)
 			{
 				stream << path;
@@ -163,7 +166,8 @@ namespace
 
 		void Destroy(std::vector<fs::path> const &ids) override
 		{
-			std::ofstream stream(self/RemovedFilename);
+			fs::path const path = self/RemovedFilename;
+			std::ofstream stream(path.string());
 			for (fs::path const &path : ids)
 			{
 				stream << path;
