@@ -11,14 +11,15 @@ public:
 	virtual ~ManagedResources() = default;
 	unsigned Add(Source *that) override;
 	Source *Remove(unsigned id) override;
-	bool Has(unsigned id);
-	unsigned Size();
+	Source *At(unsigned id) const;
+	bool Has(unsigned id) const;
+	unsigned Size() const;
 
 protected:
 
-	unsigned UpdateSources();
-	unsigned UpdateSources(std::vector<Source*> const &sources);
-	unsigned UpdateSources(std::vector<unsigned> const &ids);
+	unsigned UpdateSources() const;
+	unsigned UpdateSources(std::vector<Source*> const &sources) const;
+	unsigned UpdateSources(std::vector<unsigned> const &ids) const;
 
 private:
 
@@ -72,6 +73,18 @@ public:
 	Type &Data(unsigned index)
 	{
 		return data.at(index);
+	}
+
+	// Locate corresponding source of data
+	Source *Find(Type const &value) const
+	{
+		auto const it = stl::find(data, value);
+		if (data.end() != it)
+		{
+			auto const index = std::distance(data.begin(), it);
+			return ManagedResources::At(index);
+		}
+		return nullptr;
 	}
 
 protected:

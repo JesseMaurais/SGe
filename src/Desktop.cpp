@@ -160,7 +160,7 @@ std::string sys::GetProgramPath(std::string const &name)
 		if (fs::exists(path))
 		{
 			// Check executable status
-			if (stl::is_exe(path))
+			if (stl::is_executable(path))
 			{
 				return path.string(); // usable
 			}
@@ -190,6 +190,12 @@ std::string sys::GetTemporaryDir()
 		}
 
 	} temp(String(Application));
+
+	if (temp.err)
+	{
+		SDL::SetError(temp.err.message());
+	}
+
 	return temp.dir.string();
 }
 

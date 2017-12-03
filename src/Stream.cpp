@@ -17,11 +17,12 @@ namespace
 	// Flag to signal thread can continue
 	bool Ready;
 
-	void SendStream(bool strict, char *data, std::size_t size)
+	void SendStream(bool strict, char *line, std::size_t size)
 	{
 		Ready = false; // reset signal flag
+		std::string string(line, size);
 		// SDL_PushEvent is already thread safe
-		SDL::SendUserEvent(EvaluateScript, strict, data, data + size);
+		SDL::SendUserEvent(EvaluateScript, strict, string);
 		// Wait for main thread to signal it's done processing
 		std::unique_lock<std::mutex> lock(Mutex);
 		Condition.wait(lock, []{ return Ready; });

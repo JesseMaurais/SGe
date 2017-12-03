@@ -14,17 +14,26 @@ namespace
 	constexpr char const *RemovedFilename = "Remove";
 	constexpr char const *Folder = "FileWatch";
 
+	enum UpdateEventCode
+	{
+		NotifyFileChanged,
+		WatchedFiles,
+	};
 
 	class FileManager : public Manager<fs::path>
 	{
+	public:
+
+		static FileManager &Instance()
+		{
+			static FileManager singleton;
+			return singleton;
+		}
+
 	private:
 
+		// File event handler
 		ScopedEventHandler updater;
-		static void UpdateHandler(SDL_Event const &event)
-		{
-			(void)event;
-			verify(Instance().Update());
-		}
 
 		// Thread control data
 		std::future<void> future;
@@ -35,6 +44,7 @@ namespace
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
+		// Path to own directory
 		fs::path const self;
 
 		FileManager()
@@ -61,6 +71,8 @@ namespace
 				future.wait();
 			}
 		}
+
+		// The following methods are called in the monitoring thread
 
 		void Thread(); // platform dependent
 
@@ -102,44 +114,79 @@ namespace
 
 		void ProcessChange(fs::path const &path)
 		{
-			if (self < path) // update self
+			if (not (self < path))
 			{
-				std::string string = path.filename().string();
-				// Filename selects the operation
-				if (string == AddedFilename)
+				std::string const message = path.string();
+				// Queue the file event so that it is updated in the main thread
+				if (not SDL::SendUserEvent(UpdateFiles, NotifyFileChanged, message))
 				{
+					SDL::LogError(CannotSendEvent);
+				}
+			}
+			else // update self
+			{
+				if (path.filename() == AddedFilename)
+				{
+					// Add watched files
+					std::string line;
 					std::ifstream stream(path.string());
-					while (std::getline(stream, string))
+					while (std::getline(stream, line))
 					{
-						if (not (self < string))
+						if (not (self < line))
 						{
-							added.push_back(string);
+							added.push_back(line);
 						}
 					}
 				}
 				else
-				if (string == RemovedFilename)
+				if (path.filename() == RemovedFilename)
 				{
+					// Remove watched files
+					std::string line;
 					std::ifstream stream(path.string());
-					while (std::getline(stream, string))
+					while (std::getline(stream, line))
 					{
-						if (not (self < string))
+						if (not (self < line))
 						{
-							removed.push_back(string);
+							removed.push_back(line);
 						}
 						else
-						if (self == string)
+						if (self == line)
 						{
 							done = true;
 						}
 					}
 				}
-				// Clear contents
+				// Clear file contents
 				stl::truncate(path.string());
 			}
-			else
-			{
+		}
 
+		// The following methods are called in the main thread
+
+		static void UpdateHandler(SDL_Event const &event)
+		{
+			switch (event.user.code)
+			{
+			case NotifyFileChanged:
+				Instance().Notify(event);
+				break;
+			case WatchedFiles:
+				Instance().Update();
+				break;
+			default:
+				assert(not "UpdateEventCode");
+			}
+		}
+
+		void Notify(SDL_Event const &event)
+		{
+			fs::path path = SDL::UserEventData(event);
+			// Notify the source of changed file
+			Source *that = Find(path);
+			if (that)
+			{
+				that->UpdateSource();
 			}
 		}
 
@@ -151,7 +198,7 @@ namespace
 
 		bool SendUpdate() override
 		{
-			return SDL::SendUserEvent(FileChanged);
+			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
 		}
 
 		void Generate(std::vector<fs::path> &ids) override
@@ -172,14 +219,6 @@ namespace
 			{
 				stream << path;
 			}
-		}
-
-	public:
-
-		static FileManager &Instance()
-		{
-			static FileManager singleton;
-			return singleton;
 		}
 	};
 }
@@ -268,7 +307,8 @@ void FileManager::Thread()
 		};
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{
-			ProcessChange(fs::path(ev->name, ev->name + ev->len));
+			std::string const path(ev->name, ev->len);
+			ProcessChange(path);
 		}
 	}
 	catch (std::exception const &exception)

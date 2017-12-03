@@ -13,14 +13,20 @@ namespace stl
 		std::for_each(c.begin(), c.end(), op);
 	}
 
+	template <typename Value, typename Alloc, template <typename, typename> class Container>
+	inline auto find(Container<Value, Alloc> const &c, Value const &value) -> decltype(c.end())
+	{
+		return std::find(c.begin(), c.end(), value);
+	}
+
 	template <typename Container, typename Predicate>
-	inline auto find_if(Container &&c, Predicate &&p) -> decltype(c.begin())
+	inline auto find_if(Container &&c, Predicate &&p) -> decltype(c.end())
 	{
 		return std::find_if(c.begin(), c.end(), p);
 	}
 
 	template <typename Container, typename Predicate>
-	inline auto find_if_not(Container &&c, Predicate &&p) -> decltype(c.begin())
+	inline auto find_if_not(Container &&c, Predicate &&p) -> decltype(c.end())
 	{
 		return std::find_if_not(std::begin(c), std::end(c), p);
 	}
@@ -63,32 +69,6 @@ namespace stl
 	inline void sort(Container &&c, Compare &&cmp)
 	{
 		std::sort(c.begin(), c.end(), cmp);
-	}
-
-	// Binary search operations (on sorted ranges)
-
-	template <typename Container, typename Value>
-	inline auto lower_bound(Container&& c, Value const &a) -> decltype(c.end())
-	{
-		return lower_bound(c.begin(), c.end(), a);
-	}
-
-	template <typename Container, typename Value, typename Compare>
-	inline auto lower_bound(Container&& c, Value const &a, Compare&& op) -> decltype(c.end())
-	{
-		return lower_bound(c.begin(), c.end(), a, op);
-	}
-
-	template <typename Container, typename Value>
-	inline auto upper_bound(Container&& c, Value const &a) -> decltype(c.end())
-	{
-		return upper_bound(c.begin(), c.end(), a);
-	}
-
-	template <typename Container, typename Value, typename Compare>
-	inline auto upper_bound(Container&& c, Value const &a, Compare&& op) -> decltype(c.end())
-	{
-		return upper_bound(c.begin(), c.end(), a, op);
 	}
 }
 

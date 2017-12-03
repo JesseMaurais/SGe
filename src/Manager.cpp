@@ -19,22 +19,27 @@ Source *ManagedResources::Remove(unsigned id)
 	return that;
 }
 
-bool ManagedResources::Has(unsigned id)
+Source *ManagedResources::At(unsigned id) const
 {
-	return id < sources.size() and sources.at(id);
+	return id < sources.size() ? sources.at(id) : nullptr;
 }
 
-unsigned ManagedResources::Size()
+bool ManagedResources::Has(unsigned id) const
+{
+	return At(id) != nullptr;
+}
+
+unsigned ManagedResources::Size() const
 {
 	return to_unsigned(sources.size());
 }
 
-unsigned ManagedResources::UpdateSources()
+unsigned ManagedResources::UpdateSources() const
 {
 	return UpdateSources(sources);
 }
 
-unsigned ManagedResources::UpdateSources(std::vector<Source*> const &sources)
+unsigned ManagedResources::UpdateSources(std::vector<Source*> const &sources) const
 {
 	unsigned count = 0;
 	for (auto const that : sources)
@@ -47,7 +52,7 @@ unsigned ManagedResources::UpdateSources(std::vector<Source*> const &sources)
 	return count;
 }
 
-unsigned ManagedResources::UpdateSources(std::vector<unsigned> const &ids)
+unsigned ManagedResources::UpdateSources(std::vector<unsigned> const &ids) const
 {
 	unsigned count = 0;
 	for (unsigned const id : ids)

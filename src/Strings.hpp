@@ -36,6 +36,7 @@ enum Strings
 	,CannotLock
 	,CannotUnlock
 	,CannotMakeExit
+	,CannotSendEvent
 	,CannotStartProcess
 	,CannotFindFormat
 	,CannotShowMessageBox

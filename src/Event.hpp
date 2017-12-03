@@ -9,7 +9,6 @@ enum UserEventType
 {
 	EscapeEvent,
 	EvaluateScript,
-	FileChanged,
 	UpdateFiles,
 	UpdateOpenAL,
 	UpdateOpenCL,
@@ -36,7 +35,9 @@ namespace SDL
 {
 	void ProcessEvents();
 	unsigned UserEvent(enum UserEventType type);
-	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char *begin = nullptr, char *end = nullptr);
+	bool SendUserEvent(enum UserEventType type, unsigned code = 0);
+	bool SendUserEvent(enum UserEventType type, unsigned code, std::string const &string);
+	std::string UserEventData(SDL_Event const &event);
 }
 
 #endif // file

@@ -6,24 +6,6 @@
 #include <stack>
 #include <map>
 
-
-unsigned SDL::UserEvent(enum UserEventType type)
-{
-	assert(type < UserEventCount);
-	static Uint32 const base = SDL_RegisterEvents(UserEventCount);
-	return static_cast<unsigned>(type) + base;
-}
-
-bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *begin, char *end)
-{
-	SDL_Event event;
-	event.user.type = SDL::UserEvent(type);
-	event.user.code = code;
-	event.user.data1 = begin;
-	event.user.data2 = end;
-	return 0 == SDL_PushEvent(&event);
-}
-
 namespace
 {
 	using Stack = std::stack<EventHandler>;
@@ -52,6 +34,25 @@ namespace
 		{
 			stack.top()(event);
 		}
+	}
+
+	bool SendUserEvent(enum UserEventType type, unsigned code, char *data, std::size_t size)
+	{
+		SDL_Event event;
+		event.user.type = SDL::UserEvent(type);
+		event.user.code = code;
+		event.user.data1 = data;
+		event.user.data2 = data + size;
+		return 0 == SDL_PushEvent(&event);
+	}
+
+	char *UserEventData(SDL_Event const &event, std::size_t &size)
+	{
+		char *begin = static_cast<char*>(event.user.data1);
+		char *end = static_cast<char*>(event.user.data2);
+		assert(begin <= end);
+		size = end - begin;
+		return begin;
 	}
 }
 
@@ -85,6 +86,43 @@ void SDL::ProcessEvents()
 		done |= not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 	}
 	while (not done);
+}
+
+
+unsigned SDL::UserEvent(enum UserEventType type)
+{
+	assert(type < UserEventCount);
+	static Uint32 const base = SDL_RegisterEvents(UserEventCount);
+	return static_cast<unsigned>(type) + base;
+}
+
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code)
+{
+	return ::SendUserEvent(type, code, nullptr, 0);
+}
+
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code, std::string const &string)
+{
+	char *data = SDL_strdup(string.c_str());
+	if (not data)
+	{
+		SDL::SetError(OutOfMemory);
+		return false;
+	}
+	return ::SendUserEvent(type, code, data, string.size());
+}
+
+std::string SDL::UserEventData(SDL_Event const &event)
+{
+	std::size_t size;
+	char *data = ::UserEventData(event, size);
+	if (data)
+	{
+		std::string string(data, size);
+		std::free(data);
+		return string;
+	}
+	return std::string();
 }
 
 ScopedEventHandler::ScopedEventHandler(unsigned type, EventHandler handler)
