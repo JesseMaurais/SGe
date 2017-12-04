@@ -27,7 +27,7 @@ namespace
 		HandlerStack(eventCode).pop();
 	}
 
-	void DispatchEvent(const SDL_Event &event)
+	void Dispatch(const SDL_Event &event)
 	{
 		Stack const &stack = HandlerStack(event.type);
 		if (not stack.empty())
@@ -35,57 +35,43 @@ namespace
 			stack.top()(event);
 		}
 	}
-
-	bool SendUserEvent(enum UserEventType type, unsigned code, char *data, std::size_t size)
-	{
-		SDL_Event event;
-		event.user.type = SDL::UserEvent(type);
-		event.user.code = code;
-		event.user.data1 = data;
-		event.user.data2 = data + size;
-		return 0 == SDL_PushEvent(&event);
-	}
-
-	char *UserEventData(SDL_Event const &event, std::size_t &size)
-	{
-		char *begin = static_cast<char*>(event.user.data1);
-		char *end = static_cast<char*>(event.user.data2);
-		assert(begin <= end);
-		size = end - begin;
-		return begin;
-	}
 }
 
 void SDL::ProcessEvents()
 {
 	bool done = false;
-	ScopedEventHandler escape(
-		SDL::UserEvent(EscapeEvent), [&done](SDL_Event const &event)
+	// Allow loop to break
+	ScopedEventHandler escape
+	(
+		SDL::UserEvent(EscapeEvent), [&](SDL_Event const &event)
 		{
-			(void) event;
+			assert(SDL::UserEvent(EscapeEvent) == event.type);
 			done = true;
 		}
 	);
+	// Main event loop
 	SDL_Event event;
-	do try
+	while (not done) try
 	{
-		if (SDL_WaitEvent(&event))
-		{
-			DispatchEvent(event);
-		}
-		else
+		// Block until event in queue
+		if (not SDL_WaitEvent(&event))
 		{
 			SDL::LogError("SDL_WaitEvent");
 		}
+		else
+		{
+			Dispatch(event);
+		}
 
+		// Break when we receive a quit event
 		done |= SDL_QuitRequested() == SDL_TRUE;
 	}
 	catch (std::exception const &exception)
 	{
 		SDL::SetError(CaughtException, exception.what());
+		// Break if the user chooses to after an exception
 		done |= not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 	}
-	while (not done);
 }
 
 
@@ -96,26 +82,42 @@ unsigned SDL::UserEvent(enum UserEventType type)
 	return static_cast<unsigned>(type) + base;
 }
 
-bool SDL::SendUserEvent(enum UserEventType type, unsigned code)
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *data, std::size_t size)
 {
-	return ::SendUserEvent(type, code, nullptr, 0);
+	SDL_Event event;
+	event.user.type = SDL::UserEvent(type);
+	event.user.code = code;
+	event.user.data1 = data;
+	event.user.data2 = data + size;
+	return 0 == SDL_PushEvent(&event);
+}
+
+char *SDL::GetUserEventData(SDL_Event const &event, std::size_t &size)
+{
+	char *begin = static_cast<char*>(event.user.data1);
+	char *end = static_cast<char*>(event.user.data2);
+	assert(begin <= end);
+	size = end - begin;
+	return begin;
 }
 
 bool SDL::SendUserEvent(enum UserEventType type, unsigned code, std::string const &string)
 {
+	// Use portable strdup since its POSIX, not C
 	char *data = SDL_strdup(string.c_str());
 	if (not data)
 	{
-		SDL::SetError(OutOfMemory);
-		return false;
+		// Not all systems will set the error number
+		SDL::SetErrno() or SDL::SetError(OutOfMemory);
+		return false; // not sent
 	}
-	return ::SendUserEvent(type, code, data, string.size());
+	return SDL::SendUserEvent(type, code, data, string.size());
 }
 
-std::string SDL::UserEventData(SDL_Event const &event)
+std::string SDL::GetUserEventData(SDL_Event const &event)
 {
 	std::size_t size;
-	char *data = ::UserEventData(event, size);
+	char *data = SDL::GetUserEventData(event, size);
 	if (data)
 	{
 		std::string string(data, size);

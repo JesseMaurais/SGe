@@ -108,6 +108,12 @@ namespace stl
 		std::ofstream stream(path, std::ios::out | std::ios::trunc);
 	}
 
+	inline void append(std::string const &path, std::string const &line)
+	{
+		std::ofstream stream(path, std::ios::out);
+		stream << line;
+	}
+
 	// Type-safe printf-like string formatting tools
 
 	class format

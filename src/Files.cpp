@@ -10,15 +10,21 @@ namespace fs = stl::filesystem;
 
 namespace
 {
-	constexpr char const *AddedFilename = "Add";
-	constexpr char const *RemovedFilename = "Remove";
-	constexpr char const *Folder = "FileWatch";
+	// Folder and file name constants
 
-	enum UpdateEventCode
+	constexpr char const *Added = "Add";
+	constexpr char const *Removed = "Remove";
+	constexpr char const *Folder = "Files";
+
+	// File event types
+
+	enum FileEventCode
 	{
-		NotifyFileChanged,
+		FileChanged,
 		WatchedFiles,
 	};
+
+	// Manager to monitor files and send notifications
 
 	class FileManager : public Manager<fs::path>
 	{
@@ -44,7 +50,7 @@ namespace
 		std::vector<fs::path> added;
 		std::vector<fs::path> removed;
 
-		// Path to own directory
+		// Own directory
 		fs::path const self;
 
 		FileManager()
@@ -65,10 +71,12 @@ namespace
 
 		~FileManager()
 		{
-			if (not self.empty())
+			if (future.valid())
 			{
-				stl::touch(self.string());
-				future.wait();
+				// Remove own directory from watched files
+				fs::path const path = self / Removed;
+				stl::append(path.string(), self.string());
+				future.wait(); // join thread when done
 			}
 		}
 
@@ -100,6 +108,8 @@ namespace
 				}
 			}
 
+			// Remove paths from watched files
+
 			for (fs::path const &path : removed)
 			{
 				auto const it = watched.find(path);
@@ -112,20 +122,19 @@ namespace
 			}
 		}
 
-		void ProcessChange(fs::path const &path)
+		void NotifyFileChanged(fs::path const &path)
 		{
 			if (not (self < path))
 			{
-				std::string const message = path.string();
 				// Queue the file event so that it is updated in the main thread
-				if (not SDL::SendUserEvent(UpdateFiles, NotifyFileChanged, message))
+				if (not SDL::SendUserEvent(UpdateFiles, FileChanged, path.string()))
 				{
 					SDL::LogError(CannotSendEvent);
 				}
 			}
 			else // update self
 			{
-				if (path.filename() == AddedFilename)
+				if (path.filename() == Added)
 				{
 					// Add watched files
 					std::string line;
@@ -139,7 +148,7 @@ namespace
 					}
 				}
 				else
-				if (path.filename() == RemovedFilename)
+				if (path.filename() == Removed)
 				{
 					// Remove watched files
 					std::string line;
@@ -168,20 +177,20 @@ namespace
 		{
 			switch (event.user.code)
 			{
-			case NotifyFileChanged:
+			case FileChanged:
 				Instance().Notify(event);
 				break;
 			case WatchedFiles:
 				Instance().Update();
 				break;
 			default:
-				assert(not "UpdateEventCode");
+				assert(not "FileEventCode");
 			}
 		}
 
 		void Notify(SDL_Event const &event)
 		{
-			fs::path path = SDL::UserEventData(event);
+			fs::path path = SDL::GetUserEventData(event);
 			// Notify the source of changed file
 			Source *that = Find(path);
 			if (that)
@@ -193,17 +202,19 @@ namespace
 		void QueryError(std::exception const &exception)
 		{
 			SDL::SetError(CaughtException, exception.what());
+			// Return from thread is user chooses on exception
 			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 		}
 
 		bool SendUpdate() override
 		{
+			// Queue event to wake the monitor to update its files
 			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
 		}
 
 		void Generate(std::vector<fs::path> &ids) override
 		{
-			fs::path const path = self/AddedFilename;
+			fs::path const path = self / Added;
 			std::ofstream stream(path.string());
 			for (fs::path const &path : ids)
 			{
@@ -213,7 +224,7 @@ namespace
 
 		void Destroy(std::vector<fs::path> const &ids) override
 		{
-			fs::path const path = self/RemovedFilename;
+			fs::path const path = self / Removed;
 			std::ofstream stream(path.string());
 			for (fs::path const &path : ids)
 			{
@@ -280,6 +291,7 @@ void FileManager::Thread()
 		);
 
 		// Block until there are events to process
+
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
 		{
@@ -300,6 +312,7 @@ void FileManager::Thread()
 		}
 
 		// Process all buffered file events
+
 		union
 		{
 			inotify_event *ev;
@@ -308,7 +321,7 @@ void FileManager::Thread()
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{
 			std::string const path(ev->name, ev->len);
-			ProcessChange(path);
+			NotifyFileChanged(path);
 		}
 	}
 	catch (std::exception const &exception)
