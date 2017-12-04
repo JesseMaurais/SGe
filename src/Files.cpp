@@ -330,8 +330,7 @@ void FileManager::Thread()
 	}
 }
 
-#else // BSD
-#if defined(__BSD__)
+#elif defined(__BSD__)
 
 #include <sys/event.h>
 
@@ -422,8 +421,7 @@ void FileManager::Thread()
 	}
 }
 
-#else // WINDOWS
-#if defined(__WINDOWS__)
+#elif defined(__WIN32__)
 
 #warning "Win32 interface is not complete"
 
@@ -514,7 +512,5 @@ void FileManager::Thread()
 	}
 }
 
-#endif // WINDOWS
-#endif // BSD
-#endif // LINUX
+#endif // operating systems
 

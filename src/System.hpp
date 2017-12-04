@@ -1,17 +1,32 @@
 /**\file
  * Constants for operating system detection. These are compile-time and are
- * always defined for all systems so that they work with ordinary constexpr-if
+ * always defined for all systems so that they work within any constexpr-if
  * statements, whereas ordinary preprocessor macros will raise a compile-time
  * error when use of a macro in a constexpr conditional is not defined.
+ *
+ * We prefer to check for features via the __has_include test macro rather
+ * than rely on preprocessor symbols to detect the operating system API. So we
+ * take any system with unistd.h as a UNIX and any with windows.h as a Win32
+ * capable system. This does not mean they are UNIX or Windows operating
+ * systems but that we can use their APIs. This is also why we have separate
+ * symbols for __WINDOWS__ the OS and __WIN32__ the API. For example, Cygwin
+ * has both APIs. We extend the SDL2 platform macros with
+ *
+ * 		__UNIX__	Has the unistd header included
+ * 		__POSIX__	Is a POSIX compliant operating system
+ * 		__BSD__		Derives from BSD UNIX (FreeBSD, NetBSD, OpenBSD, or MacOS)
+ * 		__WIN32__	Has the windows header included
  */
+
 #ifndef System_hpp
 #define System_hpp
 
 #include <SDL2/SDL_platform.h> // has macros
 
-// Check which OS headers we are safe to include
+// Check which operating system headers exist
 
-#ifdef __has_include // features before macros
+#ifdef __has_include // try headers
+
 #if __has_include(<unistd.h>)
 #undef __UNIX__
 #define __UNIX__ 1 
@@ -20,13 +35,20 @@ constexpr bool UNIX = true;
 #else
 constexpr bool UNIX = false;
 #endif
+
 #if __has_include(<windows.h>)
+#undef __WIN32__
+#define __WIN32__ 1
 #include <windows.h>
-constexpr bool WINDOWS = true;
+#ifndef WIN32
+constexpr bool WIN32 = true;
+#endif // WIN32
 #else
-constexpr bool WINDOWS = false;
+constexpr bool WIN32 = false;
 #endif
+
 #else // fall back on macros
+
 #if defined(unix) || defined(__unix) || defined(__unix__)
 #undef __UNIX__
 #define __UNIX__ 1
@@ -35,12 +57,24 @@ constexpr bool UNIX = true;
 #else
 constexpr bool UNIX = false;
 #endif
+
 #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#undef __WIN32__
+#define __WIN32__ 1
 #include <windows.h>
-constexpr bool WINDOWS = true;
+constexpr bool WIN32 = true;
 #else
-constexpr bool WINDOWS = false;
+constexpr bool WIN32 = false;
 #endif
+
+#endif // headers
+
+// Not every system with that is Win32 capable is the Windows operating system
+
+#if defined(__WINDOWS__)
+constexpr auto WINDOWS = true;
+#else
+constexpr auto WINDOWS = false;
 #endif
 
 // POSIX exists in principle for any UNIX even if we lack the version
@@ -97,6 +131,6 @@ constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD;
 
 // Some sanity checks. At a minimum...
 
-static_assert(POSIX or WINDOWS, "Cannot determine which operating system API to use"); // serious
+static_assert(POSIX or WINDOWS, "Cannot determine which operating system API to use");
 
 #endif // file
