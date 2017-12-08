@@ -6,12 +6,8 @@
 
 struct Quaternion
 {
-	union {
-	 Scalar v[4];
-	 struct {
-	  Scalar w, x, y, z;
-	 };
-	};
+	Scalar w, x, y, z;
+
 	Quaternion();
 	void Concatenate(Quaternion const &Q, Quaternion const &R);
 	void Rotate(Scalar radian, Scalar x, Scalar y, Scalar z);

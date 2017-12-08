@@ -1,9 +1,11 @@
 #include "Vector.hpp"
+#include "Strings.hpp"
+#include <stdexcept>
 #include <cmath>
 
 Vector::Vector()
 {
-	x = y = z = Scalar(0);
+	x = y = z = 0.0;
 }
 
 Vector::Vector(Scalar *v)
@@ -51,11 +53,9 @@ Scalar Vector::Magnitude() const
 Scalar Vector::Normalize()
 {
 	Scalar m = Magnitude();
-
 	x /= m;
 	y /= m;
 	z /= m;
-
 	return m;
 }
 
@@ -132,3 +132,34 @@ bool Vector::operator == (Vector const &V) const
 	return (x == V.x) and (y == V.y) and (z == V.z);
 }
 
+Scalar const &Vector::operator[](int index) const
+{
+	switch (index)
+	{
+	case 0: return x;
+	case 1: return y;
+	case 2: return z;
+	}
+	throw std::out_of_range(String(OutOfRange));
+}
+
+Scalar &Vector::operator[](int index)
+{
+	switch (index)
+	{
+	case 0: return x;
+	case 1: return y;
+	case 2: return z;
+	}
+	throw std::out_of_range(String(OutOfRange));
+}
+
+Vector::operator Scalar const *() const
+{
+	return &x;
+}
+
+Vector::operator Scalar *()
+{
+	return &x;
+}

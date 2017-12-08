@@ -66,7 +66,7 @@ void Tessel::BeginPolygon()
 void Tessel::PolygonVertex(int point)
 {
 	Vector &V = Mesh::GetVertex(point);
-	gluTessVertex(obj, V.v, reinterpret_cast<void*>(point));
+	gluTessVertex(obj, V, reinterpret_cast<void*>(point));
 }
 
 void Tessel::PolygonVertex(Vector V)

@@ -83,10 +83,10 @@ void Crayon::DrawSegment(Vector point)
 	Vector D = point + perpB * width;
 
 	glBegin(GL_LINE_LOOP);
-	 glVertex3dv(A.v);
-	 glVertex3dv(B.v);
-	 glVertex3dv(C.v);
-	 glVertex3dv(D.v);
+	 glVertex3dv(A);
+	 glVertex3dv(B);
+	 glVertex3dv(C);
+	 glVertex3dv(D);
 	glEnd();
 }
 
@@ -132,9 +132,9 @@ void Crayon::DrawJoin(void)
 void Crayon::DrawJoinBevel(Vector U, Vector V)
 {
 	glBegin(GL_LINE_LOOP);
-	 glVertex3dv(pivot.v);
-	 glVertex3dv(U.v);
-	 glVertex3dv(V.v);
+	 glVertex3dv(pivot);
+	 glVertex3dv(U);
+	 glVertex3dv(V);
 	glEnd();
 }
 
@@ -143,10 +143,10 @@ void Crayon::DrawJoinMiter(Vector U, Vector V, double d)
 	Vector W = pivot + (lineA - lineB) * width / fabs(d);
 
 	glBegin(GL_LINE_LOOP);
-	 glVertex3dv(pivot.v);
-	 glVertex3dv(U.v);
-	 glVertex3dv(W.v);
-	 glVertex3dv(V.v);
+	 glVertex3dv(pivot);
+	 glVertex3dv(U);
+	 glVertex3dv(W);
+	 glVertex3dv(V);
 	glEnd();
 }
 
@@ -162,7 +162,7 @@ void Crayon::DrawJoinRoundPart(Vector U, Vector V, int n)
 		W.Normalize();
 		W = W * width;
 		W = W + pivot;
-		glVertex3dv(W.v);
+		glVertex3dv(W);
 	}
 }
 
@@ -171,8 +171,8 @@ void Crayon::DrawJoinRound(Vector U, Vector V)
 	double d = lineA.Dot(lineB);
 
 	glBegin(GL_LINE_LOOP);
-	 glVertex3dv(pivot.v);
-	 glVertex3dv(U.v);
+	 glVertex3dv(pivot);
+	 glVertex3dv(U);
 
 	 if (d < 0)
 	 {
@@ -184,7 +184,7 @@ void Crayon::DrawJoinRound(Vector U, Vector V)
 	 else
 		DrawJoinRoundPart(U, V, 9);
 
-	 glVertex3dv(V.v);
+	 glVertex3dv(V);
 	glEnd();
 }
 
@@ -195,17 +195,17 @@ void Crayon::DrawJoinConic(Vector U, Vector V, double d)
 	Bezier bez;
 
 	glBegin(GL_LINE_LOOP);
-	 glVertex3dv(pivot.v);
-	 glVertex3dv(U.v);
+	 glVertex3dv(pivot);
+	 glVertex3dv(U);
 
 	 bez.Cone(U, W, V);
 
 	 for (float n = 1; n < 100; ++n)
 	 {
-	  glVertex3dv(bez.Equate(n/100).v);
+	  glVertex3dv(bez.Equate(n/100));
 	 }
 
-	 glVertex3dv(V.v);
+	 glVertex3dv(V);
 	glEnd();
 }
 

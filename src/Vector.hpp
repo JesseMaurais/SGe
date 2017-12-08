@@ -5,15 +5,7 @@
 
 struct Vector
 {
-	union
-	{
-	 Scalar v[3];
-	
-	 struct { Scalar x,y,z; };
-	 struct { Scalar i,j,k; };
-	 struct { Scalar s,t,r; };
-	 struct { Scalar R,G,B; };
-	};
+	Scalar x, y, z;
 
 	Vector();
 	Vector(Scalar *);
@@ -41,6 +33,10 @@ struct Vector
 	Vector operator * (Scalar s) const;
 	Vector operator / (Scalar s) const;
 	bool operator == (Vector const &V) const;
+	Scalar const &operator[](int index) const;
+	Scalar &operator[](int index);
+	operator Scalar const *() const;
+	operator Scalar *();
 };
 
 #endif // file

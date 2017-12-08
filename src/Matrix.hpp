@@ -7,10 +7,12 @@
 struct Matrix
 {
 	union {
-	 Scalar dim[4][4], v[16];
+	 Scalar dim[4][4];
 	 struct {
-	  struct { Scalar x, y, z, w; } X, Y, Z, W;
-	 };
+	  struct {
+	   Scalar x, y, z, w;
+	  } X, Y, Z, W;
+	 } n;
 	};
 
 	Matrix();
@@ -23,6 +25,9 @@ struct Matrix
 	void Transpose();
 	Vector Transform(Vector const &V);
 	void Tangent(Vector const V [3], Vector const C [3]);
+
+	operator Scalar const *() const;
+	operator Scalar *();
 };
 
 #endif // file

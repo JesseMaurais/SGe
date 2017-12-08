@@ -10,6 +10,7 @@ enum Strings
 	,NoError
 	,UnknownError
 	,OutOfMemory
+	,OutOfRange
 	,EncodingError
 	,NoDebugger
 	,NameNotUnique

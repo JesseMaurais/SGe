@@ -27,7 +27,7 @@ namespace
 		HandlerStack(eventCode).pop();
 	}
 
-	void Dispatch(const SDL_Event &event)
+	void Dispatch(SDL_Event const &event)
 	{
 		Stack const &stack = HandlerStack(event.type);
 		if (not stack.empty())
@@ -62,9 +62,8 @@ void SDL::ProcessEvents()
 		{
 			Dispatch(event);
 		}
-
 		// Break when we receive a quit event
-		done |= SDL_QuitRequested() == SDL_TRUE;
+		done |= SDL_TRUE == SDL_QuitRequested();
 	}
 	catch (std::exception const &exception)
 	{
@@ -103,7 +102,7 @@ char *SDL::GetUserEventData(SDL_Event const &event, std::size_t &size)
 
 bool SDL::SendUserEvent(enum UserEventType type, unsigned code, std::string const &string)
 {
-	// Use portable strdup since its POSIX, not C
+	// Use portable strdup since its not C
 	char *data = SDL_strdup(string.c_str());
 	if (not data)
 	{

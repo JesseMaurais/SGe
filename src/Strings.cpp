@@ -12,6 +12,7 @@ char const *String(enum Strings id)
 	case NoError: return "Error reported without information";
 	case UnknownError: return "Unknown error";
 	case OutOfMemory: return "Out of memory";
+	case OutOfRange: return "Out of range";
 	case EncodingError: return "Encoding error";
 	case NoDebugger: return "There is no debugger";
 	case NameNotUnique: return "The name \"%1\" is not unique";

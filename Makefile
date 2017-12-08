@@ -2,7 +2,7 @@ CC = g++
 RM = rm
 MKDIR = mkdir
 STDFLAGS = -std=c++17 -I/usr/include/freetype2
-DBGFLAGS = -Wall -Wextra -Winvalid-pch -g
+DBGFLAGS = -Wall -Wextra -Wpedantic -Winvalid-pch -g
 DFLAGS = -MMD -MP
 CFLAGS = $(DBGFLAGS) $(STDFLAGS) 
 LIB = -ldl -lpthread -lstdc++fs -lboost_system -lboost_filesystem -lreadline -lfreetype -lexpat -ljerry-core -lX11 -lSDL2 -lSDL2_image -lGL -lGLU -lGLEW -lOpenCL -lopenal -lode

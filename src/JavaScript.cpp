@@ -4,6 +4,8 @@
 #include "Event.hpp"
 #include "std.hpp"
 #include <ctime>
+#include <memory>
+#include <functional>
 #include <jerryscript-port.h>
 
 namespace
