@@ -65,3 +65,4 @@ char const *String(enum Strings id)
 	assert(not "Valid strings id");
 	return nullptr;
 }
+

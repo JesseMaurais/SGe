@@ -136,3 +136,4 @@ ScopedEventHandler::~ScopedEventHandler()
 {
 	PopEventHandler(event);
 }
+

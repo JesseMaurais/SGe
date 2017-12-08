@@ -21,7 +21,7 @@ namespace icos
 	extern Point RFaces[nFaces][3];
 	extern Face EFaces[nFaces];
 	extern int PFaces[nFaces][3];
-};
+}
 
 #endif // file
 

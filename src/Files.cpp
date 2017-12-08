@@ -423,8 +423,6 @@ void FileManager::Thread()
 
 #elif defined(__WIN32__)
 
-#warning "Win32 interface is not complete"
-
 namespace
 {
 	bool LogLastError(char const *prefix)
@@ -437,7 +435,7 @@ namespace
 		, nullptr
 		, GetLastError()
 		, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT)
-		, &buffer
+		, (LPSTR) &buffer
 		, 0
 		, nullptr
 		);
@@ -487,7 +485,7 @@ void FileManager::Thread()
 		);
 
 		std::vector<HANDLE> obj(data.size());
-		stl::transform(watched, obj, [](auto const &pair) { return pair.second; });
+		stl::transform(data, obj, [](auto const &pair) { return pair.second; });
 
 		// Block until there are events to process
 		DWORD const status = WaitForMultipleObjects(obj.size(), obj.data(), FALSE, INFINITE);

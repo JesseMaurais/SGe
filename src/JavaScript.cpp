@@ -3,7 +3,6 @@
 #include "Error.hpp"
 #include "Event.hpp"
 #include "std.hpp"
-#include <ctime>
 #include <memory>
 #include <functional>
 #include <jerryscript-port.h>
@@ -197,6 +196,7 @@ namespace
 	public:
 
 		using Signature = Result(Object::*)(Args...);
+		typedef Signature *Pointer;
 
 		static NativeInfo &Instance()
 		{
@@ -211,10 +211,10 @@ namespace
 			return value;
 		}
 
-		void SetObject(jerry_value_t const obj, Signature function)
+		void SetObject(jerry_value_t const obj, Signature &function)
 		{
 			Convert cast;
-			cast.function = function;
+			cast.object = &function;
 			jerry_set_object_native_pointer(obj, cast.address, this);
 		}
 
@@ -226,7 +226,7 @@ namespace
 			{
 				if (info == this)
 				{
-					return cast.function;
+					return *cast.object;
 				}
 			}
 			return nullptr;
@@ -242,7 +242,7 @@ namespace
 		union Convert
 		{
 			void *address;
-			Signature function;
+			Pointer object;
 		};
 
 		NativeInfo()
@@ -651,36 +651,28 @@ bool js::Init(jerry_init_flag_t const flags)
 
 void jerry_port_fatal(jerry_fatal_code_t code)
 {
-	SDL::Log("Fatal: %1", code);
+	SDL::Log("jerry(%1) fatal", code);
 	std::exit(0);
 }
 
 void jerry_port_log(jerry_log_level_t level, const char *format, ...)
 {
-	SDL::Log("Log: %1", level);
-
 	va_list args;
 	va_start (args, format);
 	char string[BUFSIZ];
 	std::vsnprintf(string, sizeof(string), format, args);
 	va_end (args);
-	SDL_Log("%s", string);
+	SDL::Log("jerry(%1) %2", level, string);
 }
 
 bool jerry_port_get_time_zone(jerry_time_zone_t *tz)
 {
-	SDL::Log("TZ data");
-
-	tzset();
-	tz->offset = timezone;
-	tz->daylight_saving_time = daylight;
-	return true;
+	(void)tz;
+	return false;
 }
 
 double jerry_port_get_current_time()
 {
-	SDL::Log("Time");
-
 	return static_cast<double>(std::time(nullptr));
 }
 
