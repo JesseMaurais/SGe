@@ -21,7 +21,7 @@ namespace
 		UpdatePrograms,
 	};
 
-	// Generic resource manager for any ALuint based id type
+	// Generic resource manager for any GLuint based id type
 	template <UpdateEventCode UpdateCode>
 	class UpdateManager : public Manager<GLuint>
 	{
@@ -32,6 +32,7 @@ namespace
 			return SDL::SendUserEvent(UpdateOpenGL, UpdateCode);
 		}
 	};
+
 
 	class TextureManager final : public UpdateManager<UpdateTextures>
 	{
