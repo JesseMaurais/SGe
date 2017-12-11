@@ -13,8 +13,8 @@ namespace
 
 	Stack &HandlerStack(Uint32 eventCode)
 	{
-		static StackMap eventStacks;
-		return eventStacks[eventCode];
+		static StackMap singleton;
+		return singleton[eventCode];
 	}
 
 	void PushEventHandler(unsigned eventCode, EventHandler function)

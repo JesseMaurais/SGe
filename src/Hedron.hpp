@@ -24,4 +24,3 @@ namespace icos
 }
 
 #endif // file
-
