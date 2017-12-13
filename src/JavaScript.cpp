@@ -40,7 +40,7 @@ namespace
 		void SetObject(jerry_value_t const value, Object const &object) const
 		{
 			Convert cast;
-			cast.pointer = new Wrap(object);
+			cast.pointer = new Box(object);
 			jerry_set_object_native_pointer(value, cast.address, this);
 		}
 
@@ -73,11 +73,11 @@ namespace
 
 	private:
 
-		typedef struct Wrap
+		typedef struct Box
 		{
 			Object object;
 
-			Wrap(Object &data)
+			Box(Object &data)
 			: object(data)
 			{}
 
@@ -253,7 +253,7 @@ namespace
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		return Handler(method, argv, argc);
+		return Handler(method, argv, argc, std::index_sequence_for<Args...>{});
 	}
 
 	template <typename Object, typename Result, typename... Args>
@@ -263,7 +263,7 @@ namespace
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		return Handler(method, object, argv, argc);
+		return Handler(method, object, argv, argc, std::index_sequence_for<Args...>{});
 	}
 
 	// C++ function wrappers third level (get object and method)
@@ -278,7 +278,7 @@ namespace
 		auto method = Get<Result(*)(Args...)>(value);
 		if (method)
 		{
-			return Handler(method, argv, argc);
+			return Handler(method, argv, argc, std::index_sequence_for<Args...>{});
 		}
 		return jerry_create_undefined();
 	}
@@ -294,7 +294,7 @@ namespace
 		auto object = Get<Object*>(obj);
 		if (method and object)
 		{
-			return Handler(method, object, argv, argc);
+			return Handler(method, object, argv, argc, std::index_sequence_for<Args...>{});
 		}
 		return jerry_create_undefined();
 	}
