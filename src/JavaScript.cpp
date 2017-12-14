@@ -302,9 +302,9 @@ namespace
 	// C++ function wrappers fourth level (native info)
 
 	template <typename Result, typename... Args>
-	jerry_value_t NativeInfo<Result(*)(Args...)>::Handler
+	jerry_value_t Handler
 	(
-		jerry_value_t const value, jerry_value_t const obj,
+		jerry_value_t const value, jerry_value_t const that,
 		jerry_value_t const argv[],	jerry_length_t const argc
 	)
 	{
@@ -315,19 +315,20 @@ namespace
 		}
 		try // report exceptions to jerry
 		{
-			(void) obj; // unused
+			(void) that; // unused
 			return ::Handler<Result, Args...>(value, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
-			return jerry_create_error(JERRY_ERROR_COMMON, (jerry_char_ptr_t) exception.what());
+			auto const error = (jerry_char_ptr_t) exception.what();
+			return jerry_create_error(JERRY_ERROR_COMMON, error);
 		}
 	}
 
 	template <typename Object, typename Result, typename... Args>
 	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler
 	(
-		jerry_value_t const value, jerry_value_t const obj,
+		jerry_value_t const value, jerry_value_t const that,
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
@@ -338,11 +339,12 @@ namespace
 		}
 		try // report exceptions to jerry
 		{
-			return ::Handler<Object, Result, Args...>(value, obj, argv, argc);
+			return ::Handler<Object, Result, Args...>(value, that, argv, argc);
 		}
 		catch (std::exception const &exception)
 		{
-			return jerry_create_error(JERRY_ERROR_COMMON, (jerry_char_ptr_t) exception.what());
+			auto const error = (jerry_char_ptr_t) exception.what();
+			return jerry_create_error(JERRY_ERROR_COMMON, error);
 		}
 	}
 
@@ -441,28 +443,6 @@ namespace
 		std::cout << GetString(result) << std::endl;
 	}
 }
-
-
-namespace
-{
-	class SomeClass
-	{
-	public:
-		std::string Message(double n)
-		{
-			std::string message;
-			for (int i = 0; i < n; ++i)
-				message += "Hello! ";
-			return message;
-		}
-	};
-
-	template <> void NativeInfo<SomeClass*>::Prototype(jerry_value_t const proto)
-	{
-		SetProperty(proto, Property("Message", Create(&SomeClass::Message)));
-	}
-}
-
 
 bool js::Init(jerry_init_flag_t const flags)
 {
