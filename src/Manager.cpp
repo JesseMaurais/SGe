@@ -65,4 +65,4 @@ unsigned ManagedResources::UpdateSources(std::vector<unsigned> const &ids) const
 	}
 	return count;
 }
-
+>>>>>>> a96ad5d412d4b708726c3d2146e6dac64a83dffd

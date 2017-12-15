@@ -260,4 +260,3 @@ int main(int argc, char **argv)
 	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }
-

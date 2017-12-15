@@ -16,86 +16,82 @@ namespace
 		jerry_string_to_char_buffer(string, (jerry_char_ptr_t) buffer.data(), buffer.size());
 		return buffer;
 	}
-}
 
-
-bool js::SetError(jerry_value_t value)
-{
-	if (jerry_is_feature_enabled(JERRY_FEATURE_ERROR_MESSAGES))
-	{
-		jerry_value_clear_error_flag(&value);
-		return SDL::SetError(GetString(value));
-	}
-	else
-	{
-		return SDL::SetError(NoDebugger);
-	}
-}
-
-bool js::CheckError(jerry_value_t value)
-{
-	return jerry_value_has_error_flag(value) and js::SetError(value);
-}
-
-namespace
-{
 	// Native object information utility template
 
-	template <typename Pointer> class NativeInfo : jerry_object_native_info_t
+	template <typename Object> class NativeInfo : public jerry_object_native_info_t
 	{
 	public:
 
-		static jerry_value_t Prototype()
-		{
-			static js::Value const value = jerry_create_object();
-			return value;
-		}
-
-		static NativeInfo &Instance()
+		static NativeInfo &Instance() const
 		{
 			static NativeInfo singleton;
 			return singleton;
 		}
 
-		jerry_value_t CreateObject(Pointer object)
+		jerry_value_t CreateObject(Object const &object) const
 		{
 			jerry_value_t const value = jerry_create_object();
 			SetObject(value, object);
 			return value;
 		}
 
-		void SetObject(jerry_value_t const obj, Pointer object)
+		jerry_value_t CreateObject(Object const &object, jerry_external_handler_t const handler) const
 		{
-			Convert cast;
-			cast.object = object;
-			jerry_set_object_native_pointer(obj, cast.address, this);
+			jerry_value_i const value = jerry_create_external_function(handler);
+			SetObject(value, object);
+			return value;
 		}
 
-		Pointer GetObject(jerry_value_t const obj)
+		void SetObject(jerry_value_t const value, Object const &object) const
+		{
+			Convert cast;
+			cast.pointer = new Box(object);
+			jerry_set_object_native_pointer(value, cast.address, this);
+		}
+
+		Object GetObject(jerry_value_t const value) const
 		{
 			Convert cast;
 			jerry_object_native_info_t const *info;
-			if (jerry_get_object_native_pointer(obj, &cast.address, &info))
+			if (jerry_get_object_native_pointer(value, &cast.address, &info))
 			{
 				if (info == this)
 				{
-					return cast.object;
+					return cast.pointer->object;
 				}
 			}
-			return nullptr;
+			throw std::bad_cast();
 		}
 
-		bool IsObject(jerry_value_t const obj)
+		bool IsObject(jerry_value_t const value) const
 		{
-			return GetObject(obj) != nullptr;
+			jerry_object_native_info_t const *info;
+			if (jerry_get_object_native_pointer(value, nullptr, &info))
+			{
+				if (info == this)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 	private:
 
+		struct Box
+		{
+			Object object;
+
+			Box(Object &data)
+			: object(data)
+			{}
+		};
+
 		union Convert
 		{
 			void *address;
-			Pointer object;
+			Box *pointer;
 		};
 
 		static void Free(void *native)
@@ -104,172 +100,29 @@ namespace
 			{
 				Convert cast;
 				cast.address = native;
-				delete cast.object;
+				delete cast.pointer;
 			}
 		}
 
-		// Called once to setup the object prototype
-		static void Prototype(jerry_value_t const value);
-
 		NativeInfo()
 		{
-			// Prototype the class
-			Prototype(Prototype());
-			// Setup the deleter
 			free_cb = Free;
 		}
 	};
 
-	// Native object information for functions
-
-	template <typename Result, typename... Args>
-	class NativeInfo<Result(*)(Args...)> : jerry_object_native_info_t
-	{
-	public:
-
-		using Signature = Result(*)(Args...);
-
-		static NativeInfo &Instance()
-		{
-			static NativeInfo singleton;
-			return singleton;
-		}
-
-		jerry_value_t CreateObject(Signature function)
-		{
-			jerry_value_t const value = jerry_create_external_function(Handler);
-			SetObject(value, function);
-			return value;
-		}
-
-		void SetObject(jerry_value_t const obj, Signature function)
-		{
-			Convert cast;
-			cast.function = function;
-			jerry_set_object_native_pointer(obj, cast.address, this);
-		}
-
-		Signature GetObject(jerry_value_t const obj)
-		{
-			Convert cast;
-			jerry_object_native_info_t const *info;
-			if (jerry_get_object_native_pointer(obj, &cast.address, &info))
-			{
-				if (info == this)
-				{
-					return cast.function;
-				}
-			}
-			return nullptr;
-		}
-
-		bool IsObject(jerry_value_t const obj)
-		{
-			return GetObject(obj) != nullptr;
-		}
-
-	private:
-
-		union Convert
-		{
-			void *address;
-			Signature function;
-		};
-
-		NativeInfo()
-		{
-			free_cb = nullptr;
-		}
-
-		static jerry_value_t Handler(
-		       jerry_value_t const value,
-		       jerry_value_t const obj,
-		       jerry_value_t const argv[],
-		       jerry_length_t const argc);
-	};
-
-	// Native object information for class methods
-
-	template <typename Object, typename Result, typename... Args>
-	class NativeInfo<Result(Object::*)(Args...)> : jerry_object_native_info_t
-	{
-	public:
-
-		using Signature = Result(Object::*)(Args...);
-		typedef Signature *Pointer;
-
-		static NativeInfo &Instance()
-		{
-			static NativeInfo singleton;
-			return singleton;
-		}
-
-		jerry_value_t CreateObject(Signature function)
-		{
-			jerry_value_t const value = jerry_create_external_function(Handler);
-			SetObject(value, function);
-			return value;
-		}
-
-		void SetObject(jerry_value_t const obj, Signature &function)
-		{
-			Convert cast;
-			cast.object = &function;
-			jerry_set_object_native_pointer(obj, cast.address, this);
-		}
-
-		Signature GetObject(jerry_value_t const obj)
-		{
-			Convert cast;
-			jerry_object_native_info_t const *info;
-			if (jerry_get_object_native_pointer(obj, &cast.address, &info))
-			{
-				if (info == this)
-				{
-					return *cast.object;
-				}
-			}
-			return nullptr;
-		}
-
-		bool IsObject(jerry_value_t const obj)
-		{
-			return GetObject(obj) != nullptr;
-		}
-
-	private:
-
-		union Convert
-		{
-			void *address;
-			Pointer object;
-		};
-
-		NativeInfo()
-		{
-			free_cb = nullptr;
-		}
-
-		static jerry_value_t Handler(
-		       jerry_value_t const value,
-		       jerry_value_t const obj,
-		       jerry_value_t const argv[],
-		       jerry_length_t const argc);
-	};
-
 	// Simplified syntax for the native object singleton
-	
-	template <typename Object> jerry_value_t Prototype()
-	{
-		return NativeInfo<Object>::Prototype(); // only for classes
-	}
 
-	template <typename Object> jerry_value_t CreateObject(Object object)
+	template <typename Object> jerry_value_t CreateObject(Object const &object)
 	{
 		return NativeInfo<Object>::Instance().CreateObject(object);
 	}
 
-	template <typename Object> void SetObject(jerry_value_t const value, Object object)
+	template <typename Object> jerry_value_t CreateObject(Object const &object, jerry_external_handler_t const handler)
+	{
+		return NativeInfo<Object>::Instance().CreateObject(object, handler);
+	}
+
+	template <typename Object> void SetObject(jerry_value_t const value, Object const &object)
 	{
 		NativeInfo<Object>::Instance().SetObject(value, object);
 	}
@@ -286,22 +139,22 @@ namespace
 
 	// Create data types with template abstraction
 
-	template <typename Type> jerry_value_t Create(Type object)
+	template <typename Type> jerry_value_t Create(Type const &data)
 	{
-		return CreateObject<Type>(object);
+		return CreateObject<Type>(data);
 	}
 
-	template <> jerry_value_t Create<std::string>(std::string string)
+	template <> jerry_value_t Create<std::string>(std::string const &string)
 	{
 		return jerry_create_string((jerry_char_ptr_t) string.data());
 	}
 
-	template <> jerry_value_t Create<bool>(bool boolean)
+	template <> jerry_value_t Create<bool>(bool const &boolean)
 	{
 		return jerry_create_boolean(boolean);
 	}
 
-	template <> jerry_value_t Create<double>(double number)
+	template <> jerry_value_t Create<double>(double &number)
 	{
 		return jerry_create_number(number);
 	}
@@ -329,7 +182,7 @@ namespace
 	}
 
 	// As data types with template abstraction
-	
+
 	template <typename Type> Type As(jerry_value_t const value)
 	{
 		return GetObject<Type>(value);
@@ -353,158 +206,44 @@ namespace
 		return Get<double>(converted);
 	}
 
-	// C++ function call wrappers first level (4 base cases)
+	// C++ function wrapper
 
-	template <typename... Args, std::size_t... Index>
+	template <typename Function, typename Object, typename... Args, std::size_t... Index>
 	jerry_value_t Handler
 	(
-		void(*method)(Args...),
-		jerry_value_t const args[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		method(As<Args>(args[Index])...);
-		return jerry_create_undefined();
-	}
-
-	template <typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		Result(*method)(Args...),
+		jerry_value_t const value, jerry_value_t const that,
 		jerry_value_t const argv[], jerry_length_t const argc,
 		std::index_sequence<Index...>
 	)
 	{
-		return Create<Result>(method(As<Args>(argv[Index])...));
-	}
-
-	template <typename Object, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		void(Object::*method)(Args...), Object *object,
-		jerry_value_t const args[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		(object->*method)(As<Args>(args[Index])...);
-		return jerry_create_undefined();
-	}
-
-	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		Result(Object::*method)(Args...), Object *object,
-		jerry_value_t const argv[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		return Create<Result>((object->*method)(As<Args>(argv[Index])...));
-	}
-
-	// C++ function wrappers second level (2 base cases)
-
-	template <typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		Result(*method)(Args...),
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		return Handler(method, argv, argc);
-	}
-
-	template <typename Object, typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		Result(Object::*method)(Args...), Object *object,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		return Handler(method, object, argv, argc);
-	}
-
-	// C++ function wrappers third level (get object and method)
-
-	template <typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		jerry_value_t const value,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		auto method = Get<Result(*)(Args...)>(value);
-		if (method)
+		auto function = Get<Function>(value);
+		auto object = Get<Object>(that);
+		if (function and object)
 		{
-			return Handler(method, argv, argc);
+			Create(function(object, As<Args>(argv[Index])...));
 		}
 		return jerry_create_undefined();
 	}
 
-	template <typename Object, typename Result, typename... Args>
+	template <typename Function, typename Object, typename... Args>
 	jerry_value_t Handler
 	(
-		jerry_value_t const value, jerry_value_t const obj,
+		jerry_value_t const value, jerry_value_t const that,
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		auto method = Get<Result(Object::*)(Args...)>(value);
-		auto object = Get<Object*>(obj);
-		if (method and object)
-		{
-			return Handler(method, object, argv, argc);
-		}
-		return jerry_create_undefined();
+		static auto const argn = std::index_sequence_for<Args...>();
+		return Handler<Function, Object, Args...>(value, that, argv, argc, argn);
 	}
 
-	// C++ function wrappers fourth level (native info)
-
-	template <typename Result, typename... Args>
-	jerry_value_t NativeInfo<Result(*)(Args...)>::Handler
-	(
-		jerry_value_t const value, jerry_value_t const obj,
-		jerry_value_t const argv[],	jerry_length_t const argc
-	)
+	template <typename Function, typename Object, typename... Args>
+	jerry_value_t CreateHandler(Function function)
 	{
-		if (sizeof...(Args) < argc)
-		{
-			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
-			return jerry_create_error(JERRY_ERROR_RANGE, error);
-		}
-		try // report exceptions to jerry
-		{
-			(void) obj; // unused
-			return ::Handler<Result, Args...>(value, argv, argc);
-		}
-		catch (std::exception const &exception)
-		{
-			return jerry_create_error(JERRY_ERROR_COMMON, (jerry_char_ptr_t) exception.what());
-		}
-	}
-
-	template <typename Object, typename Result, typename... Args>
-	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler
-	(
-		jerry_value_t const value, jerry_value_t const obj,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		if (sizeof...(Args) < argc)
-		{
-			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
-			return jerry_create_error(JERRY_ERROR_RANGE, error);
-		}
-		try // report exceptions to jerry
-		{
-			return ::Handler<Object, Result, Args...>(value, obj, argv, argc);
-		}
-		catch (std::exception const &exception)
-		{
-			return jerry_create_error(JERRY_ERROR_COMMON, (jerry_char_ptr_t) exception.what());
-		}
+		return CreateObject(function, Handler<Function, Object, Args...>);
 	}
 
 	// More utility functions for setting properties
-	
+
 	struct PropertyDescriptor : jerry_property_descriptor_t
 	{
 		PropertyDescriptor()
@@ -599,28 +338,6 @@ namespace
 	}
 }
 
-
-namespace
-{
-	class SomeClass
-	{
-	public:
-		std::string Message(double n)
-		{
-			std::string message;
-			for (int i = 0; i < n; ++i)
-				message += "Hello! ";
-			return message;
-		}
-	};
-
-	template <> void NativeInfo<SomeClass*>::Prototype(jerry_value_t const proto)
-	{
-		SetProperty(proto, Property("Message", Create(&SomeClass::Message)));
-	}
-}
-
-
 bool js::Init(jerry_init_flag_t const flags)
 {
 	jerry_init(flags);
@@ -630,22 +347,30 @@ bool js::Init(jerry_init_flag_t const flags)
 		return false;
 	}
 
-	Property const properties [] =
-	{
-		{ "SomeClass", Constructor(+[](){ return new SomeClass; }) }
-	};
-
-	Value const global = jerry_get_global_object();
-	for (auto const &property : properties)
-	{
-		SetProperty(global, property);
-	}
-
 	static ScopedEventHandler
 		handler(SDL::UserEvent(EvaluateScript), Evaluate);
 
 	return true;
 }
+
+bool js::SetError(jerry_value_t value)
+{
+	if (jerry_is_feature_enabled(JERRY_FEATURE_ERROR_MESSAGES))
+	{
+		jerry_value_clear_error_flag(&value);
+		return SDL::SetError(GetString(value));
+	}
+	else
+	{
+		return SDL::SetError(NoDebugger);
+	}
+}
+
+bool js::CheckError(jerry_value_t value)
+{
+	return jerry_value_has_error_flag(value) and js::SetError(value);
+}
+
 
 // Implementation of the JerryScript port API
 
@@ -675,4 +400,3 @@ double jerry_port_get_current_time()
 {
 	return static_cast<double>(std::time(nullptr));
 }
-
