@@ -37,6 +37,13 @@ namespace
 			return value;
 		}
 
+		jerry_value_t CreateObject(jerry_external_handler_t const handler, Object const &object) const
+		{
+			jerry_value_t const value = jerry_create_external_function(handler);
+			SetObject(value, object);
+			return value;
+		}
+
 		void SetObject(jerry_value_t const value, Object const &object) const
 		{
 			Convert cast;
@@ -104,6 +111,28 @@ namespace
 			free_cb = Free;
 		}
 	};
+
+	// C++ function wrapper
+
+	template <typename Function, typename Object, typename... Args, std::size_t... Index>
+	jerry_value_t Handler
+	(
+		jerry_value_t const value, jerry_value_t const that,
+		jerry_value_t const argv[], jerry_length_t const argc,
+		std::index_sequence<Index...>
+	)
+	{
+		if (sizeof...(Args) == argc)
+		{
+			auto function = Get<Function>(value);
+			auto object = Get<Object>(that);
+			if (function and object)
+			{
+				return Create(function(object, As<Args>(argv[Index])...));
+			}
+		}
+		return jerry_create_undefined();
+	}
 
 	// Simplified syntax for the native object singleton
 
@@ -194,158 +223,6 @@ namespace
 	{
 		js::Value converted = jerry_value_to_number(value);
 		return Get<double>(converted);
-	}
-
-	// C++ function call wrappers first level (4 base cases)
-
-	template <typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		void(*method)(Args...),
-		jerry_value_t const args[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		method(As<Args>(args[Index])...);
-		return jerry_create_undefined();
-	}
-
-	template <typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		Result(*method)(Args...),
-		jerry_value_t const argv[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		return Create<Result>(method(As<Args>(argv[Index])...));
-	}
-
-	template <typename Object, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		void(Object::*method)(Args...), Object *object,
-		jerry_value_t const args[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		(object->*method)(As<Args>(args[Index])...);
-		return jerry_create_undefined();
-	}
-
-	template <typename Object, typename Result, typename... Args, std::size_t... Index>
-	jerry_value_t Handler
-	(
-		Result(Object::*method)(Args...), Object *object,
-		jerry_value_t const argv[], jerry_length_t const argc,
-		std::index_sequence<Index...>
-	)
-	{
-		return Create<Result>((object->*method)(As<Args>(argv[Index])...));
-	}
-
-	// C++ function wrappers second level (2 base cases)
-
-	template <typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		Result(*method)(Args...),
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		return Handler(method, argv, argc, std::index_sequence_for<Args...>{});
-	}
-
-	template <typename Object, typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		Result(Object::*method)(Args...), Object *object,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		return Handler(method, object, argv, argc, std::index_sequence_for<Args...>{});
-	}
-
-	// C++ function wrappers third level (get object and method)
-
-	template <typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		jerry_value_t const value,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		auto method = Get<Result(*)(Args...)>(value);
-		if (method)
-		{
-			return Handler(method, argv, argc, std::index_sequence_for<Args...>{});
-		}
-		return jerry_create_undefined();
-	}
-
-	template <typename Object, typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		jerry_value_t const value, jerry_value_t const obj,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		auto method = Get<Result(Object::*)(Args...)>(value);
-		auto object = Get<Object*>(obj);
-		if (method and object)
-		{
-			return Handler(method, object, argv, argc, std::index_sequence_for<Args...>{});
-		}
-		return jerry_create_undefined();
-	}
-
-	// C++ function wrappers fourth level (native info)
-
-	template <typename Result, typename... Args>
-	jerry_value_t Handler
-	(
-		jerry_value_t const value, jerry_value_t const that,
-		jerry_value_t const argv[],	jerry_length_t const argc
-	)
-	{
-		if (sizeof...(Args) < argc)
-		{
-			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
-			return jerry_create_error(JERRY_ERROR_RANGE, error);
-		}
-		try // report exceptions to jerry
-		{
-			(void) that; // unused
-			return ::Handler<Result, Args...>(value, argv, argc);
-		}
-		catch (std::exception const &exception)
-		{
-			auto const error = (jerry_char_ptr_t) exception.what();
-			return jerry_create_error(JERRY_ERROR_COMMON, error);
-		}
-	}
-
-	template <typename Object, typename Result, typename... Args>
-	jerry_value_t NativeInfo<Result(Object::*)(Args...)>::Handler
-	(
-		jerry_value_t const value, jerry_value_t const that,
-		jerry_value_t const argv[], jerry_length_t const argc
-	)
-	{
-		if (sizeof...(Args) < argc)
-		{
-			auto error = (jerry_char_ptr_t) String(InvalidArgumentRange);
-			return jerry_create_error(JERRY_ERROR_RANGE, error);
-		}
-		try // report exceptions to jerry
-		{
-			return ::Handler<Object, Result, Args...>(value, that, argv, argc);
-		}
-		catch (std::exception const &exception)
-		{
-			auto const error = (jerry_char_ptr_t) exception.what();
-			return jerry_create_error(JERRY_ERROR_COMMON, error);
-		}
 	}
 
 	// More utility functions for setting properties
