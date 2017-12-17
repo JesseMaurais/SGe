@@ -9,6 +9,8 @@
 #include <cstring>
 #include <getopt.h>
 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+
 namespace
 {
 	struct Option

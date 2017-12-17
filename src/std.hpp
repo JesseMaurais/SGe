@@ -7,6 +7,7 @@
 #include "stl/filesystem.hpp"
 
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <type_traits>
 #include <string>
@@ -69,7 +70,7 @@ namespace stl
 
 	inline std::string to_upper(std::string string)
 	{
-		constexpr auto upper = [](char c) { return std::toupper(c); };
+		auto upper = [](char c) { return std::toupper(c); };
 		stl::transform(string, upper);
 		return string;
 	}

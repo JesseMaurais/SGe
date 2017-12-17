@@ -1,9 +1,10 @@
 #include "Metric.hpp"
 #include "Tree.hpp"
+#include "std.hpp"
 #include <cstdio>
 #include <cmath>
 
-#include "std.hpp"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 
 bool Tree::Traverse(Vector const &eye, Vector const &at)
 {
@@ -162,11 +163,10 @@ bool Tree::Load(char const *path)
 			return false;
 		}
 	}
-	
+
 	if (std::fclose(file))
 	{
 		std::perror(path);
 	}
 	return true;
 }
-

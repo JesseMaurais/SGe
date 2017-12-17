@@ -4,6 +4,7 @@
 #include "Event.hpp"
 #include "std.hpp"
 #include <memory>
+#include <utility>
 #include <functional>
 #include <jerryscript-port.h>
 
@@ -23,7 +24,7 @@ namespace
 	{
 	public:
 
-		static NativeInfo &Instance() const
+		static NativeInfo &Instance()
 		{
 			static NativeInfo singleton;
 			return singleton;
@@ -38,7 +39,7 @@ namespace
 
 		jerry_value_t CreateObject(Object const &object, jerry_external_handler_t const handler) const
 		{
-			jerry_value_i const value = jerry_create_external_function(handler);
+			jerry_value_t const value = jerry_create_external_function(handler);
 			SetObject(value, object);
 			return value;
 		}
@@ -154,7 +155,7 @@ namespace
 		return jerry_create_boolean(boolean);
 	}
 
-	template <> jerry_value_t Create<double>(double &number)
+	template <> jerry_value_t Create<double>(double const &number)
 	{
 		return jerry_create_number(number);
 	}
@@ -208,7 +209,7 @@ namespace
 
 	// C++ function wrapper
 
-	template <typename Function, typename Object, typename... Args, std::size_t... Index>
+	template <typename Signature, typename Object, typename... Args, std::size_t... Index>
 	jerry_value_t Handler
 	(
 		jerry_value_t const value, jerry_value_t const that,
@@ -216,30 +217,85 @@ namespace
 		std::index_sequence<Index...>
 	)
 	{
-		auto function = Get<Function>(value);
-		auto object = Get<Object>(that);
-		if (function and object)
+		using Function = std::function<Signature>;
+		using Pointer = std::shared_ptr<Object>;
+
+		if (sizeof...(Args) == argc)
 		{
-			Create(function(object, As<Args>(argv[Index])...));
+			if constexpr (not std::is_void<Object>::value)
+			{
+				auto function = Get<Function>(value);
+				auto pointer = Get<Pointer>(that);
+
+				if constexpr (not std::is_void<typename Function::result_type>::value)
+				{
+					return Create(function(pointer.get(), As<Args>(argv[Index])...));
+				}
+				else
+				{
+					Create(function(pointer.get(), As<Args>(argv[Index])...));
+				}
+			}
+			else
+			{
+				auto function = Get<Function>(value);
+
+				if constexpr (not std::is_void<typename Function::result_type>::value)
+				{
+					return Create(function(As<Args>(argv[Index])...));
+				}
+				else
+				{
+					Create(function(As<Args>(argv[Index])...));
+				}
+			}
 		}
 		return jerry_create_undefined();
 	}
 
-	template <typename Function, typename Object, typename... Args>
+	template <typename Signature, typename Object, typename... Args>
 	jerry_value_t Handler
 	(
 		jerry_value_t const value, jerry_value_t const that,
 		jerry_value_t const argv[], jerry_length_t const argc
 	)
 	{
-		static auto const argn = std::index_sequence_for<Args...>();
-		return Handler<Function, Object, Args...>(value, that, argv, argc, argn);
+		try
+		{
+			auto const argn = std::index_sequence_for<Args...>();
+			return Handler<Signature, Object, Args...>(value, that, argv, argc, argn);
+		}
+		catch (std::exception const &exception)
+		{
+			auto const message = (jerry_char_ptr_t) exception.what();
+			jerry_value_t value = jerry_create_string(message);
+			jerry_value_set_error_flag(&value);
+			return value;
+		}
 	}
 
-	template <typename Function, typename Object, typename... Args>
-	jerry_value_t CreateHandler(Function function)
+	template <typename Signature, typename Object, typename... Args>
+	jerry_value_t CreateHandler(std::function<Signature> function)
 	{
-		return CreateObject(function, Handler<Function, Object, Args...>);
+		jerry_value_t const value = CreateObject(function, Handler<Signature, Object, Args...>);
+		assert(jerry_value_is_function(value));
+		return value;
+	}
+
+	template <typename Object>
+	jerry_value_t CreateShared(std::shared_ptr<Object> shared)
+	{
+		jerry_value_t const value = CreateObject(shared);
+		assert(jerry_value_is_object(value));
+		return value;
+	}
+
+	template <typename Signature>
+	jerry_value_t CreateConstructor(Signature &&constructor)
+	{
+		jerry_value_t const value = CreateHandler(constructor);
+		assert(jerry_value_is_constructor(value));
+		return value;
 	}
 
 	// More utility functions for setting properties
@@ -292,14 +348,6 @@ namespace
 	{
 		js::Value const value = jerry_set_property(obj, prop.name, prop.value);
 		return js::CheckError(value);
-	}
-
-	template <typename Signature>
-	jerry_value_t Constructor(Signature &&constructor)
-	{
-		jerry_value_t const value = Create(constructor);
-		assert(jerry_value_is_constructor(value));
-		return value;
 	}
 
 	void Evaluate(SDL_Event const &event)
