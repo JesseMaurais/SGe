@@ -38,7 +38,7 @@ namespace SDL
 	{
 	public:
 
-		explicit ScopedAssertHandler(SDL_Window *window = nullptr);
+		ScopedAssertHandler(SDL_Window *window = nullptr);
 		~ScopedAssertHandler();
 
 	private:
@@ -49,4 +49,3 @@ namespace SDL
 }
 
 #endif // file
-
