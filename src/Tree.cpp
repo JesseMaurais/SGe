@@ -4,8 +4,6 @@
 #include <cstdio>
 #include <cmath>
 
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-
 bool Tree::Traverse(Vector const &eye, Vector const &at)
 {
 	if (visit.empty())
@@ -125,7 +123,7 @@ bool Tree::Load(char const *path)
 		{
 			std::fputs("Unexpected end of file", stderr);
 		}
-		// no break
+		// fallthrough
 	default:
 		if (std::fclose(file))
 		{
@@ -154,7 +152,7 @@ bool Tree::Load(char const *path)
 			{
 				std::fputs("Unexpected end of file", stderr);
 			}
-			// no break
+			// fallthrough
 		default:
 			if (std::fclose(file))
 			{

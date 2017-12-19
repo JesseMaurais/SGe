@@ -9,8 +9,6 @@
 #include <cstring>
 #include <getopt.h>
 
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-
 namespace
 {
 	struct Option
@@ -219,7 +217,7 @@ int main(int argc, char **argv)
 
 			case Option::Unknown:
 				SDL::Log(InvalidArgument, opt.value);
-				// no break
+				// fallthrough
 
 			case Option::Help:
 				PrintCommandLineOptions(programName);
