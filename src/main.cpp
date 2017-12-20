@@ -1,10 +1,12 @@
 #include "JavaScript.hpp"
 #include "Stream.hpp"
 #include "Error.hpp"
+#include "Signal.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
 #include "std.hpp"
 #include <cstdio>
+#include <csignal>
 #include <cerrno>
 #include <cstring>
 #include <getopt.h>
@@ -168,6 +170,13 @@ int main(int argc, char **argv)
 		// Parse command line options
 
 		bool done = argc < 2;
+
+		sys::sig::ScopedHandler sigint(SIGINT, [&](int signo)
+		{
+			assert(SIGINT == signo);
+			done = true;
+		});
+
 		while (not done)
 		{
 			auto opt = NextOption(argc, argv);

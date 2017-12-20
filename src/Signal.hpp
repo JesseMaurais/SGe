@@ -1,6 +1,7 @@
 #ifndef Signal_hpp
 #define Signal_hpp
 
+#include <algorithm>
 #include <functional>
 #include <map>
 
@@ -11,14 +12,15 @@ public:
 	using Signature = void(Args...);
 	using Observer = std::function<Signature>;
 	using Container = std::map<Slot, Observer>;
+	using KeyValue = typename Container::value_type;
 
-	bool Connect(Slot &&id, Signature &&observer)
+	bool Connect(Slot id, Observer observer)
 	{
 		auto pair = slots.insert_or_assign(id, observer);
 		return pair.second; // true if not extant
 	}
 
-	bool Disconnect(Slot &&id)
+	bool Disconnect(Slot id)
 	{
 		return 1 == slots.erase(id);
 	}
@@ -28,12 +30,10 @@ public:
 		slots.clear();
 	}
 
-	void Emit(Args... args)
+	template <typename Filter>
+	void Emit(Filter &&filter)
 	{
-		for (auto it : slots)
-		{
-			it.second(args...);
-		}
+		std::for_each(slots.begin(), slots.end(), filter);
 	}
 
 private:
@@ -46,29 +46,41 @@ template <typename... Args> class Slot
 {
 public:
 
-	using Subject = Signal<Slot, Args...>;
+	using Subject = Signal<Slot*, Args...>;
+	using Signature = typename Subject::Signature;
 	using Observer = typename Subject::Observer;
 
 	virtual ~Slot()
 	{
-		verify(signal.Disconnect(this));
+		subject.Disconnect(this);
 	}
 
-	Slot(Subject &sub, Observer &&callback) : signal(sub)
+	Slot(Subject &sub, Observer observer) : subject(sub)
 	{
-		verify(signal.Connect(this, callback));
-	}
-
-	template <class Object>
-	static Observer Bind(Object *that, void(Object::*method)(Args...))
-	{
-		return [that](Args... args) { that->method(args...); };
+		subject.Connect(this, observer);
 	}
 
 private:
 
-	Subject &signal;
+	Subject &subject;
 };
 
+namespace sys::sig
+{
+	using Slot = Slot<int>;
+	using Signature = Slot::Signature;
+	using Observer = Slot::Observer;
+
+	struct ScopedHandler : Slot
+	{
+		ScopedHandler(int signo, Observer handler);
+		~ScopedHandler();
+
+	private:
+
+		Signature *handler;
+		int signo;
+	};
+}
 
 #endif // file
