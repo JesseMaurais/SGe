@@ -36,6 +36,19 @@ public:
 		std::for_each(slots.begin(), slots.end(), filter);
 	}
 
+	bool Move(Slot from, Slot to)
+	{
+		auto const it = slots.find(from);
+		bool const unique = Connect(to, it->second);
+		slots.erase(it);
+		return unique;
+	}
+
+	void Merge(Signal const & that)
+	{
+		slots.merge(that.slots);
+	}
+
 private:
 
 	Container slots;
