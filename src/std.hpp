@@ -7,6 +7,7 @@
 #include "stl/filesystem.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <limits>
 #include <type_traits>
@@ -19,7 +20,7 @@
 #ifndef NDEBUG
 #define verify(condition) assert(condition)
 #else
-#define verify(condtiion) (condition)
+#define verify(condition) (condition)
 #endif
 
 

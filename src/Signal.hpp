@@ -75,6 +75,7 @@ namespace sys::sig
 	{
 		ScopedHandler(int signo, Observer handler);
 		~ScopedHandler();
+		operator bool();
 
 	private:
 

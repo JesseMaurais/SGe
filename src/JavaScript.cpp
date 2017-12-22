@@ -6,7 +6,6 @@
 #include <memory>
 #include <utility>
 #include <functional>
-#include <jerryscript-port.h>
 
 namespace
 {
@@ -298,58 +297,6 @@ namespace
 		return value;
 	}
 
-	// More utility functions for setting properties
-
-	struct PropertyDescriptor : jerry_property_descriptor_t
-	{
-		PropertyDescriptor()
-		{
-			jerry_init_property_descriptor_fields(this);
-		}
-
-		~PropertyDescriptor()
-		{
-			jerry_free_property_descriptor_fields(this);
-		}
-
-		jerry_value_t DefineOwn(jerry_value_t const obj, jerry_value_t const name)
-		{
-			return jerry_define_own_property(obj, name, this);
-		}
-
-		jerry_value_t GetOwn(jerry_value_t const obj, jerry_value_t const name)
-		{
-			return jerry_get_own_property_descriptor(obj, name, this);
-		}
-
-		operator jerry_value_t() const
-		{
-			return value;
-		}
-	};
-
-	struct Property
-	{
-		js::Value name;
-		js::Value value;
-
-		Property(char const *property_name, jerry_value_t const property_value)
-		: name(jerry_create_string((jerry_char_ptr_t) property_name))
-		, value(property_value)
-		{}
-
-		operator jerry_value_t() const
-		{
-			return value;
-		}
-	};
-
-	bool SetProperty(jerry_value_t const obj, Property const &prop)
-	{
-		js::Value const value = jerry_set_property(obj, prop.name, prop.value);
-		return js::CheckError(value);
-	}
-
 	void Evaluate(SDL_Event const &event)
 	{
 		bool const strict = false != event.user.code;
@@ -417,34 +364,4 @@ bool js::SetError(jerry_value_t value)
 bool js::CheckError(jerry_value_t value)
 {
 	return jerry_value_has_error_flag(value) and js::SetError(value);
-}
-
-
-// Implementation of the JerryScript port API
-
-void jerry_port_fatal(jerry_fatal_code_t code)
-{
-	SDL::Log("jerry(%1) fatal", code);
-	std::exit(0);
-}
-
-void jerry_port_log(jerry_log_level_t level, const char *format, ...)
-{
-	va_list args;
-	va_start (args, format);
-	char string[BUFSIZ];
-	std::vsnprintf(string, sizeof(string), format, args);
-	va_end (args);
-	SDL::Log("jerry(%1) %2", level, string);
-}
-
-bool jerry_port_get_time_zone(jerry_time_zone_t *tz)
-{
-	(void)tz;
-	return false;
-}
-
-double jerry_port_get_current_time()
-{
-	return static_cast<double>(std::time(nullptr));
 }

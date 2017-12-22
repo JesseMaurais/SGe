@@ -51,6 +51,52 @@ namespace js
 
 		jerry_value_t value;
 	};
+
+	// More utility functions for setting properties
+
+	struct PropertyDescriptor : jerry_property_descriptor_t
+	{
+		PropertyDescriptor()
+		{
+			jerry_init_property_descriptor_fields(this);
+		}
+
+		~PropertyDescriptor()
+		{
+			jerry_free_property_descriptor_fields(this);
+		}
+
+		jerry_value_t DefineOwn(jerry_value_t const obj, jerry_value_t const name)
+		{
+			return jerry_define_own_property(obj, name, this);
+		}
+
+		jerry_value_t GetOwn(jerry_value_t const obj, jerry_value_t const name)
+		{
+			return jerry_get_own_property_descriptor(obj, name, this);
+		}
+
+		operator jerry_value_t() const
+		{
+			return value;
+		}
+	};
+
+	struct Property
+	{
+		Value name;
+		Value value;
+
+		Property(char const *property_name, jerry_value_t const property_value)
+		: name(jerry_create_string((jerry_char_ptr_t) property_name))
+		, value(property_value)
+		{}
+
+		operator jerry_value_t() const
+		{
+			return value;
+		}
+	};
 }
 
 #endif // file

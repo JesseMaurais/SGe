@@ -50,7 +50,7 @@ namespace
 		void Destroy(std::vector<ALuint> const &ids) override
 		{
 			alDeleteBuffers(ids.size(), ids.data());
-			if (OpenAL::LogError("alDeleteBuffers"))
+			if (OpenAL::CheckError("alDeleteBuffers"))
 			{
 				SDL::LogError(CannotFreeResource);
 			}

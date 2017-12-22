@@ -1,6 +1,8 @@
 #ifndef stl_numeric_hpp
 #define stl_numeric_hpp
 
+#include <numeric>
+
 namespace stl
 {
 	template <typename Container, typename Value>

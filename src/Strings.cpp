@@ -39,6 +39,7 @@ char const *String(enum Strings id)
 	case CannotLock: return "Cannot lock";
 	case CannotUnlock: return "Cannot unlock";
 	case CannotMakeExit: return "Cannot make %1 at exit";
+	case CannotHandleSignal: return "Cannot set signal handler";
 	case CannotSendEvent: return "Cannot queue an event";
 	case CannotStartProcess: return "Cannot start a system process";
 	case CannotFindFormat: return "Cannot find matching format";
@@ -65,4 +66,3 @@ char const *String(enum Strings id)
 	assert(not "Valid strings id");
 	return nullptr;
 }
-

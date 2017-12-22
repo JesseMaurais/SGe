@@ -1,5 +1,5 @@
 #include "Signal.hpp"
-#include "std.hpp"
+#include "Error.hpp"
 #include <csignal>
 #include <map>
 
@@ -27,11 +27,20 @@ namespace sys::sig
     {
         this->signo = signo;
         this->handler = std::signal(signo, SignalHandler);
+        if (SIG_ERR == this->handler)
+        {
+            SDL::SetErrno();
+        }
     }
 
     ScopedHandler::~ScopedHandler()
     {
         handler = std::signal(signo, handler);
         assert(SignalHandler == handler);
+    }
+
+    ScopedHandler::operator bool()
+    {
+        return SIG_ERR == handler;
     }
 }
