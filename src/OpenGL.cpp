@@ -22,8 +22,8 @@ namespace
 	};
 
 	// Generic resource manager for any GLuint based id type
-	template <UpdateEventCode UpdateCode>
-	class UpdateManager : public Manager<GLuint>
+	template <UpdateEventCode UpdateCode, typename Slot>
+	class UpdateManager : public Manager<Slot*, GLuint>
 	{
 	private:
 

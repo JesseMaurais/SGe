@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <string>
 #include <vector>
+#include <map>
+#include <set>
 #include <cassert>
 #include <cctype>
 #include <future>

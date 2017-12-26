@@ -1,6 +1,5 @@
 #include "OpenAL.hpp"
 #include "Manager.hpp"
-#include "Audio.hpp"
 #include "Event.hpp"
 #include "Error.hpp"
 #include "SDL.hpp"
@@ -14,11 +13,11 @@ namespace
 
 	// Generic resource manager for any ALuint based id type
 	template <UpdateEventCode UpdateCode>
-	class UpdateManager : public Manager<ALuint>
+	class UpdateManager : public Manager<Slot<ALuint>*, ALuint>
 	{
 	private:
 
-		bool SendUpdate() override
+		bool SendUpdate() const override
 		{
 			return SDL::SendUserEvent(UpdateOpenAL, UpdateCode);
 		}
@@ -91,29 +90,13 @@ namespace
 	};
 }
 
-// OpenAL buffer management
+OpenAL::Buffer::Buffer(Observer observer)
+: Slot(AudioBufferManager::Instance(), observer)
+{}
 
-Resources &AudioBuffer::Manager()
-{
-	return AudioBufferManager::Instance();
-}
-
-ALuint OpenAL::GetBuffer(unsigned index)
-{
-	return AudioBufferManager::Instance().Data(index);
-}
-
-// OpenAL source management
-
-Resources &AudioSource::Manager()
-{
-	return AudioSourceManager::Instance();
-}
-
-ALuint OpenAL::GetSource(unsigned index)
-{
-	return AudioSourceManager::Instance().Data(index);
-}
+OpenAL::Source::Source(Observer observer)
+: Slot(AudioSourceManager::Instance(), observer)
+{}
 
 // OpenAL device management
 

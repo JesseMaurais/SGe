@@ -1,113 +1,133 @@
+/** \file
+ * Template for managing the addition and removal of resources in queue and
+ * on reset. Uses signals & slots to notify observers when the reset occurs.
+ */
+
 #ifndef Manager_hpp
 #define Manager_hpp
 
 #include "Signal.hpp"
-#include "std.hpp"
+#include <vector>
+#include <map>
+#include <set>
 
-template <typename Type> class Manager : private Signal<unsigned, unsigned>
+/// Manages access an observer, identified by a slot, has to a resource type
+template <typename Slot, typename Type> class Manager : public Signal<Slot, Type>
 {
+	using Signal = typename ::Signal<Slot, Type>;
+	using Observer = typename Signal::Observer;
+
 public:
 
-	// Regenerate all from their sources
+	/// Regenerate all data, notifying observers
 	void Initialize()
 	{
-		Generate(data); // include added
-		added.clear(); // done adding
-		// Sync with data
-		UpdateSources();
+		Add();
 	}
 
-	// Destroy all resources
+	/// Destroy data but retain observer slots
 	void Release()
 	{
-		// Destroy any removed too
-		stl::append(removed, data);
-		Destroy(removed); // retain data
-		removed.clear(); // done removing
+		Remove();
+		Retain();
 	}
 
-	// Update any added or removed sources
+	/// Update any added or removed slots
 	void Update()
 	{
-		// Destroy any removed
-		Destroy(removed);
-		removed.clear();
-		// Reserve space for added
-		auto const size = added.size();
-		std::vector<Type> newdata(size);
-		// Generate new data for added
-		Generate(newdata);
-		Replace(newdata);
-		// Update the added from their sources
-		UpdateSources(added);
-		added.clear();
+		Remove();
+		Add();
 	}
 
-	// Capture the id and generate in queue later
-	unsigned Add(Observer observer)
+	/// Capture the id and generate in queue later
+	bool Connect(Slot id, Observer observer) override
 	{
-		unsigned const index = to_unsigned(data.size() + added.size());
-		Signal::Connect(index, observer);
-		added.push_back(index);
-		QueueUpdate();
-		return index;
+		bool const ok = QueueUpdate() and Signal::Connect(id, observer);
+		added.insert(id);
+		return ok;
 	}
 
-	// Capture the id and destroy in queue later
-	void Remove(unsigned index)
+	/// Capture the id and destroy in queue later
+	bool Disconnect(Slot id) override
 	{
-		Signal::Disconnect(index);
-		removed.push_back(data.at(index));
-		QueueUpdate();
-	}
-
-	// Get the internal resource data
-	Type &Data(unsigned index)
-	{
-		return data.at(index);
+		bool const ok = QueueUpdate() and Signal::Disconnect(id);
+		removed.insert(id);
+		return ok;
 	}
 
 protected:
 
 	virtual void Generate(std::vector<Type> &data) = 0;
 	virtual void Destroy(std::vector<Type> const &data) = 0;
-	virtual bool SendUpdate() = 0;
+	virtual bool SendUpdate() const = 0;
 
 private:
 
-	std::vector<Type> data;
-	std::vector<unsigned> added;
-	std::vector<Type> removed;
+	std::set<Slot> added;
+	std::set<Slot> removed;
+	std::map<Slot, Type> map;
 
-	bool NeedUpdate()
+	// Generate and merge added into map
+	void Add()
 	{
-		// Only need update if we have pending changes
-		return not added.empty() or not removed.empty();
-	}
-
-	bool QueueUpdate()
-	{
-		// Only send the update message there is not one pending
-		return not NeedUpdate() or SendUpdate();
-	}
-	
-	void UpdateSources()
-	{
-		Signal::Emit([](auto const &pair)
+		auto const size = added.size();
+		std::vector<Type> data(size);
+		Generate(data);
+		for (auto const &key : added)
 		{
-			pair.second(pair.first);
-		});
-	}
-
-	// Replace data with new data at added indices
-	void Replace(std::vector<Type> const &newdata)
-	{
-		assert(newdata.size() == added.size());
-		for (std::size_t it = 0; it < added.size(); ++it)
-		{
-			unsigned const id = added.at(it);
-			data.at(id) = newdata.at(it);
+			Type const &value = data.back();
+			auto const pair = map.insert_or_assign(key, value);
+			assert(pair.second);
+			// Notify observer of its new resource value
+			Signal::Emit(key, [value](auto const &pair)
+			{
+				pair.second(value);
+			});
+			data.pop_back();
 		}
+		added.clear();
+	}
+
+	// Destroy any removed from map
+	void Remove()
+	{
+		std::vector<Type> data;
+		for (Slot const &key : removed)
+		{
+			auto const it = map.find(key);
+			if (map.end() != it)
+			{
+				data.push_back(it->second);
+				map.erase(it);
+			}
+		}
+		Destroy(data);
+		removed.clear();
+	}
+
+	// Retain slots by moving into added
+	void Retain()
+	{
+		std::vector<Type> data;
+		for (auto const &pair : map)
+		{
+			added.insert(pair.first);
+			data.push_back(pair.second);
+		}
+		Destroy(data);
+		map.clear();
+	}
+
+	bool NeedUpdate() const
+	{
+		// Only need update if we have no pending changes
+		return added.empty() and removed.empty();
+	}
+
+	bool QueueUpdate() const
+	{
+		// Only send the update message if there is not one pending
+		return not NeedUpdate() or SendUpdate();
 	}
 };
 

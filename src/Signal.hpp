@@ -14,13 +14,13 @@ public:
 	using Container = std::map<Slot, Observer>;
 	using KeyValue = typename Container::value_type;
 
-	bool Connect(Slot id, Observer observer)
+	virtual bool Connect(Slot id, Observer observer)
 	{
-		auto pair = slots.insert_or_assign(id, observer);
-		return pair.second; // true if not extant
+		auto const pair = slots.insert_or_assign(id, observer);
+		return pair.second; // true if not already extant
 	}
 
-	bool Disconnect(Slot id)
+	virtual bool Disconnect(Slot id)
 	{
 		return 1 == slots.erase(id);
 	}
@@ -36,17 +36,14 @@ public:
 		std::for_each(slots.begin(), slots.end(), filter);
 	}
 
-	bool Move(Slot from, Slot to)
+	template <typename Filter>
+	void Emit(Slot id, Filter &&filter)
 	{
-		auto const it = slots.find(from);
-		bool const unique = Connect(to, it->second);
-		slots.erase(it);
-		return unique;
-	}
-
-	void Merge(Signal const & that)
-	{
-		slots.merge(that.slots);
+		auto const it = slots.find(id);
+		if (slots.end() != it)
+		{
+			filter(*it);
+		}
 	}
 
 private:
@@ -75,8 +72,12 @@ public:
 
 private:
 
+	Slot(Slot const &that) = delete;
+	Slot const &operator=(Slot const &that) = delete;
+
 	Subject &subject;
 };
+
 
 namespace sys::sig
 {

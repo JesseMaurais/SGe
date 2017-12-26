@@ -5,6 +5,7 @@
 #ifndef OpenGL_hpp
 #define OpenGL_hpp
 
+#include "Signal.hpp"
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <GL/gl.h>
@@ -20,17 +21,6 @@ namespace OpenGL
 	/// Log the current error with SDL. Returns true when an error exists.
 	bool LogError(const char *origin);
 
-	/// Texture id at the given index from within the singleton.
-	GLuint GetTexture(unsigned index);
-	/// Buffer id at the given index from within the singleton.
-	GLuint GetBuffer(unsigned index);
-	/// Program id at the given index from within the singleton.
-	GLuint GetProgram(unsigned index);
-	/// Shader id at the given index from within the singleton.
-	GLuint GetShader(unsigned index);
-	/// Set the shader type that will be generated on update.
-	void SetShaderType(unsigned index, GLenum type);
-
 	/**
 	 * \brief Update the graphics device singleton for compatibility with the
 	 * given window.
@@ -40,7 +30,28 @@ namespace OpenGL
 	 * \return Context handle now current, or null and the error string is set.
 	 */
 	void *GetContext(SDL_Window *window);
+
+	// Managed resource observer slots
+
+	struct Texture : Slot<GLuint>
+	{
+		Texture(Observer);
+	};
+
+	struct Buffer : Slot<GLuint>
+	{
+		Buffer(Observer);
+	};
+
+	struct Shader : Slot<GLuint>
+	{
+		Shader(Observer);
+	};
+
+	struct Program : Slot<GLuint>
+	{
+		Program(Observer);
+	};
 }
 
 #endif // file
-

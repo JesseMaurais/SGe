@@ -5,6 +5,7 @@
 #ifndef OpenAL_hpp
 #define OpenAL_hpp
 
+#include "Signal.hpp"
 #include <AL/alc.h>
 #include <AL/al.h>
 
@@ -24,11 +25,6 @@ namespace OpenAL
 	/// Log the current device error with SDL. Returns true when an error exists.
 	bool LogError(ALCdevice *device, const char *origin);
 
-	// Buffer id at the given index from within the singleton.
-	ALuint GetBuffer(unsigned index);
-	// Source id at the given index from within the singleton.
-	ALuint GetSource(unsigned index);
-
 	/**
 	 * \brief Update the audio device singleton for the given device name.
 	 * \param name The name of the device to be opened or none for the default.
@@ -46,7 +42,18 @@ namespace OpenAL
 	 * \return Context handle now current, or null and the error string is set.
 	 */
 	ALCcontext *GetContext(const int *attributes = {0});
+
+	// Managed resource observer slots
+
+	struct Buffer : Slot<ALuint>
+	{
+		Buffer(Observer);
+	};
+
+	struct Source : Slot<ALuint>
+	{
+		Source(Observer);
+	};
 }
 
 #endif // file
-
