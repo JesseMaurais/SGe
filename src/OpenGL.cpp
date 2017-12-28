@@ -1,40 +1,98 @@
 #include "OpenGL.hpp"
-#include "Shader.hpp"
 #include "Manager.hpp"
-#include "Video.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
-
-#include "stl/algorithm.hpp"
 
 // Resource management implementation
 
 namespace
 {
-	// User event codes to queue updates with
-	enum UpdateEventCode : Uint32
+	// User event codes to queue updates
+	enum NotifyEventCode : Sint32
 	{
-		UpdateTextures,
-		UpdateBuffers,
-		UpdateShaders,
-		UpdatePrograms,
+		NotifyTextures,
+		NotifyBuffers,
+		NotifyPrograms,
+		NotifyVertexes,
+		NotifyFragments,
+		NotifyGeometries,
+		NotifyComputers,
 	};
 
-	// Generic resource manager for any GLuint based id type
-	template <UpdateEventCode UpdateCode, typename Slot>
-	class UpdateManager : public Manager<Slot*, GLuint>
+	using ManagerType = Manager<Slot<GLuint>*, GLuint>;
+
+	// Collect resource managers so we do not miss any
+	class ManagerSet : public ManagerType
 	{
+	public:
+
+		static void Initialize()
+		{
+			for (auto const &pair : set)
+			{
+				pair.second->Initialize();
+			}
+		}
+
+		static void Release()
+		{
+			for (auto const &pair : set)
+			{
+				pair.second->Release();
+			}
+		}
+
+		static void Update(NotifyEventCode const code)
+		{
+			set.at(code)->Update();
+		}
+
+	protected:
+
+		ManagerSet(NotifyEventCode const code)
+		{
+			set.insert_or_assign(code, this);
+		}
+
+		~ManagerSet()
+		{
+			for (auto it = set.begin(); it != set.end(); ++it)
+			{
+				if (this == it->second)
+				{
+					set.erase(it);
+					break;
+				}
+			}
+		}
+
 	private:
 
-		bool SendUpdate() override
+		static std::map<NotifyEventCode, Manager*> set;
+	};
+
+	// Generic manager for common notifications
+	template <NotifyEventCode NotifyCode>
+	class UpdateManager : public ManagerSet
+	{
+	protected:
+
+		UpdateManager()
+		: ManagerSet(NotifyCode)
+		{}
+
+	private:
+
+		bool SendUpdate() const override
 		{
-			return SDL::SendUserEvent(UpdateOpenGL, UpdateCode);
+			return SDL::SendUserEvent(UpdateOpenGL, NotifyCode);
 		}
 	};
 
+	// Specific resource managers
 
-	class TextureManager final : public UpdateManager<UpdateTextures>
+	class TextureManager final : public UpdateManager<NotifyTextures>
 	{
 	private:
 
@@ -67,7 +125,7 @@ namespace
 		}
 	};
 
-	class BufferManager final : public UpdateManager<UpdateBuffers>
+	class BufferManager final : public UpdateManager<NotifyBuffers>
 	{
 	private:
 
@@ -100,7 +158,7 @@ namespace
 		}
 	};
 
-	class ProgramManager final : public UpdateManager<UpdatePrograms>
+	class ProgramManager final : public UpdateManager<NotifyPrograms>
 	{
 	private:
 
@@ -116,41 +174,35 @@ namespace
 
 		void Generate(std::vector<GLuint> &ids) override
 		{
-			stl::generate(ids, []()
+			for (GLuint &program : ids)
 			{
-				GLuint const program = glCreateProgram();
+				program = glCreateProgram();
 				if (OpenGL::CheckError("glCreateProgram"))
 				{
 					SDL::LogError(CannotAllocateResource);
 				}
-				return program;
-			});
+			}
 		}
 
 		void Destroy(std::vector<GLuint> const &ids) override
 		{
-			stl::for_each(ids, [](GLuint const program)
+			for (GLuint const program : ids)
 			{
 				glDeleteProgram(program);
 				if (OpenGL::CheckError("glDeleteProgram"))
 				{
 					SDL::LogError(CannotFreeResource);
 				}
-			});
+			}
 		}
 	};
 
-	struct ShaderPair { GLenum type; GLuint shader; };
-	class ShaderManager final : public Manager<ShaderPair>
+	template <NotifyEventCode NotifyCode, GLenum ShaderType>
+	class ShaderManager : public UpdateManager<NotifyCode>
 	{
 	private:
 
 		ShaderManager() = default;
-
-		bool SendUpdate() override
-		{
-			return SDL::SendUserEvent(UpdateOpenAL, UpdateShaders);
-		}
 
 	public:
 
@@ -160,30 +212,55 @@ namespace
 			return singleton;
 		}
 
-		void Generate(std::vector<ShaderPair> &pairs) override
+		void Generate(std::vector<GLuint> &ids) override
 		{
-			stl::for_each(pairs, [](ShaderPair &pair)
+			for (GLuint &shader : ids)
 			{
-				pair.shader = glCreateShader(pair.type);
+				shader = glCreateShader(ShaderType);
 				if (OpenGL::CheckError("glCreateShader"))
 				{
 					SDL::LogError(CannotAllocateResource);
 				}
-			});
+			}
 		}
 
-		void Destroy(std::vector<ShaderPair> const &pairs) override
+		void Destroy(std::vector<GLuint> const &ids) override
 		{
-			stl::for_each(pairs, [](ShaderPair const &pair)
+			for (GLuint const shader : ids)
 			{
-				glDeleteShader(pair.shader);
+				glDeleteShader(shader);
 				if (OpenGL::CheckError("glDeleteShader"))
 				{
 					SDL::LogError(CannotFreeResource);
 				}
-			});
+			}
 		}
 	};
+
+	ManagerType &FindShaderManager(GLenum const type)
+	{
+		using VertexManager = ShaderManager<NotifyVertexes, GL_VERTEX_SHADER>;
+		using FragmentManager = ShaderManager<NotifyFragments, GL_FRAGMENT_SHADER>;
+		using GeometryManager = ShaderManager<NotifyGeometries, GL_GEOMETRY_SHADER>;
+		using ComputeManager = ShaderManager<NotifyComputers, GL_COMPUTE_SHADER>;
+
+		switch (type)
+		{
+		default:
+			assert(not "OpenGL shader type");
+			throw std::bad_cast();
+
+		case GL_VERTEX_SHADER:
+			return VertexManager::Instance();
+		case GL_FRAGMENT_SHADER:
+			return FragmentManager::Instance();
+		case GL_GEOMETRY_SHADER:
+			return GeometryManager::Instance();
+		case GL_COMPUTE_SHADER:
+			return ComputeManager::Instance();
+		}
+	}
+
 
 	// Convert error code to error string.
 	char const *ErrorString(GLenum error)
@@ -198,7 +275,25 @@ namespace
 	}
 }
 
-// OpenGL error utility functions
+// Bind observers to the correct manager
+
+OpenGL::Texture::Texture(Observer observer)
+: Managed(TextureManager::Instance(), observer)
+{}
+
+OpenGL::Buffer::Buffer(Observer observer)
+: Managed(BufferManager::Instance(), observer)
+{}
+
+OpenGL::Program::Program(Observer observer)
+: Managed(ProgramManager::Instance(), observer)
+{}
+
+OpenGL::Shader::Shader(GLenum type, Observer observer)
+: Managed(FindShaderManager(type), observer)
+{}
+
+// Error utility functions
 
 bool OpenGL::SetError(const char *origin, GLenum error)
 {
@@ -217,54 +312,9 @@ bool OpenGL::LogError(const char *origin)
 	return error and SDL::LogError(origin, ErrorString(error));
 }
 
-// OpenGL resource utility functions
+// Context singleton
 
-GLuint OpenGL::GetTexture(unsigned index)
-{
-	return TextureManager::Instance().Data(index);
-}
-
-Resources &VideoTexture::Manager()
-{
-	return TextureManager::Instance();
-}
-
-GLuint OpenGL::GetBuffer(unsigned index)
-{
-	return BufferManager::Instance().Data(index);
-}
-
-Resources &VideoBuffer::Manager()
-{
-	return BufferManager::Instance();
-}
-
-GLuint OpenGL::GetProgram(unsigned index)
-{
-	return ProgramManager::Instance().Data(index);
-}
-
-Resources &Shader::Manager()
-{
-	return ProgramManager::Instance();
-}
-
-Resources &Shader::SourceCode::Manager()
-{
-	return ShaderManager::Instance();
-}
-
-GLuint OpenGL::GetShader(unsigned index)
-{
-	return ShaderManager::Instance().Data(index).shader;
-}
-
-void OpenGL::SetShaderType(unsigned index, GLenum type)
-{
-	ShaderManager::Instance().Data(index).type = type;
-}
-
-void *OpenGL::GetContext(SDL_Window *window)
+SDL_GLContext OpenGL::GetContext(SDL_Window *window)
 {
 	static class Context
 	{
@@ -272,47 +322,17 @@ void *OpenGL::GetContext(SDL_Window *window)
 
 		static void Initialize()
 		{
-			// Generate textures
-			TextureManager::Instance().Initialize();
-			// Generate buffers
-			BufferManager::Instance().Initialize();
-			// Create shaders
-			ShaderManager::Instance().Initialize();
-			// Create programs
-			ProgramManager::Instance().Initialize();
+			ManagerSet::Initialize();
 		}
 
 		static void Release()
 		{
-			// Delete textures
-			TextureManager::Instance().Release();
-			// Delete buffers
-			BufferManager::Instance().Release();
-			// Delete shaders
-			ShaderManager::Instance().Release();
-			// Delete programs
-			ProgramManager::Instance().Release();
+			ManagerSet::Release();
 		}
 
 		static void UpdateHandler(SDL_Event const &event)
 		{
-			switch (event.user.code)
-			{
-			case UpdateTextures:
-				TextureManager::Instance().Update();
-				break;
-			case UpdateBuffers:
-				BufferManager::Instance().Update();
-				break;
-			case UpdateShaders:
-				ShaderManager::Instance().Update();
-				break;
-			case UpdatePrograms:
-				ProgramManager::Instance().Update();
-				break;
-			default:
-				assert(not "OpenGL event code");
-			}
+			ManagerSet::Update(static_cast<NotifyEventCode>(event.user.code));
 		}
 
 		ScopedEventHandler updater;
@@ -341,7 +361,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 					if (not init)
 					{
 						// Initialize extensions
-						GLenum error = glewInit();
+						GLenum const error = glewInit();
 						if (error)
 						{
 							union {
@@ -354,6 +374,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 						}
 						else init = true;
 					}
+					// Init resources
 					Initialize();
 				}
 				else
@@ -368,6 +389,7 @@ void *OpenGL::GetContext(SDL_Window *window)
 			// Free if it was created
 			if (context)
 			{
+				// Free resources
 				Release();
 				// Detach before deletion
 				if (SDL_GL_GetCurrentContext() == context)

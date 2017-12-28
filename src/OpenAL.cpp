@@ -90,6 +90,8 @@ namespace
 	};
 }
 
+// Bind observers to the correct manager
+
 OpenAL::Buffer::Buffer(Observer observer)
 : Slot(AudioBufferManager::Instance(), observer)
 {}
@@ -98,7 +100,7 @@ OpenAL::Source::Source(Observer observer)
 : Slot(AudioSourceManager::Instance(), observer)
 {}
 
-// OpenAL device management
+// Device singleton
 
 ALCdevice *OpenAL::GetDevice(const char *name)
 {
@@ -149,7 +151,7 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 	return singleton.device;
 }
 
-// OpenAL context management
+// Context singleton
 
 ALCcontext *OpenAL::GetContext(int const *attributes)
 {
@@ -262,7 +264,7 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 	return singleton.context;
 }
 
-// OpenAL error utility functions
+// Error utility functions
 
 bool OpenAL::SetError(const char *origin, ALenum error)
 {
@@ -280,8 +282,6 @@ bool OpenAL::LogError(const char *origin)
 	ALenum const error = alGetError();
 	return error or SDL::LogError(origin, alGetString(error));
 }
-
-// ALC error utility functions
 
 bool OpenAL::SetError(ALCdevice *device, const char *origin, ALenum error)
 {

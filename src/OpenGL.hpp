@@ -14,43 +14,45 @@ struct SDL_Window;
 
 namespace OpenGL
 {
-	/// Set the SDL error string to the given error code. Always returns true.
+	/// Set the SDL error string to the given error code. Always returns true
 	bool SetError(const char *origin, GLenum error);
-	/// Set the SDL error string to the current error code. Returns true when an error exists.
+	/// Set the SDL error string to the current error code. Returns true when an error exists
 	bool CheckError(const char *origin);
-	/// Log the current error with SDL. Returns true when an error exists.
+	/// Log the current error with SDL. Returns true when an error exists
 	bool LogError(const char *origin);
 
 	/**
 	 * \brief Update the graphics device singleton for compatibility with the
 	 * given window.
 	 * \param window Window for which the singleton context will be made
-	 * compatible. Provide null to delete the context. It will be deleted
+	 * compatible. Provide null to return current context. It will be deleted
 	 * automatically at exit.
 	 * \return Context handle now current, or null and the error string is set.
 	 */
-	void *GetContext(SDL_Window *window);
+	void *GetContext(SDL_Window *window = nullptr);
 
 	// Managed resource observer slots
 
-	struct Texture : Slot<GLuint>
+	using Managed = Slot<GLuint>;
+
+	struct Texture : Managed
 	{
 		Texture(Observer);
 	};
 
-	struct Buffer : Slot<GLuint>
+	struct Buffer : Managed
 	{
 		Buffer(Observer);
 	};
 
-	struct Shader : Slot<GLuint>
-	{
-		Shader(Observer);
-	};
-
-	struct Program : Slot<GLuint>
+	struct Program : Managed
 	{
 		Program(Observer);
+	};
+
+	struct Shader : Managed
+	{
+		Shader(GLenum type, Observer);
 	};
 }
 

@@ -4,40 +4,43 @@
 #ifndef Shader_hpp
 #define Shader_hpp
 
-#include "Source.hpp"
+#include "OpenGL.hpp"
 #include <memory>
 #include <vector>
 #include <string>
 
-class Shader : public ManagedSource<Shader>
+class Shader
 {
 public:
 
-	~Shader();
 	bool LoadString(std::string const &code);
 	bool LoadFile(std::string const &path);
 	bool Link();
 	bool Use();
 
-	class SourceCode : public ManagedSource<SourceCode>
+	class Source
 	{
 	public:
 
-		bool Attach(unsigned id);
-		bool Detach(unsigned id);
+		Source(GLenum type);
+		virtual bool UpdateSource(GLuint shader) = 0;
+		bool Attach(GLuint program);
+		bool Detach(GLuint program);
 
-		static Resources &Manager();
+	protected:
+
+		OpenGL::Shader slot;
+		GLuint shader;
 	};
-
-	static Resources &Manager();
 
 protected:
 
-	bool UpdateSource() override;
+	OpenGL::Program slot;
+	GLuint program;
 
 private:
 
-	std::vector<std::shared_ptr<SourceCode>> shaderSources;
+	std::vector<std::shared_ptr<Source>> shaderSources;
 };
 
 #endif // file

@@ -135,6 +135,7 @@ namespace
 	}
 }
 
+// Error utility functions
 
 bool OpenCL::SetError(const char *origin, cl_int error)
 {
@@ -151,6 +152,7 @@ bool OpenCL::LogError(const char *origin, cl_int error)
 	return error and SDL::LogError(origin, ErrorString(error));
 }
 
+// Singleton utilities
 
 std::vector<cl_platform_id> const &OpenCL::GetPlatformIDs()
 {
@@ -178,7 +180,6 @@ std::vector<cl_platform_id> const &OpenCL::GetPlatformIDs()
 
 	return singleton;
 }
-
 
 std::vector<cl_device_id> const &OpenCL::GetDeviceIDs(cl_device_type type)
 {
@@ -352,4 +353,3 @@ cl_command_queue OpenCL::GetCommandQueue(std::vector<unsigned long> const &prope
 	}
 	return singleton.queue;
 }
-

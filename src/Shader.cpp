@@ -1,6 +1,4 @@
 #include "Shader.hpp"
-#include "Collection.hpp"
-#include "OpenGL.hpp"
 #include "Error.hpp"
 #include "SDL.hpp"
 #include "std.hpp"
@@ -90,10 +88,10 @@ namespace
 	}
 
 	// Guess the shader type by inspecting the source code
-	GLenum GuessShaderType(std::string const &sourceCode)
+	GLenum GuessShaderType(std::string const &code)
 	{
 		// Inspect the first line (usually a comment) for a keyword
-		auto line = sourceCode.substr(0, sourceCode.find("\n"));
+		auto line = code.substr(0, code.find("\n"));
 		line = stl::to_upper(line); // case insensitive match
 
 		if (std::string::npos != line.find("FRAGMENT"))
@@ -130,21 +128,22 @@ namespace
 
 	// Shader source code loaded from a string.
 
-	class SourceString : public Shader::SourceCode
-	, public std::enable_shared_from_this<SourceString>
+	class SourceCode : public Shader::Source
+	, public std::enable_shared_from_this<SourceCode>
 	{
 	public:
 
-		static std::shared_ptr<SourceCode> Find(std::string const &sourceString)
+		static std::shared_ptr<Shader::Source> Find(std::string const &code)
 		{
-			auto const it = stl::find_if(code.set, [&](SourceString *that)
+			auto const it = stl::find_if(set, [&](SourceCode *that)
 			{
-				return sourceString == that->sourceString;
+				return code == that->code;
 			});
 			// Share or make new object.
-			if (code.set.end() == it)
+			if (set.end() == it)
 			{
-				return std::make_shared<SourceString>(sourceString);
+				GLenum const type = GuessShaderType(code);
+				return std::make_shared<SourceCode>(type, code);
 			}
 			else
 			{
@@ -152,44 +151,63 @@ namespace
 			}
 		}
 
-		SourceString(std::string const &source) : sourceString(source)
+		bool UpdateSource(GLuint shader) override
 		{
-			GLenum const type = GuessShaderType(source);
-			OpenGL::SetShaderType(Source::id, type);
-			verify(code.Add(this));
+			while (true)
+			{
+				// Split the code into lines.
+				std::vector<std::string> lines;
+				stl::split(lines, code, std::string("\n"));
+				// Compile the source code lines into a shader.
+				bool const ok = CompileShaderSource(shader, lines);
+				if (not ok and SetShaderError(shader))
+				{
+					if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+					{
+						continue; // retry
+					}
+				}
+				return ok;
+			}
 		}
-		~SourceString()
+
+		SourceCode(GLenum type, std::string const &string)
+		:  Source(type), code(string)
 		{
-			verify(code.Remove(this));
+			set.insert(this);
+		}
+
+		~SourceCode()
+		{
+			set.erase(this);
 		}
 
 	private:
 
-		std::string const sourceString;
-		bool UpdateSource() override;
-
-		static Collection<SourceString> code;
+		std::string const code;
+		static std::set<SourceCode*> set;
 	};
 
-	Collection<SourceString> SourceString::code;
+	std::set<SourceCode*> SourceCode::set;
 
 	// Shader source code loaded from a file.
 
-	class SourceFile : public Shader::SourceCode
+	class SourceFile : public Shader::Source
 	, public std::enable_shared_from_this<SourceFile>
 	{
 	public:
 
-		static std::shared_ptr<SourceCode> Find(std::string const &sourceFile)
+		static std::shared_ptr<Shader::Source> Find(std::string const &path)
 		{
-			auto const it = stl::find_if(code.set, [&](SourceFile *that)
+			auto const it = stl::find_if(set, [&](SourceFile *that)
 			{
-				return sourceFile == that->sourceFile;
+				return path == that->path;
 			});
 			// Share or make new object.
-			if (code.set.end() == it)
+			if (set.end() == it)
 			{
-				return std::make_shared<SourceFile>(sourceFile);
+				GLenum const type = GuessShaderType(path);
+				return std::make_shared<SourceFile>(type, path);
 			}
 			else
 			{
@@ -197,79 +215,59 @@ namespace
 			}
 		}
 
-		SourceFile(std::string const &source) : sourceFile(source)
+		bool UpdateSource(GLuint const shader) override
 		{
-			verify(code.Add(this));
+			while (true)
+			{
+				// Parse the file into lines.
+				std::vector<std::string> lines;
+				{
+					std::ifstream stream(path);
+					std::string line;
+					while (std::getline(stream, line))
+					{
+						lines.emplace_back(line);
+					}
+				}
+				// Compile the source code lines into a shader.
+				bool const ok = CompileShaderSource(shader, lines);
+				if (not ok and SetShaderError(shader))
+				{
+					if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+					{
+						continue; // retry
+					}
+				}
+				return ok;
+			}
+		}
+
+		SourceFile(GLenum type, std::string const &file)
+		: Source(type), path(file)
+		{
+			set.insert(this);
 		}
 		~SourceFile()
 		{
-			verify(code.Remove(this));
+			set.erase(this);
 		}
 
 	private:
 
-		std::string const sourceFile;
-		bool UpdateSource() override;
+		std::string const path;
 
-		static Collection<SourceFile> code;
+		static std::set<SourceFile*> set;
 	};
 
-	Collection<SourceFile> SourceFile::code;
+	std::set<SourceFile*> SourceFile::set;
 }
 
-bool SourceString::UpdateSource()
-{
-	while (true)
-	{
-		// Split the code into lines.
-		std::vector<std::string> lines;
-		stl::split(lines, sourceString, std::string("\n"));
-		// Compile the source code lines into a shader.
-		GLuint const shader = OpenGL::GetShader(Source::id);
-		bool const ok = CompileShaderSource(shader, lines);
-		if (not ok and SetShaderError(shader))
-		{
-			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
-			{
-				continue; // retry
-			}
-		}
-		return ok;
-	}
-}
+Shader::Source::Source(GLenum type)
+: slot(type, [this](GLuint shader) { UpdateSource(shader); })
+{}
 
-bool SourceFile::UpdateSource()
+bool Shader::Source::Attach(GLuint program)
 {
-	while (true)
-	{
-		// Parse the file into lines.
-		std::vector<std::string> lines;
-		{
-			std::ifstream stream(sourceFile);
-			std::string line;
-			while (std::getline(stream, line))
-			{
-				lines.emplace_back(line);
-			}
-		}
-		// Compile the source code lines into a shader.
-		GLuint const shader = OpenGL::GetShader(Source::id);
-		bool const ok = CompileShaderSource(shader, lines);
-		if (not ok and SetShaderError(shader))
-		{
-			if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
-			{
-				continue; // retry
-			}
-		}
-		return ok;
-	}
-}
-
-bool Shader::SourceCode::Attach(unsigned id)
-{
-	GLuint const shader = OpenGL::GetShader(Source::id);
-	GLuint const program = OpenGL::GetProgram(id);
 	glAttachShader(program, shader);
 	if (OpenGL::CheckError("glAttachShader"))
 	{
@@ -279,10 +277,8 @@ bool Shader::SourceCode::Attach(unsigned id)
 	return true;
 }
 
-bool Shader::SourceCode::Detach(unsigned id)
+bool Shader::Source::Detach(GLuint program)
 {
-	GLuint const shader = OpenGL::GetShader(Source::id);
-	GLuint const program = OpenGL::GetProgram(id);
 	glDetachShader(program, shader);
 	if (OpenGL::CheckError("glDetachShader"))
 	{
@@ -296,7 +292,6 @@ bool Shader::Link()
 {
 	while (true)
 	{
-		GLuint const program = OpenGL::GetProgram(Source::id);
 		glLinkProgram(program);
 		if (OpenGL::CheckError("glLinkProgram"))
 		{
@@ -316,7 +311,6 @@ bool Shader::Link()
 
 bool Shader::Use()
 {
-	GLuint const program = OpenGL::GetProgram(Source::id);
 	glUseProgram(program);
 	if (OpenGL::CheckError("glUseProgram"))
 	{
@@ -328,7 +322,7 @@ bool Shader::Use()
 
 bool Shader::LoadString(std::string const &code)
 {
-	auto source = SourceString::Find(code);
+	auto source = SourceCode::Find(code);
 	if (source)
 	{
 		shaderSources.emplace_back(source);
@@ -337,9 +331,9 @@ bool Shader::LoadString(std::string const &code)
 	return false;
 }
 
-bool Shader::LoadFile(std::string const &file)
+bool Shader::LoadFile(std::string const &path)
 {
-	auto source = SourceFile::Find(file);
+	auto source = SourceFile::Find(path);
 	if (source)
 	{
 		shaderSources.emplace_back(source);
@@ -347,30 +341,3 @@ bool Shader::LoadFile(std::string const &file)
 	}
 	return false;
 }
-
-bool Shader::UpdateSource()
-{
-	unsigned count = 0;
-	for (auto const &shader : shaderSources)
-	{
-		if (shader->Attach(Source::id))
-		{
-			++count;
-		}
-	}
-	return shaderSources.size() == count;
-}
-
-Shader::~Shader()
-{
-	unsigned count = 0;
-	for (auto const &shader : shaderSources)
-	{
-		if (shader->Detach(Source::id))
-		{
-			++count;
-		}
-	}
-	assert(shaderSources.size() == count);
-}
-

@@ -7,6 +7,7 @@
 #define Manager_hpp
 
 #include "Signal.hpp"
+#include <cassert>
 #include <vector>
 #include <map>
 #include <set>
