@@ -1,18 +1,12 @@
 #ifndef Files_hpp
 #define Files_hpp
 
-#include "Source.hpp"
+#include "Signal.hpp"
+#include <string>
 
-class ManagedFile : public ManagedSource<ManagedFile>
+struct WatchedFile : Slot<std::string>
 {
-public:
-
-	ManagedFile(std::string const &path);
-
-private:
-
-	friend ManagedSource<ManagedFile>;
-	static Resources &Manager();
+	WatchedFile(std::string const &path, Observer);
 };
 
 #endif // file

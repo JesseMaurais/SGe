@@ -14,7 +14,7 @@ namespace
 
 	constexpr char const *Added = "Add";
 	constexpr char const *Removed = "Remove";
-	constexpr char const *Folder = "Files";
+	constexpr char const *Folder = "Watch";
 
 	// File event types
 
@@ -26,7 +26,7 @@ namespace
 
 	// Manager to monitor files and send notifications
 
-	class FileManager : public Manager<fs::path>
+	class FileManager : public Manager<WatchedFile*, fs::path>
 	{
 	public:
 
@@ -65,7 +65,7 @@ namespace
 			added.push_back(self);
 			future = std::async([this]()
 			{
-				Thread(); 
+				Thread();
 			});
 		}
 
@@ -206,13 +206,13 @@ namespace
 			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 		}
 
-		bool SendUpdate() override
+		bool SendUpdate() const override
 		{
 			// Queue event to wake the monitor to update its files
 			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
 		}
 
-		void Generate(std::vector<fs::path> &ids) override
+		void Generate(std::vector<fs::path> &ids) const override
 		{
 			fs::path const path = self / Added;
 			std::ofstream stream(path.string());
@@ -222,7 +222,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<fs::path> const &ids) override
+		void Destroy(std::vector<fs::path> const &ids) const override
 		{
 			fs::path const path = self / Removed;
 			std::ofstream stream(path.string());
@@ -369,10 +369,10 @@ void FileManager::Thread()
 			{
 				all.erase(stl::find_if(all, [&](struct kevent &ev))
 				{
-					union 
+					union
 					{
 						void *address;
-						char *string; 
+						char *string;
 					};
 					address = ev.udata;
 					return path == string;
@@ -408,7 +408,7 @@ void FileManager::Thread()
 				union
 				{
 					void *address;
-					char *string; 
+					char *string;
 				};
 				address = kev[ev].udata;
 				ProcessChange(string);
@@ -429,8 +429,8 @@ namespace
 	{
 		LPSTR buffer = nullptr;
 		std::size_t const size = FormatMessage
-		( FORMAT_MESSAGE_ALLOCATE_BUFFER 
-		| FORMAT_MESSAGE_FROM_SYSTEM 
+		( FORMAT_MESSAGE_ALLOCATE_BUFFER
+		| FORMAT_MESSAGE_FROM_SYSTEM
 		| FORMAT_MESSAGE_IGNORE_INSERTS
 		, nullptr
 		, GetLastError()
@@ -494,7 +494,7 @@ void FileManager::Thread()
 			LogLastError("WaitForMultipleObjects");
 			return;
 		}
-		
+
 		HANDLE const handle = obj.at(status - WAIT_OBJECT_0);
 		if (FALSE == FindNextChangeNotification(handle))
 		{
@@ -502,7 +502,7 @@ void FileManager::Thread()
 			continue;
 		}
 
-	
+
 	}
 	catch (std::exception const &exception)
 	{
@@ -511,4 +511,3 @@ void FileManager::Thread()
 }
 
 #endif // operating systems
-

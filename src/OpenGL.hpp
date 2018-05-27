@@ -33,26 +33,24 @@ namespace OpenGL
 
 	// Managed resource observer slots
 
-	using Managed = Slot<GLuint>;
-
-	struct Texture : Managed
+	struct Texture : Slot<GLuint>
 	{
-		Texture(Observer);
+		Texture(Observer observer = nullptr);
 	};
 
-	struct Buffer : Managed
+	struct Buffer : Slot<GLuint>
 	{
-		Buffer(Observer);
+		Buffer(Observer observer = nullptr);
 	};
 
-	struct Program : Managed
+	struct Program : Slot<GLuint>
 	{
-		Program(Observer);
+		Program(Observer observer = nullptr);
 	};
 
-	struct Shader : Managed
+	struct Shader : Slot<GLuint>
 	{
-		Shader(GLenum type, Observer);
+		Shader(GLenum type = 0, Observer observer = nullptr);
 	};
 }
 

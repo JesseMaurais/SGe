@@ -1,5 +1,5 @@
-#ifndef __Font__
-#define __Font__
+#ifndef Font_hpp
+#define Font_hpp
 
 #include "FreeType.hpp"
 #include "Stroke.hpp"

@@ -69,7 +69,7 @@ constexpr bool WIN32 = false;
 
 #endif // headers
 
-// Not every system with that is Win32 capable is the Windows operating system
+// Not every system that is Win32 capable is the Windows operating system
 
 #if defined(__WINDOWS__)
 constexpr auto WINDOWS = true;
@@ -126,11 +126,12 @@ constexpr bool OPENBSD = false;
 constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD;
 
 #if defined(__MACOS__) || defined(__FREEBSD__) || defined(__NETBSD__) || defined(__OPENBSD__)
+#undef __BSD__
 #define __BSD__ 1
 #endif
 
 // Some sanity checks. At a minimum...
 
-static_assert(POSIX or WINDOWS, "Cannot determine which operating system API to use");
+static_assert(POSIX or WIN32, "Cannot determine which operating system API to use");
 
 #endif // file

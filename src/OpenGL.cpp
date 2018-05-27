@@ -106,7 +106,7 @@ namespace
 			return singleton;
 		}
 
-		void Generate(std::vector<GLuint> &ids) override
+		void Generate(std::vector<GLuint> &ids) const override
 		{
 			glGenTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glGenTextures"))
@@ -115,7 +115,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<GLuint> const &ids) override
+		void Destroy(std::vector<GLuint> const &ids) const override
 		{
 			glDeleteTextures(ids.size(), ids.data());
 			if (OpenGL::CheckError("glDeleteTextures"))
@@ -139,7 +139,7 @@ namespace
 			return singleton;
 		}
 
-		void Generate(std::vector<GLuint> &ids) override
+		void Generate(std::vector<GLuint> &ids) const override
 		{
 			glGenBuffers(ids.size(), ids.data());
 			if (OpenGL::CheckError("glGenBuffers"))
@@ -148,7 +148,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<GLuint> const &ids) override
+		void Destroy(std::vector<GLuint> const &ids) const override
 		{
 			glDeleteBuffers(ids.size(), ids.data());
 			if (OpenGL::CheckError("glDeleteTextures"))
@@ -172,7 +172,7 @@ namespace
 			return singleton;
 		}
 
-		void Generate(std::vector<GLuint> &ids) override
+		void Generate(std::vector<GLuint> &ids) const override
 		{
 			for (GLuint &program : ids)
 			{
@@ -184,7 +184,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<GLuint> const &ids) override
+		void Destroy(std::vector<GLuint> const &ids) const override
 		{
 			for (GLuint const program : ids)
 			{
@@ -212,7 +212,7 @@ namespace
 			return singleton;
 		}
 
-		void Generate(std::vector<GLuint> &ids) override
+		void Generate(std::vector<GLuint> &ids) const override
 		{
 			for (GLuint &shader : ids)
 			{
@@ -224,7 +224,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<GLuint> const &ids) override
+		void Destroy(std::vector<GLuint> const &ids) const override
 		{
 			for (GLuint const shader : ids)
 			{
@@ -237,6 +237,7 @@ namespace
 		}
 	};
 
+	// Map a shader type to a shader resource manager
 	ManagerType &FindShaderManager(GLenum const type)
 	{
 		using VertexManager = ShaderManager<NotifyVertexes, GL_VERTEX_SHADER>;
@@ -247,9 +248,6 @@ namespace
 		switch (type)
 		{
 		default:
-			assert(not "OpenGL shader type");
-			throw std::bad_cast();
-
 		case GL_VERTEX_SHADER:
 			return VertexManager::Instance();
 		case GL_FRAGMENT_SHADER:
@@ -260,7 +258,6 @@ namespace
 			return ComputeManager::Instance();
 		}
 	}
-
 
 	// Convert error code to error string.
 	char const *ErrorString(GLenum error)
@@ -278,19 +275,19 @@ namespace
 // Bind observers to the correct manager
 
 OpenGL::Texture::Texture(Observer observer)
-: Managed(TextureManager::Instance(), observer)
+: Slot(&TextureManager::Instance(), observer)
 {}
 
 OpenGL::Buffer::Buffer(Observer observer)
-: Managed(BufferManager::Instance(), observer)
+: Slot(&BufferManager::Instance(), observer)
 {}
 
 OpenGL::Program::Program(Observer observer)
-: Managed(ProgramManager::Instance(), observer)
+: Slot(&ProgramManager::Instance(), observer)
 {}
 
 OpenGL::Shader::Shader(GLenum type, Observer observer)
-: Managed(FindShaderManager(type), observer)
+: Slot(&FindShaderManager(type), observer)
 {}
 
 // Error utility functions

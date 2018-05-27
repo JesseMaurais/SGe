@@ -6,7 +6,7 @@
 namespace
 {
 	// Get the shader info log and set it as the SDL error string
-	bool SetShaderError(GLuint const shader)
+	bool SetShaderError(GLuint shader)
 	{
 		GLint length;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
@@ -31,7 +31,7 @@ namespace
 	}
 
 	// Get the program info log and set it as the SDL error string
-	bool SetProgramError(GLuint const program)
+	bool SetProgramError(GLuint program)
 	{
 		GLint length;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
@@ -135,15 +135,14 @@ namespace
 
 		static std::shared_ptr<Shader::Source> Find(std::string const &code)
 		{
-			auto const it = stl::find_if(set, [&](SourceCode *that)
+			auto const it = stl::find_if(set, [&code](SourceCode *that)
 			{
 				return code == that->code;
 			});
 			// Share or make new object.
 			if (set.end() == it)
 			{
-				GLenum const type = GuessShaderType(code);
-				return std::make_shared<SourceCode>(type, code);
+				return std::make_shared<SourceCode>(code);
 			}
 			else
 			{
@@ -151,8 +150,10 @@ namespace
 			}
 		}
 
-		bool UpdateSource(GLuint shader) override
+		bool Update(GLuint shader) override
 		{
+			Source::shader = shader;
+
 			while (true)
 			{
 				// Split the code into lines.
@@ -171,9 +172,9 @@ namespace
 			}
 		}
 
-		SourceCode(GLenum type, std::string const &string)
-		:  Source(type), code(string)
+		SourceCode(std::string const &string) : code(string)
 		{
+			SetShaderType(GuessShaderType(code));
 			set.insert(this);
 		}
 
@@ -206,8 +207,7 @@ namespace
 			// Share or make new object.
 			if (set.end() == it)
 			{
-				GLenum const type = GuessShaderType(path);
-				return std::make_shared<SourceFile>(type, path);
+				return std::make_shared<SourceFile>(path);
 			}
 			else
 			{
@@ -215,8 +215,10 @@ namespace
 			}
 		}
 
-		bool UpdateSource(GLuint const shader) override
+		bool Update(GLuint shader) override
 		{
+			Source::shader = shader;
+
 			while (true)
 			{
 				// Parse the file into lines.
@@ -242,11 +244,11 @@ namespace
 			}
 		}
 
-		SourceFile(GLenum type, std::string const &file)
-		: Source(type), path(file)
+		SourceFile(std::string const &file) : path(file)
 		{
 			set.insert(this);
 		}
+
 		~SourceFile()
 		{
 			set.erase(this);
@@ -262,33 +264,47 @@ namespace
 	std::set<SourceFile*> SourceFile::set;
 }
 
-Shader::Source::Source(GLenum type)
-: slot(type, [this](GLuint shader) { UpdateSource(shader); })
-{}
-
-bool Shader::Source::Attach(GLuint program)
+void Shader::Source::SetShaderType(GLenum newType)
 {
-	glAttachShader(program, shader);
-	if (OpenGL::CheckError("glAttachShader"))
+	if (newType != type)
 	{
-		SDL::LogError(CannotUseShader);
-		return false;
+		type = newType;
+		slot = OpenGL::Shader(type, [this](GLuint shader)
+		{
+		 	Update(shader);
+		});
+	}
+}
+
+bool Shader::Source::Attach(GLuint program) const
+{
+	if (slot and glIsShader(shader))
+	{
+		glAttachShader(program, shader);
+		if (OpenGL::CheckError("glAttachShader"))
+		{
+			SDL::LogError(CannotUseShader);
+			return false;
+		}
 	}
 	return true;
 }
 
-bool Shader::Source::Detach(GLuint program)
+bool Shader::Source::Detach(GLuint program) const
 {
-	glDetachShader(program, shader);
-	if (OpenGL::CheckError("glDetachShader"))
+	if (slot and glIsShader(shader))
 	{
-		SDL::LogError(CannotUseShader);
-		return false;
+		glDetachShader(program, shader);
+		if (OpenGL::CheckError("glDetachShader"))
+		{
+			SDL::LogError(CannotUseShader);
+			return false;
+		}
 	}
 	return true;
 }
 
-bool Shader::Link()
+bool Shader::Link() const
 {
 	while (true)
 	{
@@ -309,15 +325,25 @@ bool Shader::Link()
 	}
 }
 
-bool Shader::Use()
+bool Shader::Use() const
 {
-	glUseProgram(program);
-	if (OpenGL::CheckError("glUseProgram"))
+	while (true)
 	{
-		SDL::LogError(CannotUseProgram);
-		return false;
+		glUseProgram(program);
+		if (OpenGL::CheckError("glUseProgram"))
+		{
+			if (SetProgramError(program))
+			{
+				if (SDL::ShowError(SDL_MESSAGEBOX_WARNING))
+				{
+					continue; // retry
+				}
+				SDL::LogError(CannotUseProgram);
+			}
+			return false;
+		}
+		return true;
 	}
-	return true;
 }
 
 bool Shader::LoadString(std::string const &code)

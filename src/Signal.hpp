@@ -12,7 +12,6 @@ public:
 	using Signature = void(Args...);
 	using Observer = std::function<Signature>;
 	using Container = std::map<Slot, Observer>;
-	using KeyValue = typename Container::value_type;
 
 	virtual bool Connect(Slot id, Observer observer)
 	{
@@ -30,6 +29,11 @@ public:
 		slots.clear();
 	}
 
+	bool Has(Slot id)
+	{
+		return slots.find(id) != slots.end();
+	}
+
 	template <typename Filter>
 	void Emit(Filter &&filter)
 	{
@@ -39,11 +43,8 @@ public:
 	template <typename Filter>
 	void Emit(Slot id, Filter &&filter)
 	{
-		auto const it = slots.find(id);
-		if (slots.end() != it)
-		{
-			filter(*it);
-		}
+		const auto pair = slots.equal_range(id);
+		std::for_each(pair.first, pair.second, filter);
 	}
 
 private:
@@ -60,24 +61,25 @@ public:
 	using Signature = typename Subject::Signature;
 	using Observer = typename Subject::Observer;
 
-	virtual ~Slot()
+	Slot(Subject *sub, Observer observer) : subject(sub)
 	{
-		subject.Disconnect(this);
+		subject->Connect(this, observer);
 	}
 
-	Slot(Subject &sub, Observer observer) : subject(sub)
+	~Slot()
 	{
-		subject.Connect(this, observer);
+		subject->Disconnect(this);
+	}
+
+	operator bool() const
+	{
+		return nullptr != subject;
 	}
 
 private:
 
-	Slot(Slot const &that) = delete;
-	Slot const &operator=(Slot const &that) = delete;
-
-	Subject &subject;
+	Subject *subject;
 };
-
 
 namespace sys::sig
 {

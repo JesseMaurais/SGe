@@ -30,7 +30,7 @@ public:
 	void Release()
 	{
 		Remove();
-		Retain();
+		Reset();
 	}
 
 	/// Update any added or removed slots
@@ -43,6 +43,14 @@ public:
 	/// Capture the id and generate in queue later
 	bool Connect(Slot id, Observer observer) override
 	{
+		// Belay if removal pending
+		auto const it = removed.find(id);
+		if (removed.end() != it)
+		{
+			removed.erase(it);
+			return true;
+		}
+		// Otherwise queue for update and connect
 		bool const ok = QueueUpdate() and Signal::Connect(id, observer);
 		added.insert(id);
 		return ok;
@@ -51,6 +59,14 @@ public:
 	/// Capture the id and destroy in queue later
 	bool Disconnect(Slot id) override
 	{
+		// Belay if addition pending
+		auto const it = added.find(id);
+		if (added.end() != it)
+		{
+			added.erase(it);
+			return true;
+		}
+		// Otherwise queue for update and disconnect
 		bool const ok = QueueUpdate() and Signal::Disconnect(id);
 		removed.insert(id);
 		return ok;
@@ -58,8 +74,8 @@ public:
 
 protected:
 
-	virtual void Generate(std::vector<Type> &data) = 0;
-	virtual void Destroy(std::vector<Type> const &data) = 0;
+	virtual void Generate(std::vector<Type> &data) const = 0;
+	virtual void Destroy(std::vector<Type> const &data) const = 0;
 	virtual bool SendUpdate() const = 0;
 
 private:
@@ -107,7 +123,7 @@ private:
 	}
 
 	// Retain slots by moving into added
-	void Retain()
+	void Reset()
 	{
 		std::vector<Type> data;
 		for (auto const &pair : map)

@@ -75,7 +75,7 @@ namespace
 		{
 			if (not opt.name)
 			{
-				return; // list is null terminated
+				break; // list is null terminated
 			}
 
 			// Give explanation of option

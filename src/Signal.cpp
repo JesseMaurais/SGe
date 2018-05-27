@@ -1,6 +1,7 @@
 #include "Signal.hpp"
 #include "Error.hpp"
 #include <csignal>
+#include <cassert>
 #include <map>
 
 namespace

@@ -37,7 +37,7 @@ namespace
 
 		AudioBufferManager() = default;
 
-		void Generate(std::vector<ALuint> &ids) override
+		void Generate(std::vector<ALuint> &ids) const override
 		{
 			alGenBuffers(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenBuffers"))
@@ -46,7 +46,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<ALuint> const &ids) override
+		void Destroy(std::vector<ALuint> const &ids) const override
 		{
 			alDeleteBuffers(ids.size(), ids.data());
 			if (OpenAL::CheckError("alDeleteBuffers"))
@@ -70,7 +70,7 @@ namespace
 
 		AudioSourceManager() = default;
 
-		void Generate(std::vector<ALuint> &ids) override
+		void Generate(std::vector<ALuint> &ids) const override
 		{
 			alGenSources(ids.size(), ids.data());
 			if (OpenAL::CheckError("alGenSources"))
@@ -79,7 +79,7 @@ namespace
 			}
 		}
 
-		void Destroy(std::vector<ALuint> const &ids) override
+		void Destroy(std::vector<ALuint> const &ids) const override
 		{
 			alDeleteSources(ids.size(), ids.data());
 			if (OpenAL::CheckError("alDeleteSources"))

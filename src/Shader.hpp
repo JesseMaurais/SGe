@@ -15,26 +15,32 @@ public:
 
 	bool LoadString(std::string const &code);
 	bool LoadFile(std::string const &path);
-	bool Link();
-	bool Use();
+	bool Link() const;
+	bool Use() const;
 
 	class Source
 	{
 	public:
 
-		Source(GLenum type);
-		virtual bool UpdateSource(GLuint shader) = 0;
-		bool Attach(GLuint program);
-		bool Detach(GLuint program);
+		bool Attach(GLuint program) const;
+		bool Detach(GLuint program) const;
+
+	private:
+
+		void SetShaderType(GLenum type);
+		Shader *parent;
+		GLenum type;
 
 	protected:
 
+		virtual bool Update(GLuint shader) = 0;
 		OpenGL::Shader slot;
 		GLuint shader;
 	};
 
 protected:
 
+	virtual void Update(GLuint program) = 0;
 	OpenGL::Program slot;
 	GLuint program;
 
