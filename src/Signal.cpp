@@ -6,9 +6,9 @@
 
 namespace
 {
-    sys::sig::Slot::Subject &SubjectMap(int signo)
+    sys::sig::Subject &SubjectMap(int signo)
     {
-        static std::map<int, sys::sig::Slot::Subject> map;
+        static std::map<int, sys::sig::Subject> map;
         return map[signo];
     }
 

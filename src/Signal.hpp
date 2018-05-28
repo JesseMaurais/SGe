@@ -11,17 +11,16 @@ public:
 
 	using Signature = void(Args...);
 	using Observer = std::function<Signature>;
-	using Container = std::map<Slot, Observer>;
+	using Container = std::multimap<Slot, Observer>;
 
-	virtual bool Connect(Slot id, Observer observer)
+	virtual void Connect(Slot id, Observer observer)
 	{
-		auto const pair = slots.insert_or_assign(id, observer);
-		return pair.second; // true if not already extant
+		slots.emplace(id, observer);
 	}
 
-	virtual bool Disconnect(Slot id)
+	virtual void Disconnect(Slot id)
 	{
-		return 1 == slots.erase(id);
+		slots.erase(id);
 	}
 
 	void Disconnect()
@@ -34,14 +33,12 @@ public:
 		return slots.find(id) != slots.end();
 	}
 
-	template <typename Filter>
-	void Emit(Filter &&filter)
+	template <typename Filter> void Emit(Filter &&filter)
 	{
 		std::for_each(slots.begin(), slots.end(), filter);
 	}
 
-	template <typename Filter>
-	void Emit(Slot id, Filter &&filter)
+	template <typename Filter> void Emit(Slot id, Filter &&filter)
 	{
 		const auto pair = slots.equal_range(id);
 		std::for_each(pair.first, pair.second, filter);
@@ -84,6 +81,7 @@ private:
 namespace sys::sig
 {
 	using Slot = Slot<int>;
+	using Subject = Slot::Subject;
 	using Signature = Slot::Signature;
 	using Observer = Slot::Observer;
 
