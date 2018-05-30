@@ -4,6 +4,7 @@
 #include "std.hpp"
 #include "SDL.hpp"
 #include "Strings.hpp"
+#include <system_error>
 
 namespace SDL
 {
@@ -35,6 +36,14 @@ namespace SDL
 	inline bool perror(std::string const &prefix)
 	{
 		return SDL::SetErrno() and SDL::LogError(prefix);
+	}
+
+	/// Set error string with given std::errc
+	inline bool SetError(std::errc const errc)
+	{
+		std::error_code const error_code = std::make_error_code(errc);
+		std::string const message = error_code.message();
+		return SDL::SetError(message);
 	}
 
 	/// Type-safe and format-safe version of SDL_SetError. Always returns true

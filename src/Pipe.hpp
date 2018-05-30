@@ -2,6 +2,7 @@
 #define Pipe_hpp
 
 #include <memory>
+#include <string>
 
 struct SDL_RWops;
 
@@ -17,11 +18,14 @@ namespace SDL
 		RWops() = default;
 		RWops(SDL_RWops *ops);
 
+		void Reset(SDL_RWops *that = nullptr)
+		{
+			ops.reset(that);
+		}
+
 		SDL_RWops *Release()
 		{
-			auto p = ops.get();
-			ops.reset();
-			return p;
+			return ops.release();
 		}
 
 		SDL_RWops *operator->()
@@ -36,7 +40,16 @@ namespace SDL
 
 	private:
 
-		std::shared_ptr<SDL_RWops> ops;
+		std::unique_ptr<SDL_RWops> ops;
+	};
+}
+
+namespace sys::io
+{
+	struct File : SDL::RWops
+	{
+		std::string get(char delim = '\n');
+		void set(std::string const &string);
 	};
 }
 

@@ -1,52 +1,76 @@
 #include <SDL2/SDL_config.h>
+#include <cstdio>
 #include "Pipe.hpp"
 #include "System.hpp"
 #include "SDL.hpp"
-#include <cstdio>
 
 namespace
 {
-	auto & PipeR(SDL_RWops *ops)
+	constexpr int R = 0, W = 1;
+
+	auto & dataR(SDL_RWops *ops)
 	{
 		return ops->hidden.unknown.data1;
 	}
 
-	auto & PipeW(SDL_RWops *ops)
+	auto & dataW(SDL_RWops *ops)
 	{
 		return ops->hidden.unknown.data2;
 	}
 
+	SDL_RWops *Rops(SDL_RWops *ops)
+	{
+		return (SDL_RWops*) dataR(ops);
+	}
+
+	SDL_RWops *Wops(SDL_RWops *ops)
+	{
+		return (SDL_RWops*) dataW(ops);
+	}
+
+	std::FILE *fileR(SDL_RWops *ops)
+	{
+		return Rops(ops)->hidden.stdio.fp;
+	}
+
+	std::FILE *fileW(SDL_RWops *ops)
+	{
+		return Wops(ops)->hidden.stdio.fp;
+	}
+
 	Sint64 Size(SDL_RWops *ops)
 	{
+		SDL::SetError(std::errc::not_supported);
 		return -1;
 	}
 
 	Sint64 Seek(SDL_RWops *ops, Sint64 off, int whence)
 	{
+		SDL::SetError(std::errc::not_supported);
 		return -1;
 	}
 
 	std::size_t Read(SDL_RWops *ops, void *ptr, std::size_t size, std::size_t maxnum)
 	{
-		return SDL_RWread(PipeR(ops), ptr, size, maxnum);
+		return SDL_RWread(Rops(ops), ptr, size, maxnum);
 	}
 
 	std::size_t Write(SDL_RWops *ops, const void *ptr, std::size_t size, std::size_t num)
 	{
-		return SDL_RWwrite(PipeW(ops), ptr, size, num);
+		return SDL_RWwrite(Wops(ops), ptr, size, num);
 	}
 
 	int Close(SDL_RWops *ops)
 	{
 		int error = 0;
-		if (SDL_RWclose(PipeR(ops)))
+		if (not Rops(ops) or SDL_RWclose(Rops(ops)))
 		{
-			SDL::LogError("PipeR");
+			SDL::LogError("SDL_RWclose(R)");
 			error = -1;
 		}
-		if (SDL_RWclose(PipeW(ops)))
+		if (not Wops(ops) or SDL_RWclose(Wops(ops)))
 		{
-			SDL::LogError("PipeW");
+			SDL::LogError("SDL_RWclose(W)");
 			error = -1;
 		}
 		return error;
@@ -57,7 +81,7 @@ namespace
 		SDL_RWops *ops = SDL_AllocRW();
 		if (not ops)
 		{
-			SDL::SetError(OutOfMemory);
+			SDL::SetError(std::errc::not_enough_memory);
 			return nullptr;
 		}
 		ops->type = SDL_RWOPS_UNKNOWN;
@@ -86,8 +110,8 @@ namespace
 	SDL_RWops *FromFD(int fd, bool readMode)
 	{
 		auto const mode = readMode ? "r" : "w";
-		std::FILE *fp;
 
+		std::FILE *fp;
 		if constexpr (POSIX)
 		{
 			fp = fdopen(fd, mode);
@@ -119,7 +143,9 @@ namespace
 		return FromFP(fp);
 	}
 
-	template <bool Win32> SDL_RWops *FromHandle(HANDLE h, bool readMode)
+#ifdef __WIN32__
+
+	SDL_RWops *FromHandle(HANDLE h, bool readMode)
 	{
 		int fd = _open_osfhandle((intptr_t) h, readMode ? _O_RDONLY : _O_WRONLY);
 		if (-1 == fd)
@@ -133,7 +159,7 @@ namespace
 		return FromFD(fd, readMode);
 	}
 
-	template <bool Win32> HANDLE ToHandle(SDL_RWops *ops)
+	HANDLE ToHandle(SDL_RWops *ops)
 	{
 		assert(SDL_RWOPS_STDFILE == ops->type);
 		int fd = _fileno(ops->hidden.stdio.fp);
@@ -150,6 +176,8 @@ namespace
 		}
 		return h;
 	}
+
+#endif // __WIN32__
 }
 
 namespace SDL
@@ -159,17 +187,13 @@ namespace SDL
 
 	SDL_RWops *Pipe()
 	{
-		// Parent handle
 		RWops ops = AllocRW();
 		if (not ops)
 		{
 			return nullptr;
 		}
 
-		// Child handles
-		constexpr int R = 0, W = 1;
 		RWops rw[2];
-
 		if constexpr (POSIX)
 		{
 			int fd[2];
@@ -215,7 +239,7 @@ namespace SDL
 					ok = false;
 				}
 
-				rw[p] = FromHandle<WIN32>(h[p], R == p);
+				rw[p] = FromHandle(h[p], R == p);
 				if (not rw[p])
 				{
 					ok = false;
@@ -226,28 +250,26 @@ namespace SDL
 				return nullptr;
 		}
 
-		// Release handles to caller
-		
-		PipeR(ops) = rw[R].Release();
-		PipeW(ops) = rw[W].Release();
+		// Release to caller
+		dataR(ops) = rw[R].Release();
+		dataW(ops) = rw[W].Release();
 		return ops.Release();
 	}
 
 	SDL_RWops *Process(char const *command)
 	{
-		RWops rw[2];
 		RWops ops = AllocRW();
 		if (not ops)
 		{
 			return nullptr;
 		}
-			
-		RWops pipe[2];
+		
+		RWops rw[2];
 		bool ok = true;
-		for (int p : {0, 1})
+		for (int p : {R, W})
 		{
-			pipe[p] = Pipe();
-			if (not pipe[p])
+			rw[p] = Pipe();
+			if (not rw[p])
 			{
 				ok = false;
 				continue;
@@ -259,25 +281,34 @@ namespace SDL
 		if constexpr (POSIX)
 		{
 			pid_t pid = fork();
-			if (pid < 0)
+			if (-1 == pid)
 			{
 				SDL::perror("fork");
 				return nullptr;
 			}
 			else
-			if (0 < pid)
+			if (0 == pid) // child
 			{
-				
-			}
+				if (-1 == dup2(fileno(fileR(rw[R])), STDIN_FILENO))
+				{
+					SDL::perror("dup2(R)");
+					std::exit(std::errno):
+				}
 
-			if (dup2(fileno(PipeR(pipe[0])), STDIN_FILENO))
-			{
-			}
+				if (-1 == dup2(fileno(fileW(rw[W])), STDOUT_FILENO))
+				{
+					SDL::perror("dup2(W)");
+					std::exit(std::errno);
+				}
 
-			if (execve(command, nullptr, nullptr))
-			{
-				SDL::perror("execve");
-				return nullptr;
+				for (int p : {R, W}) rw[p].Reset();
+
+				auto const argv[] = {command, NULL};
+				if (execv(command, argv))
+				{
+					SDL::perror("execv");
+					std::exit(std::errno);
+				}
 			}
 		}
 		else
@@ -286,23 +317,21 @@ namespace SDL
 			STARTUPINFO init;
 			ZeroMemory(&init, sizeof(init));
 			init.cb = sizeof(init);
-			init.hStdInput = ToHandle(PipeW(rw[0]));
-			init.hStdOutput = ToHandle(PipeR(rw[1]));
+			init.hStdInput = ToHandle(Rops(rw[R]));
+			init.hStdOutput = ToHandle(Wops(rw[W]));
 			init.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-
-			// Start the process
 
 			PROCESS_INFORMATION info;
 			BOOL const ok = CreateProcess
 			(
-			 nullptr, // no application name
+			 NULL,    // no application name
 			 command, // command line
-			 nullptr, // process security attributes
-			 nullptr, // primary thread security attributes
+			 NULL,    // process security attributes
+			 NULL,    // primary thread security attributes
 			 FALSE,   // handles are not inherited
 			 0,       // creation flags
-			 nullptr, // use parent's environment
-			 nullptr, // use parent's current directory
+			 NULL,    // use parent's environment
+			 NULL,    // use parent's current directory
 			 &init,   // startup information (in)
 			 &info    // process information (out)
 			);
@@ -313,8 +342,6 @@ namespace SDL
 				return nullptr;
 			}
 
-			// Close unused process handles
-
 			if (not CloseHandle(info.hProcess))
 			{
 				Win32::LogLastError("CloseHandle(hProcess)");
@@ -324,11 +351,17 @@ namespace SDL
 				Win32::LogLastError("CloseHandle(hThread)");
 			}
 		}
+	
+		SDL_RWops *raw[2];
+		for (int p : {R, W}) raw[p] = rw[p].Release();
 
-		// Release handles to caller
-			
-		PipeW(ops) = rw[0].Release();
-		PipeR(ops) = rw[1].Release();
+		// Delete with RAII
+		rw[R] = Rops(raw[R]);
+		rw[W] = Wops(raw[W]);
+
+		// Release to caller
+		dataR(ops) = dataR(raw[W]);
+		dataW(ops) = dataW(raw[R]);
 		return ops.Release();
 	}
 }
