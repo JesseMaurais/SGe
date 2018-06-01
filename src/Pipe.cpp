@@ -30,11 +30,13 @@ namespace
 
 	std::FILE *fileR(SDL_RWops *ops)
 	{
+		assert(SDL_RWOPS_STDFILE == ops->type);
 		return Rops(ops)->hidden.stdio.fp;
 	}
 
 	std::FILE *fileW(SDL_RWops *ops)
 	{
+		assert(SDL_RWOPS_STDFILE == ops->type);
 		return Wops(ops)->hidden.stdio.fp;
 	}
 
@@ -93,9 +95,9 @@ namespace
 		return ops;
 	}
 
-	SDL_RWops *FromFP(FILE* fp)
+	SDL_RWops *FromFP(std::FILE* fp)
 	{
-		auto ops = SDL_RWFromFP(fp, SDL_TRUE);
+		SDL_RWops *ops = SDL_RWFromFP(fp, SDL_TRUE);
 		if (not ops)
 		{
 			SDL::LogError("SDL_RWFromFP");
@@ -303,8 +305,7 @@ namespace SDL
 
 				for (int p : {R, W}) rw[p].Reset();
 
-				auto const argv[] = {command, NULL};
-				if (execv(command, argv))
+				if (execl(command, command))
 				{
 					SDL::perror("execv");
 					std::exit(std::errno);

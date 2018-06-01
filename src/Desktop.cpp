@@ -84,171 +84,136 @@ namespace
 	}
 }
 
-std::string sys::GetCurrentUserName()
+namespace sys::env
 {
-	for (auto const env : { "LOGNAME", "USER", "USERNAME" })
+	std::string GetUserName()
 	{
-		auto const var = std::getenv(env);
-		if (var)
+		for (auto const env : { "LOGNAME", "USER", "USERNAME" })
 		{
-			return var;
-		}
-	}
-	return std::string();
-}
-
-std::vector<std::string> sys::GetSystemDirs()
-{
-	std::string const path = std::getenv("PATH");
-	return SplitDirs(path);
-}
-
-
-std::string sys::GetBaseDir()
-{
-	return SDL_GetBasePath();
-}
-
-std::string sys::GetHomeDir()
-{
-	if (POSIX)
-	{
-		return std::getenv("HOME");
-	}
-	else
-	{
-		return std::getenv("USERPROFILE");
-	}
-}
-
-std::vector<std::string> sys::GetSharedDirs()
-{
-	if (POSIX)
-	{
-		return { "/usr/local/share", "/usr/share" };
-	}
-	else
-	{
-		return { std::getenv("ALLUSERSPROFILE") };
-	}
-}
-
-std::vector<std::string> sys::GetConfigDirs()
-{
-	if (POSIX)
-	{
-		return { "/etc" };
-	}
-	else
-	{
-		return { std::getenv("COMMONPROGRAMFILES") };
-	}
-}
-
-std::string sys::GetProgramPath(std::string const &name)
-{
-	// Unless extension is given, assume it's a binary
-	fs::path image = name;
-	if (image.extension().empty())
-	{
-		image += EXE_EXTENSION;
-	}
-	// Search for image in system directories
-	for (fs::path path : sys::GetSystemDirs())
-	{
-		path /= image;
-		if (fs::exists(path))
-		{
-			// Check executable status
-			if (stl::is_executable(path))
+			auto const var = std::getenv(env);
+			if (var)
 			{
-				return path.string(); // usable
+				return var;
 			}
 		}
+		return std::string();
 	}
-	return std::string();
+
+	std::vector<std::string> GetPaths()
+	{
+		std::string const path = std::getenv("PATH");
+		return SplitDirs(path);
+	}
+
+	std::string GetHomeDir()
+	{
+		if (POSIX)
+		{
+			return std::getenv("HOME");
+		}
+		else
+		{
+			return std::getenv("USERPROFILE");
+		}
+	}
+
+	std::vector<std::string> GetSharedDirs()
+	{
+		if (POSIX)
+		{
+			return { "/usr/local/share", "/usr/share" };
+		}
+		else
+		{
+			return { std::getenv("ALLUSERSPROFILE") };
+		}
+	}
+
+	std::vector<std::string> GetConfigDirs()
+	{
+		if (POSIX)
+		{
+			return { "/etc" };
+		}
+		else
+		{
+			return { std::getenv("COMMONPROGRAMFILES") };
+		}
+	}
 }
 
-std::string sys::GetTemporaryDir()
+namespace sys
 {
-	static struct TemporaryDir
+	std::string GetBaseDir()
 	{
-		fs::path dir;
-		stl::error_code err;
-		TemporaryDir(std::string const &foldername)
+		return SDL_GetBasePath();
+	}
+
+	std::string GetProgramPath(std::string const &name)
+	{
+		// Unless extension is given, assume it's a binary
+		fs::path image = name;
+		if (image.extension().empty())
 		{
-			fs::path path = fs::temp_directory_path(err);
-			if (not err)
+			image += EXE_EXTENSION;
+		}
+		// Search for image in system directories
+		for (fs::path path : sys::GetSystemDirs())
+		{
+			path /= image;
+			if (fs::exists(path))
 			{
-				path /= foldername;
-				fs::remove_all(path, err);
-				if (fs::create_directory(path, err))
+				// Check executable status
+				if (stl::is_executable(path))
 				{
-					dir = path;
+					return path.string(); // usable
 				}
 			}
 		}
-
-	} temp(String(Application));
-
-	if (temp.err)
-	{
-		SDL::SetError(temp.err.message());
+		return std::string();
 	}
 
-	return temp.dir.string();
-}
-
-std::string sys::GetTemporaryPath(std::string const &filename)
-{
-	static fs::path const path = sys::GetTemporaryDir();
-	if (not path.empty())
+	std::string GetTemporaryDir()
 	{
-		return (path/filename).string();
-	}
-	return path.string();
-}
-
-bool sys::LoadConfigs(std::string const &path, sys::ini &config, bool replace)
-{
-	auto section = config.end();
-
-	std::string line;
-	std::ifstream stream(path);
-	while (GetNextLine(stream, line))
-	{
-		if (IsSection(line))
+		static struct TemporaryDir
 		{
-			sys::ini::mapped_type empty;
-			auto pair = config.emplace(line, empty);
-			section = pair.first;
-			if (not replace and not pair.second)
+			fs::path dir;
+			stl::error_code err;
+			TemporaryDir(std::string const &foldername)
 			{
-				SDL::SetError(IniSectionNotUnique, line);
-				config.clear();
-				return false;
+				fs::path path = fs::temp_directory_path(err);
+				if (not err)
+				{
+					path /= foldername;
+					fs::remove_all(path, err);
+					if (fs::create_directory(path, err))
+					{
+						dir = path;
+					}
+				}
 			}
-			continue;
+
+		} temp(String(Application));
+
+		if (temp.err)
+		{
+			SDL::SetError(temp.err.message());
 		}
 
-		if (config.end() == section)
-		{
-			SDL::SetError(IniKeyBeforeSection, line);
-			config.clear();
-			return false;
-		}
-
-		auto pair = section->second.emplace(stl::param_value(line));
-		if (not replace and not pair.second)
-		{
-			SDL::SetError(IniKeyNotUnique, line);
-			config.clear();
-			return false;
-		}
+		return temp.dir.string();
 	}
 
-	return true;
+	std::string GetTemporaryPath(std::string const &filename)
+	{
+		static fs::path const path = GetTemporaryDir();
+		if (not path.empty())
+		{
+			return (path/filename).string();
+		}
+		return path.string();
+	}
 }
+
 
 namespace
 {
@@ -302,200 +267,244 @@ namespace
 	}
 }
 
-std::string xdg::GetDataHome()
+namespace xdg
 {
-	fs::path path = std::getenv("XDG_DATA_HOME");
-	if (path.empty())
+	bool LoadConfigs(std::string const &path, ini &config, bool replace)
 	{
-		path = sys::GetHomeDir();
-		path /= ".local/share";
-	}
-	return path.string();
-}
+		auto section = config.end();
 
-std::vector<std::string> xdg::GetDataDirs()
-{
-	std::string dirs = std::getenv("XDG_DATA_DIRS");
-	if (dirs.empty())
-	{
-		return sys::GetSharedDirs();
-	}
-	return SplitDirs(dirs);
-}
-
-std::string xdg::GetConfigHome()
-{
-	fs::path path = std::getenv("XDG_CONFIG_HOME");
-	if (path.empty())
-	{
-		path = sys::GetHomeDir();
-		path /= ".config";
-	}
-	return path.string();
-}
-
-std::vector<std::string> xdg::GetConfigDirs()
-{
-	std::string dirs = std::getenv("XDG_CONFIG_DIRS");
-	if (dirs.empty())
-	{
-		std::vector<std::string> dirs;
-		for (fs::path path : sys::GetConfigDirs())
+		std::string line;
+		std::ifstream stream(path);
+		while (GetNextLine(stream, line))
 		{
-			path /= "xdg";
-			dirs.emplace_back(path.string());
-		}
-		return dirs;
-	}
-	return SplitDirs(dirs);
-}
-
-std::string xdg::GetCacheHome()
-{
-	fs::path path = std::getenv("XDG_CACHE_HOME");
-	if (path.empty())
-	{
-		path = sys::GetHomeDir();
-		path /= ".cache";
-	}
-	return path.string();
-}
-
-std::vector<std::string> xdg::GetIconDirs()
-{	
-	std::vector<std::string> paths;
-
-	// Look in HOME/.icons first
-	{
-		fs::path path = sys::GetHomeDir();
-		path /= ".icons";
-		if (fs::exists(path))
-		{
-			paths.push_back(path.string());
-		}
-	}
-
-	// Then in XDG_DATA_DIRS/icons
-	
-	for (fs::path path : xdg::GetDataDirs())
-	{
-		path /= "icons";
-		if (fs::exists(path))
-		{
-			paths.push_back(path.string());
-		}
-	}
-
-	// Last in shared pixmaps
-	
-	for (fs::path path : sys::GetSharedDirs())
-	{
-		path /= "pixmaps";
-		if (fs::exists(path))
-		{
-			paths.push_back(path.string());
-		}
-	}
-
-	return paths;
-}
-
-bool xdg::IsDesktop(std::string const &path)
-{
-	static std::set<std::string> const set = { ".desktop", ".directory" };
-
-	std::string const extension = fs::path(path).extension().string();
-
-	// With no extension use magic
-	if (extension.empty())
-	{
-		return HasMagic(path, "[Desktop Entry]");
-	}
-	// Base case is that the extension matches
-	return set.find(extension) != set.end();
-}
-
-std::vector<std::string> xdg::FindApplicationMenus()
-{
-	std::vector<std::string> paths;
-	std::string const menu_prefix = std::getenv("XDG_MENU_PREFIX");
-	std::string const applications_menu = menu_prefix + "applications.menu";
-	for (fs::path path : xdg::GetConfigDirs())
-	{
-		path /= "menus";
-		path /= applications_menu;
-		if (fs::exists(path))
-		{
-			paths.push_back(path.string());
-		}
-	}
-	return paths;
-}
-
-std::vector<std::string> xdg::FindDesktopApplications()
-{
-	std::vector<std::string> paths;
-
-	for (fs::path path : xdg::GetConfigDirs())
-	{
-		path /= "applications";
-
-		if (fs::exists(path) and fs::is_directory(path))
-		{
-			fs::directory_iterator it(path), end;
-
-			while (it != end)
+			if (IsSection(line))
 			{
-				path = *it;
-
-				if (xdg::IsDesktop(path.string()))
+				ini::mapped_type empty;
+				auto pair = config.emplace(line, empty);
+				section = pair.first;
+				if (not replace and not pair.second)
 				{
-					paths.push_back(path.string());
+					SDL::SetError(IniSectionNotUnique, line);
+					config.clear();
+					return false;
+				}
+				continue;
+			}
+
+			if (config.end() == section)
+			{
+				SDL::SetError(IniKeyBeforeSection, line);
+				config.clear();
+				return false;
+			}
+
+			auto pair = section->second.emplace(stl::param_value(line));
+			if (not replace and not pair.second)
+			{
+				SDL::SetError(IniKeyNotUnique, line);
+				config.clear();
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	std::string GetDataHome()
+	{
+		fs::path path = std::getenv("XDG_DATA_HOME");
+		if (path.empty())
+		{
+			path = sys::GetHomeDir();
+			path /= ".local/share";
+		}
+		return path.string();
+	}
+
+	std::vector<std::string> GetDataDirs()
+	{
+		std::string dirs = std::getenv("XDG_DATA_DIRS");
+		if (dirs.empty())
+		{
+			return sys::GetSharedDirs();
+		}
+		return SplitDirs(dirs);
+	}
+
+	std::string GetConfigHome()
+	{
+		fs::path path = std::getenv("XDG_CONFIG_HOME");
+		if (path.empty())
+		{
+			path = sys::GetHomeDir();
+			path /= ".config";
+		}
+		return path.string();
+	}
+
+	std::vector<std::string> GetConfigDirs()
+	{
+		std::string dirs = std::getenv("XDG_CONFIG_DIRS");
+		if (dirs.empty())
+		{
+			std::vector<std::string> dirs;
+			for (fs::path path : sys::GetConfigDirs())
+			{
+				path /= "xdg";
+				dirs.emplace_back(path.string());
+			}
+			return dirs;
+		}
+		return SplitDirs(dirs);
+	}
+
+	std::string GetCacheHome()
+	{
+		fs::path path = std::getenv("XDG_CACHE_HOME");
+		if (path.empty())
+		{
+			path = sys::GetHomeDir();
+			path /= ".cache";
+		}
+		return path.string();
+	}
+
+	std::vector<std::string> GetIconDirs()
+	{	
+		std::vector<std::string> paths;
+
+		// Look in HOME/.icons first
+		{
+			fs::path path = sys::GetHomeDir();
+			path /= ".icons";
+			if (fs::exists(path))
+			{
+				paths.push_back(path.string());
+			}
+		}
+
+		// Then in XDG_DATA_DIRS/icons
+	
+		for (fs::path path : xdg::GetDataDirs())
+		{
+			path /= "icons";
+			if (fs::exists(path))
+			{
+				paths.push_back(path.string());
+			}
+		}
+
+		// Last in shared pixmaps
+	
+		for (fs::path path : sys::GetSharedDirs())
+		{
+			path /= "pixmaps";
+			if (fs::exists(path))
+			{
+				paths.push_back(path.string());
+			}
+		}
+
+		return paths;
+	}
+
+	bool IsDesktop(std::string const &path)
+	{
+		static std::set<std::string> const set = { ".desktop", ".directory" };
+
+		std::string const extension = fs::path(path).extension().string();
+
+		// With no extension use magic
+		if (extension.empty())
+		{
+			return HasMagic(path, "[Desktop Entry]");
+		}
+		// Base case is that the extension matches
+		return set.find(extension) != set.end();
+	}
+
+	std::vector<std::string> FindApplicationMenus()
+	{
+		std::vector<std::string> paths;
+		std::string const menu_prefix = std::getenv("XDG_MENU_PREFIX");
+		std::string const applications_menu = menu_prefix + "applications.menu";
+		for (fs::path path : xdg::GetConfigDirs())
+		{
+			path /= "menus";
+			path /= applications_menu;
+			if (fs::exists(path))
+			{
+				paths.push_back(path.string());
+			}
+		}
+		return paths;
+	}
+
+	std::vector<std::string> FindDesktopApplications()
+	{
+		std::vector<std::string> paths;
+
+		for (fs::path path : xdg::GetConfigDirs())
+		{
+			path /= "applications";
+
+			if (fs::exists(path) and fs::is_directory(path))
+			{
+				fs::directory_iterator it(path), end;
+
+				while (it != end)
+				{
+					path = *it;
+
+					if (xdg::IsDesktop(path.string()))
+					{
+						paths.push_back(path.string());
+					}
 				}
 			}
 		}
+		return paths;
 	}
-	return paths;
-}
 
-bool xdg::Open(std::string const &path)
-{
-	static std::string const open = GetLauncherPath();
-	if (not open.empty())
+	bool Open(std::string const &path)
 	{
-		std::deque<std::string> args;
-		args.push_back(open);
-		args.push_back(path);
-		std::vector<std::string> dummy;
-		return 0 == SystemCommand(args, dummy);
-	}
-	return false;
-}
-
-bool xdg::Edit(std::string const &path)
-{
-	// Try with launcher first
-	bool ok = xdg::Open(path);
-	if (not ok)
-	{
-		// Next look for a visual editor like VIM
-		std::string editor = std::getenv("VISUAL");
-		if (editor.empty())
-		{
-			// Look for a basic editor last
-			editor = std::getenv("EDITOR");
-		}
-		if (not editor.empty())
+		static std::string const open = GetLauncherPath();
+		if (not open.empty())
 		{
 			std::deque<std::string> args;
-			args.push_back(editor);
+			args.push_back(open);
 			args.push_back(path);
-			args.push_back("&"); // don't block
-			std::vector<std::string> out; // dummy
-			ok = 0 == SystemCommand(args, out);
+			std::vector<std::string> dummy;
+			return 0 == SystemCommand(args, dummy);
 		}
+		return false;
 	}
-	return ok;
+
+	bool Edit(std::string const &path)
+	{
+		// Try with launcher first
+		bool ok = xdg::Open(path);
+		if (not ok)
+		{
+			// Next look for a visual editor like VIM
+			std::string editor = std::getenv("VISUAL");
+			if (editor.empty())
+			{
+				// Look for a basic editor last
+				editor = std::getenv("EDITOR");
+			}
+			if (not editor.empty())
+			{
+				std::deque<std::string> args;
+				args.push_back(editor);
+				args.push_back(path);
+				args.push_back("&"); // don't block
+				std::vector<std::string> out; // dummy
+				ok = 0 == SystemCommand(args, out);
+			}
+		}
+		return ok;
+	}
 }
 
 namespace
@@ -582,89 +591,93 @@ namespace
 	}
 }
 
-bool zen::ShowError(std::string const &text)
+namespace zenity
 {
-	return 0 == Message(text, "--error");
-}
-
-bool zen::ShowWarning(std::string const &text)
-{
-	return 0 == Message(text, "--warning");
-}
-
-bool zen::ShowInformation(std::string const &text)
-{
-	return 0 == Message(text, "--info");
-}
-
-bool zen::ShowNotification(std::string const &text)
-{
-	return 0 == Message(text, "--notification");
-}
-
-bool zen::ShowQuestion(std::string const &text, enum zen::Answer &answer)
-{
-	int status = Message(text, "--question");
-	switch (status)
+	bool ShowError(std::string const &text)
 	{
-	case 0:
-		answer = zen::Answer::Yes;
-		return true;
-	case 1:
-		answer = zen::Answer::No;
-		return true;
-	}
-	return false;
-}
-
-bool zen::SelectFile(std::vector<std::string> &out, enum zen::SelectFile options, std::string const &path, std::string const &title)
-{
-	std::deque<std::string> args;
-
-	// Enable the file selection option
-	args.push_back("--file-selection");
-
-	// Allow custom title
-	if (not title.empty())
-	{
-		// Escaped quotes around the title
-		std::string const quote = stl::quote(title);
-		args.push_back(stl::param_value("--title", quote));
+		return 0 == Message(text, "--error");
 	}
 
-	// Default directory or file
-	if (not path.empty())
+	bool ShowWarning(std::string const &text)
 	{
-		// Escaped quotes around the path
-		std::string quote = stl::quote(path);
-		args.push_back(stl::param_value("--filename", quote));
+		return 0 == Message(text, "--warning");
 	}
 
-	// Select multiple files
-	if (options & zen::SelectFile ::Multiple)
+	bool ShowInformation(std::string const &text)
 	{
-		args.push_back("--multiple");
-		// Use the system directory separator
-		std::string quote = stl::quote(DIR_SEPARATOR);
-		args.push_back(stl::param_value("--separator", quote));
+		return 0 == Message(text, "--info");
 	}
 
-	// Choose a directory rather than a file
-	if (options & zen::SelectFile ::Directory)
+	bool ShowNotification(std::string const &text)
 	{
-		args.push_back("--directory");
+		return 0 == Message(text, "--notification");
 	}
 
-	// Save rather than open
-	if (options & zen::SelectFile::Save)
+	bool ShowQuestion(std::string const &text, enum zen::Answer &answer)
 	{
-		args.push_back("--save");
+		int status = Message(text, "--question");
+		switch (status)
+		{
+		case 0:
+			answer = zen::Answer::Yes;
+			return true;
+		case 1:
+			answer = zen::Answer::No;
+			return true;
+		}
+		return false;
 	}
 
-	// Block on call to external program
-	int const status = Zenity(args, out);
-	// Separate the result string
-	out = SplitDirs(out.front());
-	// Okay if exit code zero
-	return 0 == status;
+	bool SelectFile(std::vector<std::string> &out, enum SelectFile options, std::string const &path, std::string const &title)
+	{
+		std::deque<std::string> args;
+
+		// Enable the file selection option
+		args.push_back("--file-selection");
+
+		// Allow custom title
+		if (not title.empty())
+		{
+			// Escaped quotes around the title
+			std::string const quote = stl::quote(title);
+			args.push_back(stl::param_value("--title", quote));
+		}
+
+		// Default directory or file
+		if (not path.empty())
+		{
+			// Escaped quotes around the path
+			std::string quote = stl::quote(path);
+			args.push_back(stl::param_value("--filename", quote));
+		}
+
+		// Select multiple files
+		if (options & SelectFile::Multiple)
+		{
+			args.push_back("--multiple");
+			// Use the system directory separator
+			std::string quote = stl::quote(DIR_SEPARATOR);
+			args.push_back(stl::param_value("--separator", quote));
+		}
+
+		// Choose a directory rather than a file
+		if (options & SelectFile::Directory)
+		{
+			args.push_back("--directory");
+		}
+
+		// Save rather than open
+		if (options & SelectFile::Save)
+		{
+			args.push_back("--save");
+		}
+
+		// Block on call to external program
+		int const status = Zenity(args, out);
+		// Separate the result string
+		out = SplitDirs(out.front());
+		// Okay if exit code zero
+		return 0 == status;
+	}
 }
+

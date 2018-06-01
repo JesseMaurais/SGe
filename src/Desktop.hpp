@@ -9,13 +9,13 @@
 #include <vector>
 #include <map>
 
-namespace sys
+namespace sys::env
 {
 	/// Get name of the current user
-	std::string GetCurrentUserName();
+	std::string GetUserName();
 
 	/// System PATH environment variable separated into components
-	std::vector<std::string> GetSystemDirs();
+	std::vector<std::string> GetPaths();
 
 	/// Get the application base directory
 	std::string GetBaseDir();
@@ -28,7 +28,10 @@ namespace sys
 
 	/// Get absolute paths to folders for configuration data
 	std::vector<std::string> GetConfigDirs();
+}
 
+namespace sys
+{
 	/// Get an absolute path to an executable found in the system PATH
 	std::string GetProgramPath(std::string const &program);
 
@@ -37,14 +40,16 @@ namespace sys
 
 	/// Get an absolute path to a temporary file name
 	std::string GetTemporaryPath(std::string const &filename);
-
-	using ini = std::map<std::string, std::map<std::string, std::string>>;
-	/// Get the content of a configuration file
-	bool LoadConfigs(std::string const &path, ini &configs, bool replace=true);
 }
 
 namespace xdg
 {
+	/// Key/value pairs arranged into sections
+	using ini = std::map<std::string, std::map<std::string, std::string>>;
+
+	/// Get the content of a configuration file and merge it with a given ini
+	bool LoadConfigs(std::string const &path, ini &configs, bool replace=true);
+
 	/// Get the home data directory
 	std::string GetDataHome();
 
@@ -79,7 +84,7 @@ namespace xdg
 	bool Edit(std::string const &path);
 }
 
-namespace zen
+namespace zenity
 {
 	/// Open an error message dialog with one "OK" button
 	bool ShowError(std::string const &text);
