@@ -13,17 +13,17 @@ namespace sys::wm
 
 	SDL_Window *Info::Sub(SDL_Rect const &rect)
 	{
-	    if (target) switch (subsystem)
-	    {
-	    default:
-	    case SDL_SYSWM_UNKNOWN:
+		if (target) switch (subsystem)
+		{
+		default:
+		case SDL_SYSWM_UNKNOWN:
 		break;
 
-	    #ifdef SDL_VIDEO_DRIVER_X11
-	    case SDL_SYSWM_X11:
-	    {
-	    	struct WindowAttributes : XWindowAttributes
-	    	{
+		#ifdef SDL_VIDEO_DRIVER_X11
+		case SDL_SYSWM_X11:
+		{
+			struct WindowAttributes : XWindowAttributes
+			{
 				WindowAttributes(Display *display, Window window)
 				{
 					status = XGetWindowAttributes(display, window, this);
@@ -35,7 +35,7 @@ namespace sys::wm
 
 			if (Success == wa.status)
 			{
-		    	union
+				union
 				{
 					Window window;
 					void *data;
@@ -56,13 +56,13 @@ namespace sys::wm
 				XMapRaised(info.x11.display, window);
 				return SDL_CreateWindowFrom(data);
 			}
-	    }
-	    break;
-	    #endif
+		}
+		break;
+		#endif
 
-	    #ifdef SDL_VIDEO_DRIVER_WINDOWS
-	    case SDL_SYSWM_WINDOWS:
-	    {
+		#ifdef SDL_VIDEO_DRIVER_WINDOWS
+		case SDL_SYSWM_WINDOWS:
+		{
 			static struct WindowClass : WNDCLASS
 			{
 				ATOM atom;
@@ -127,10 +127,10 @@ namespace sys::wm
 				ShowWindow(window, SW_SHOW);
 				return SDL_CreateWindowFrom(data);
 			}
-	    }
-	    break;
-	    #endif
-	    }
-	    return nullptr;
+	 	}
+	 	break;
+		#endif
+		}
+		return nullptr;
 	}
 }
