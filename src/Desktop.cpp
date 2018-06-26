@@ -158,7 +158,7 @@ namespace sys
 			image += EXE_EXTENSION;
 		}
 		// Search for image in system directories
-		for (fs::path path : sys::GetSystemDirs())
+		for (fs::path path : sys::env::GetPaths())
 		{
 			path /= image;
 			if (fs::exists(path))
@@ -315,7 +315,7 @@ namespace xdg
 		fs::path path = std::getenv("XDG_DATA_HOME");
 		if (path.empty())
 		{
-			path = sys::GetHomeDir();
+			path = sys::env::GetHomeDir();
 			path /= ".local/share";
 		}
 		return path.string();
@@ -326,7 +326,7 @@ namespace xdg
 		std::string dirs = std::getenv("XDG_DATA_DIRS");
 		if (dirs.empty())
 		{
-			return sys::GetSharedDirs();
+			return sys::env::GetSharedDirs();
 		}
 		return SplitDirs(dirs);
 	}
@@ -336,7 +336,7 @@ namespace xdg
 		fs::path path = std::getenv("XDG_CONFIG_HOME");
 		if (path.empty())
 		{
-			path = sys::GetHomeDir();
+			path = sys::env::GetHomeDir();
 			path /= ".config";
 		}
 		return path.string();
@@ -348,7 +348,7 @@ namespace xdg
 		if (dirs.empty())
 		{
 			std::vector<std::string> dirs;
-			for (fs::path path : sys::GetConfigDirs())
+			for (fs::path path : sys::env::GetConfigDirs())
 			{
 				path /= "xdg";
 				dirs.emplace_back(path.string());
@@ -363,7 +363,7 @@ namespace xdg
 		fs::path path = std::getenv("XDG_CACHE_HOME");
 		if (path.empty())
 		{
-			path = sys::GetHomeDir();
+			path = sys::env::GetHomeDir();
 			path /= ".cache";
 		}
 		return path.string();
@@ -375,7 +375,7 @@ namespace xdg
 
 		// Look in HOME/.icons first
 		{
-			fs::path path = sys::GetHomeDir();
+			fs::path path = sys::env::GetHomeDir();
 			path /= ".icons";
 			if (fs::exists(path))
 			{
@@ -396,7 +396,7 @@ namespace xdg
 
 		// Last in shared pixmaps
 	
-		for (fs::path path : sys::GetSharedDirs())
+		for (fs::path path : sys::env::GetSharedDirs())
 		{
 			path /= "pixmaps";
 			if (fs::exists(path))
@@ -591,7 +591,7 @@ namespace
 	}
 }
 
-namespace zenity
+namespace desktop
 {
 	bool ShowError(std::string const &text)
 	{
@@ -613,22 +613,22 @@ namespace zenity
 		return 0 == Message(text, "--notification");
 	}
 
-	bool ShowQuestion(std::string const &text, enum zen::Answer &answer)
+	bool ShowQuestion(std::string const &text, enum Answer &answer)
 	{
 		int status = Message(text, "--question");
 		switch (status)
 		{
 		case 0:
-			answer = zen::Answer::Yes;
+			answer = Answer::Yes;
 			return true;
 		case 1:
-			answer = zen::Answer::No;
+			answer = Answer::No;
 			return true;
 		}
 		return false;
 	}
 
-	bool SelectFile(std::vector<std::string> &out, enum SelectFile options, std::string const &path, std::string const &title)
+	bool SelectFile(std::vector<std::string> &out, enum Select opt, std::string const &path, std::string const &title)
 	{
 		std::deque<std::string> args;
 
@@ -652,7 +652,7 @@ namespace zenity
 		}
 
 		// Select multiple files
-		if (options & SelectFile::Multiple)
+		if (opt & Select::Multiple)
 		{
 			args.push_back("--multiple");
 			// Use the system directory separator
@@ -661,13 +661,13 @@ namespace zenity
 		}
 
 		// Choose a directory rather than a file
-		if (options & SelectFile::Directory)
+		if (opt & Select::Directory)
 		{
 			args.push_back("--directory");
 		}
 
 		// Save rather than open
-		if (options & SelectFile::Save)
+		if (opt & Select::Save)
 		{
 			args.push_back("--save");
 		}

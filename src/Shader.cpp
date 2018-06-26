@@ -224,8 +224,8 @@ namespace
 				// Parse the file into lines.
 				std::vector<std::string> lines;
 				{
-					std::ifstream stream(path);
 					std::string line;
+					std::ifstream stream(path);
 					while (std::getline(stream, line))
 					{
 						lines.emplace_back(line);
@@ -278,7 +278,7 @@ void Shader::Source::SetShaderType(GLenum newType)
 
 bool Shader::Source::Attach(GLuint program) const
 {
-	if (slot and glIsShader(shader))
+	if (glIsShader(shader))
 	{
 		glAttachShader(program, shader);
 		if (OpenGL::CheckError("glAttachShader"))
@@ -292,7 +292,7 @@ bool Shader::Source::Attach(GLuint program) const
 
 bool Shader::Source::Detach(GLuint program) const
 {
-	if (slot and glIsShader(shader))
+	if (glIsShader(shader))
 	{
 		glDetachShader(program, shader);
 		if (OpenGL::CheckError("glDetachShader"))

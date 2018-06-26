@@ -69,8 +69,10 @@ namespace
 
 	private:
 
-		static std::map<NotifyEventCode, Manager*> set;
+		static std::map<NotifyEventCode, ManagerType*> set;
 	};
+
+	std::map<NotifyEventCode, ManagerType*> ManagerSet::set;
 
 	// Generic manager for common notifications
 	template <NotifyEventCode NotifyCode>
@@ -275,19 +277,19 @@ namespace
 // Bind observers to the correct manager
 
 OpenGL::Texture::Texture(Observer observer)
-: Slot(&TextureManager::Instance(), observer)
+: Slot(TextureManager::Instance(), observer)
 {}
 
 OpenGL::Buffer::Buffer(Observer observer)
-: Slot(&BufferManager::Instance(), observer)
+: Slot(BufferManager::Instance(), observer)
 {}
 
 OpenGL::Program::Program(Observer observer)
-: Slot(&ProgramManager::Instance(), observer)
+: Slot(ProgramManager::Instance(), observer)
 {}
 
 OpenGL::Shader::Shader(GLenum type, Observer observer)
-: Slot(&FindShaderManager(type), observer)
+: Slot(FindShaderManager(type), observer)
 {}
 
 // Error utility functions

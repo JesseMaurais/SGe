@@ -258,7 +258,7 @@ namespace SDL
 		return ops.Release();
 	}
 
-	SDL_RWops *Process(char const *command)
+	SDL_RWops *Process(std::vector<std::string> const &args)
 	{
 		RWops ops = AllocRW();
 		if (not ops)

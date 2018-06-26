@@ -84,7 +84,7 @@ namespace xdg
 	bool Edit(std::string const &path);
 }
 
-namespace zenity
+namespace desktop
 {
 	/// Open an error message dialog with one "OK" button
 	bool ShowError(std::string const &text);
@@ -102,9 +102,9 @@ namespace zenity
 	/// Open a question dialog with "No" and "Yes" buttons
 	bool ShowQuestion(std::string const &text, enum Answer &answer);
 
-	enum SelectFile { None, Multiple=1, Directory=2, Save=4 };
+	enum Select { None, Multiple=1, Directory=2, Save=4 };
 	/// Open a file selection dialog
-	bool SelectFile(std::vector<std::string> &out, enum SelectFile opt=None, std::string const &path="", std::string const &title="");
+	bool SelectFile(std::vector<std::string> &out, enum Select opt=None, std::string const &path="", std::string const &title="");
 }
 
 #endif // file

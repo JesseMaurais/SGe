@@ -25,17 +25,13 @@ public:
 		bool Attach(GLuint program) const;
 		bool Detach(GLuint program) const;
 
-	private:
-
-		void SetShaderType(GLenum type);
-		Shader *parent;
-		GLenum type;
-
 	protected:
 
+		void SetShaderType(GLenum type);
 		virtual bool Update(GLuint shader) = 0;
 		OpenGL::Shader slot;
 		GLuint shader;
+		GLenum type;
 	};
 
 protected:

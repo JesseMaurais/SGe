@@ -3,13 +3,14 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 struct SDL_RWops;
 
 namespace SDL
 {
 	SDL_RWops *Pipe();
-	SDL_RWops *Process(char const *command, char const *mode);
+	SDL_RWops *Process(std::vector<std::string> const &command);
 
 	class RWops
 	{

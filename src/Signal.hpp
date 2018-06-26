@@ -13,14 +13,15 @@ public:
 	using Observer = std::function<Signature>;
 	using Container = std::multimap<Slot, Observer>;
 
-	virtual void Connect(Slot id, Observer observer)
+	virtual bool Connect(Slot id, Observer observer)
 	{
 		slots.emplace(id, observer);
+		return true;
 	}
 
-	virtual void Disconnect(Slot id)
+	virtual bool Disconnect(Slot id)
 	{
-		slots.erase(id);
+		return 0 < slots.erase(id);
 	}
 
 	void Disconnect()
@@ -58,7 +59,7 @@ public:
 	using Signature = typename Subject::Signature;
 	using Observer = typename Subject::Observer;
 
-	Slot(Subject *sub, Observer observer) : subject(sub)
+	Slot(Subject &sub, Observer observer) : subject(&sub)
 	{
 		subject->Connect(this, observer);
 	}
@@ -66,11 +67,6 @@ public:
 	~Slot()
 	{
 		subject->Disconnect(this);
-	}
-
-	operator bool() const
-	{
-		return nullptr != subject;
 	}
 
 private:

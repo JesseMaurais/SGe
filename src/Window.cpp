@@ -17,7 +17,7 @@ namespace sys::wm
 		{
 		default:
 		case SDL_SYSWM_UNKNOWN:
-			break;
+		break;
 
 		#ifdef SDL_VIDEO_DRIVER_X11
 		case SDL_SYSWM_X11:
