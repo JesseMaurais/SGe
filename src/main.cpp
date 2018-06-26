@@ -171,12 +171,6 @@ int main(int argc, char **argv)
 
 		bool done = argc < 2;
 
-		sys::sig::ScopedHandler sigint(SIGINT, [&](int signo)
-		{
-			assert(SIGINT == signo);
-			done = true;
-		});
-
 		while (not done)
 		{
 			auto opt = NextOption(argc, argv);
@@ -226,7 +220,7 @@ int main(int argc, char **argv)
 
 			case Option::Unknown:
 				SDL::Log(InvalidArgument, opt.value);
-				// fallthrough
+				[[fallthrough]];
 
 			case Option::Help:
 				PrintCommandLineOptions(programName);
@@ -266,6 +260,13 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+	// Respond to terminate signal with a graceful exit
+	sys::sig::ScopedHandler sigterm(SIGTERM, [&](int signo)
+	{
+		assert(SIGTERM == signo);
+		SDL::SendUserEvent(EscapeEvent);
+	});
+	// Go into main loop
 	SDL::ProcessEvents();
 	return EXIT_SUCCESS;
 }

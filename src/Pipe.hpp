@@ -1,31 +1,57 @@
 #ifndef Pipe_hpp
 #define Pipe_hpp
 
+#include <memory>
+#include <string>
+#include <vector>
+
 struct SDL_RWops;
 
 namespace SDL
 {
-    SDL_RWops *RWFromProcess(char const *program, char const *mode);
+	SDL_RWops *Pipe();
+	SDL_RWops *Process(std::vector<std::string> const &command);
+
+	class RWops
+	{
+	public:
+
+		RWops() = default;
+		RWops(SDL_RWops *ops);
+
+		void Reset(SDL_RWops *that = nullptr)
+		{
+			ops.reset(that);
+		}
+
+		SDL_RWops *Release()
+		{
+			return ops.release();
+		}
+
+		SDL_RWops *operator->()
+		{
+			return ops.get();
+		}
+
+		operator SDL_RWops*()
+		{
+			return ops.get();
+		}
+
+	private:
+
+		std::unique_ptr<SDL_RWops> ops;
+	};
 }
 
 namespace sys::io
 {
-    class Pipe
-    {
-    public:
-
-        Pipe(SDL_RWops *ops);
-        ~Pipe();
-
-        operator SDL_RWops*()
-        {
-            return ops;
-        }
-
-    private:
-
-        SDL_RWops *ops;
-    };
+	struct File : SDL::RWops
+	{
+		std::string get(char delim = '\n');
+		void set(std::string const &string);
+	};
 }
 
 #endif // file

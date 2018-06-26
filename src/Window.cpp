@@ -24,12 +24,12 @@ namespace sys::wm
 		{
 			struct WindowAttributes : XWindowAttributes
 			{
+				Status status;
+
 				WindowAttributes(Display *display, Window window)
 				{
 					status = XGetWindowAttributes(display, window, this);
 				}
-
-				Status status;
 
 			} wa(info.x11.display, info.x11.window);
 
@@ -56,21 +56,21 @@ namespace sys::wm
 				XMapRaised(info.x11.display, window);
 				return SDL_CreateWindowFrom(data);
 			}
+			break;
 		}
-		break;
 		#endif
 
 		#ifdef SDL_VIDEO_DRIVER_WINDOWS
 		case SDL_SYSWM_WINDOWS:
 		{
-			static struct WindowClass : WNDCLASS
+			struct WindowClass : WNDCLASS
 			{
 				ATOM atom;
 
-				WindowClass()
+				WindowClass(HWND parent)
 				{
 				    style = 0;
-				    lpfnWndProc = WndProc;
+				    lpfnWndProc = (WNDPROC) GetWindowLongPtr(parent, GWLP_WNDPROC);
 				    cbClsExtra = 0;
 				    cbWndExtra = 0;
 				    hInstance = GetModuleHandle(nullptr);
@@ -83,25 +83,7 @@ namespace sys::wm
 				    atom = RegisterClass(this);
 				}
 
-			private:
-
-				static LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-				{
-				    switch (msg)
-				    {
-				    case WM_CLOSE:
-				        DestroyWindow(hwnd);
-				        break;
-				    case WM_DESTROY:
-				        PostQuitMessage(0);
-				        break;
-				    default:
-				        return DefWidnowProc(hwnd, msg, wParam, lParam);
-				    }
-				    return 0;
-				}
-
-			} wc;
+			} wc(info.win.window);
 
 			if (wc.atom)
 			{
@@ -127,9 +109,10 @@ namespace sys::wm
 				ShowWindow(window, SW_SHOW);
 				return SDL_CreateWindowFrom(data);
 			}
-	 	}
-	 	break;
+			break;
+		}
 		#endif
+
 		}
 		return nullptr;
 	}

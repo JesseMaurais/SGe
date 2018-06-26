@@ -4,6 +4,7 @@
 #include "std.hpp"
 #include "SDL.hpp"
 #include "Strings.hpp"
+#include <system_error>
 
 namespace SDL
 {
@@ -49,6 +50,14 @@ namespace SDL
 	template <typename... Args> bool SetError(enum Strings format, Args&&... args)
 	{
 		return SetError(String(format), args...);
+	}
+
+	/// Set error string with given std::errc
+	inline bool SetError(std::errc const errc)
+	{
+		std::error_code const error_code = std::make_error_code(errc);
+		std::string const message = error_code.message();
+		return SetError(message);
 	}
 
 	/// Type-safe and format-safe version of SDL_Log
