@@ -111,6 +111,7 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 		ALCdevice *device = nullptr;
 
 		Device() = default;
+
 		Device(const char *name)
 		{
 			if (name)
@@ -130,6 +131,7 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 				}
 			}
 		}
+
 		~Device()
 		{
 			// Destroy the singleton context too
@@ -142,12 +144,8 @@ ALCdevice *OpenAL::GetDevice(const char *name)
 		}
 
 	} singleton;
-	// Either new or not initialized
-	if (name or not singleton.device)
-	{
-		// Update to the named device
-		singleton = Device(name);
-	}
+	// Update to the named device
+	singleton = Device(name);
 	return singleton.device;
 }
 
@@ -190,15 +188,16 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 			}
 		}
 
-		ScopedEventHandler updater;
+		unsigned UpdateEvent = SDL::UserEvent(UpdateOpenAL);
+		ScopedEventHandler updater{ UpdateEvent, UpdateHandler };
 
 	public:
 
 		ALCcontext *context = nullptr;
 
 		Context() = default;
+
 		Context(int const *attributes)
-		: updater(SDL::UserEvent(UpdateOpenAL), UpdateHandler)
 		{
 			if (attributes)
 			{
@@ -233,6 +232,7 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 				}
 			}
 		}
+
 		~Context()
 		{
 			// Destroy if it was created
@@ -255,12 +255,8 @@ ALCcontext *OpenAL::GetContext(int const *attributes)
 		}
 
 	} singleton;
-	// Either new or not initialized
-	if (attributes or not singleton.context)
-	{
-		// Update with given attributes
-		singleton = Context(attributes);
-	}
+	// Update with given attributes
+	singleton = Context(attributes);
 	return singleton.context;
 }
 

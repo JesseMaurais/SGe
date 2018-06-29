@@ -23,13 +23,13 @@ namespace
 	using ManagerType = Manager<Slot<GLuint>*, GLuint>;
 
 	// Collect resource managers so we do not miss any
-	class ManagerSet : public ManagerType
+	class ManagerGroup : public ManagerType
 	{
 	public:
 
 		static void Initialize()
 		{
-			for (auto const &pair : set)
+			for (auto const &pair : map)
 			{
 				pair.second->Initialize();
 			}
@@ -37,7 +37,7 @@ namespace
 
 		static void Release()
 		{
-			for (auto const &pair : set)
+			for (auto const &pair : map)
 			{
 				pair.second->Release();
 			}
@@ -45,23 +45,23 @@ namespace
 
 		static void Update(NotifyEventCode const code)
 		{
-			set.at(code)->Update();
+			map.at(code)->Update();
 		}
 
 	protected:
 
-		ManagerSet(NotifyEventCode const code)
+		ManagerGroup(NotifyEventCode const code)
 		{
-			set.insert_or_assign(code, this);
+			map.insert_or_assign(code, this);
 		}
 
-		~ManagerSet()
+		~ManagerGroup()
 		{
-			for (auto it = set.begin(); it != set.end(); ++it)
+			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				if (this == it->second)
 				{
-					set.erase(it);
+					map.erase(it);
 					break;
 				}
 			}
@@ -69,19 +69,19 @@ namespace
 
 	private:
 
-		static std::map<NotifyEventCode, ManagerType*> set;
+		static std::map<NotifyEventCode, ManagerType*> map;
 	};
 
-	std::map<NotifyEventCode, ManagerType*> ManagerSet::set;
+	std::map<NotifyEventCode, ManagerType*> ManagerGroup::map;
 
 	// Generic manager for common notifications
 	template <NotifyEventCode NotifyCode>
-	class UpdateManager : public ManagerSet
+	class UpdateManager : public ManagerGroup
 	{
 	protected:
 
 		UpdateManager()
-		: ManagerSet(NotifyCode)
+		: ManagerGroup(NotifyCode)
 		{}
 
 	private:
@@ -274,24 +274,6 @@ namespace
 	}
 }
 
-// Bind observers to the correct manager
-
-OpenGL::Texture::Texture(Observer observer)
-: Slot(TextureManager::Instance(), observer)
-{}
-
-OpenGL::Buffer::Buffer(Observer observer)
-: Slot(BufferManager::Instance(), observer)
-{}
-
-OpenGL::Program::Program(Observer observer)
-: Slot(ProgramManager::Instance(), observer)
-{}
-
-OpenGL::Shader::Shader(GLenum type, Observer observer)
-: Slot(FindShaderManager(type), observer)
-{}
-
 // Error utility functions
 
 bool OpenGL::SetError(const char *origin, GLenum error)
@@ -311,6 +293,24 @@ bool OpenGL::LogError(const char *origin)
 	return error and SDL::LogError(origin, ErrorString(error));
 }
 
+// Bind observers to the correct manager
+
+OpenGL::Texture::Texture(Observer observer)
+: Slot(TextureManager::Instance(), observer)
+{}
+
+OpenGL::Buffer::Buffer(Observer observer)
+: Slot(BufferManager::Instance(), observer)
+{}
+
+OpenGL::Program::Program(Observer observer)
+: Slot(ProgramManager::Instance(), observer)
+{}
+
+OpenGL::Shader::Shader(GLenum type, Observer observer)
+: Slot(FindShaderManager(type), observer)
+{}
+
 // Context singleton
 
 SDL_GLContext OpenGL::GetContext(SDL_Window *window)
@@ -321,28 +321,29 @@ SDL_GLContext OpenGL::GetContext(SDL_Window *window)
 
 		static void Initialize()
 		{
-			ManagerSet::Initialize();
+			ManagerGroup::Initialize();
 		}
 
 		static void Release()
 		{
-			ManagerSet::Release();
+			ManagerGroup::Release();
 		}
 
 		static void UpdateHandler(SDL_Event const &event)
 		{
-			ManagerSet::Update(static_cast<NotifyEventCode>(event.user.code));
+			ManagerGroup::Update(static_cast<NotifyEventCode>(event.user.code));
 		}
 
-		ScopedEventHandler updater;
+		unsigned UpdateEvent = SDL::UserEvent(UpdateOpenGL);
+		ScopedEventHandler updater{ UpdateEvent, UpdateHandler };
 
 	public:
 
 		SDL_GLContext context = nullptr;
 
 		Context() = default;
+
 		Context(SDL_Window *window)
-		: updater(SDL::UserEvent(UpdateOpenGL), UpdateHandler)
 		{
 			if (window)
 			{
@@ -383,6 +384,7 @@ SDL_GLContext OpenGL::GetContext(SDL_Window *window)
 				}
 			}
 		}
+
 		~Context()
 		{
 			// Free if it was created
@@ -403,11 +405,7 @@ SDL_GLContext OpenGL::GetContext(SDL_Window *window)
 		}
 
 	} singleton;
-	// Either new or not initialized
-	if (window or not singleton.context)
-	{
-		// Update for compatibility with given window
-		singleton = Context(window);
-	}
+	// Update for compatibility with given window
+	singleton = Context(window);
 	return singleton.context;
 }
