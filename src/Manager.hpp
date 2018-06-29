@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 
-/// Manages access an observer, identified by a slot, has to a resource type
+/// Defers a slots acquisition of managed resources to a moment in queue
 template <typename Slot, typename Type> class Manager : public Signal<Slot, Type>
 {
 	using Signal = typename ::Signal<Slot, Type>;
@@ -50,8 +50,8 @@ public:
 			removed.erase(it);
 			return true;
 		}
-		// Otherwise queue for update and connect
-		bool const ok = QueueUpdate() and Signal::Connect(id, observer);
+		// Otherwise connect and queue for update
+		bool ok = Signal::Connect(id, observer) and QueueUpdate();
 		added.insert(id);
 		return ok;
 	}
@@ -66,8 +66,8 @@ public:
 			added.erase(it);
 			return true;
 		}
-		// Otherwise queue for update and disconnect
-		bool const ok = QueueUpdate() and Signal::Disconnect(id);
+		// Otherwise disconnect and queue for update
+		bool ok = Signal::Disconnect(id) and QueueUpdate();
 		removed.insert(id);
 		return ok;
 	}
@@ -135,15 +135,15 @@ private:
 		map.clear();
 	}
 
+	// Only need update if we no changes pending
 	bool NeedUpdate() const
 	{
-		// Only need update if we have no pending changes
 		return added.empty() and removed.empty();
 	}
 
+	// Only send the update if none pending
 	bool QueueUpdate() const
 	{
-		// Only send the update message if there is not one pending
 		return not NeedUpdate() or SendUpdate();
 	}
 };
