@@ -1,7 +1,8 @@
 #include "Shader.hpp"
 #include "Error.hpp"
 #include "SDL.hpp"
-#include "stl.hpp"
+#include "io.hpp"
+#include "algorithm.hpp"
 
 namespace
 {
@@ -92,7 +93,7 @@ namespace
 	{
 		// Inspect the first line (usually a comment) for a keyword
 		auto line = code.substr(0, code.find("\n"));
-		line = stl::to_upper(line); // case insensitive match
+		line = fmt::to_upper(line); // case insensitive match
 
 		if (std::string::npos != line.find("FRAGMENT"))
 		{
@@ -135,7 +136,7 @@ namespace
 
 		static std::shared_ptr<Shader::Source> Find(std::string const &code)
 		{
-			auto const it = stl::find_if(set, [&code](SourceCode *that)
+			auto const it = algo::find_if(set, [&code](SourceCode *that)
 			{
 				return code == that->code;
 			});
@@ -158,7 +159,7 @@ namespace
 			{
 				// Split the code into lines.
 				std::vector<std::string> lines;
-				stl::split(lines, code, std::string("\n"));
+				fmt::split(lines, code, "\n");
 				// Compile the source code lines into a shader.
 				bool const ok = CompileShaderSource(shader, lines);
 				if (not ok and SetShaderError(shader))
@@ -200,7 +201,7 @@ namespace
 
 		static std::shared_ptr<Shader::Source> Find(std::string const &path)
 		{
-			auto const it = stl::find_if(set, [&](SourceFile *that)
+			auto const it = algo::find_if(set, [&](SourceFile *that)
 			{
 				return path == that->path;
 			});

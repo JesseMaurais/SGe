@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <queue>
+#include <string>
 #include "Number.hpp"
 #include "Plane.hpp"
 #include "Mesh.hpp"
@@ -31,8 +32,8 @@ struct Tree : virtual Mesh
 
 	int AddNode(Branch node);
 
-	bool Save(const char *path);
-	bool Load(const char *path);
+	bool Save(std::string const& path);
+	bool Load(std::string const& path);
 };
 
 #endif // file

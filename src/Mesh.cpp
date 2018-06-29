@@ -1,5 +1,6 @@
 #include "Mesh.hpp"
-#include "stl.hpp"
+#include "numeric.hpp"
+#include "algorithm.hpp"
 
 void Mesh::Clear()
 {
@@ -36,13 +37,13 @@ void Mesh::Append(Mesh const &M)
 		G.count = it->second.count;
 	}
 
-	stl::append(edges, M.edges);
-	stl::append(points, M.points);
-	stl::append(faces, M.faces);
-	stl::append(colors, M.colors);
-	stl::append(normals, M.normals);
-	stl::append(vertexes, M.vertexes);
-	stl::append(texCoords, M.texCoords);
+	algo::append(edges, M.edges);
+	algo::append(points, M.points);
+	algo::append(faces, M.faces);
+	algo::append(colors, M.colors);
+	algo::append(normals, M.normals);
+	algo::append(vertexes, M.vertexes);
+	algo::append(texCoords, M.texCoords);
 }
 
 int Mesh::AddSurface(Surface const &S)

@@ -1,9 +1,9 @@
-#ifndef stl_algorithm_hpp
-#define stl_algorithm_hpp
+#ifndef algorithm_hpp
+#define algorithm_hpp
 
 #include <algorithm>
 
-namespace stl
+namespace algo
 {
 	// Non-modifying sequence operations
 
@@ -36,31 +36,38 @@ namespace stl
 	template <typename Container, typename Iterator>
 	inline auto copy(Container &&c, Iterator &&it) -> decltype(c.end())
 	{
-		return std::copy(c.begin(), c.end(), it);
+		return std::copy(begin(c), end(c), it);
 	}
 
 	template <typename Container, typename Operation>
 	inline void transform(Container &&c, Operation &&op)
 	{
-		std::transform(c.begin(), c.end(), c.begin(), op);
+		std::transform(begin(c), end(c), begin(c), op);
 	}
 
 	template <typename ContainerA, typename ContainerB, typename Operation>
 	inline void transform(ContainerA &&a, ContainerB &&b, Operation &&op)
 	{
-		std::transform(std::begin(a), std::end(a), std::begin(b), op);
+		std::transform(begin(a), end(a), begin(b), op);
 	}
 
 	template <typename Container, typename Generator>
 	inline void generate(Container &&c, Generator &&g)
 	{
-		std::generate(c.begin(), c.end(), g);
+		std::generate(begin(c), end(c), g);
 	}
 
 	template <typename Container, typename Value>
 	inline void replace(Container &&c, Value const &a, Value const &b)
 	{
-		std::replace(c.begin(), c.end(), a, b);
+		std::replace(begin(c), end(c), a, b);
+	}
+
+	template <typename ToContainer, typename FromContainer>
+	inline void append(ToContainer& to, FromContainer const &from)
+	{
+		to.reserve(to.size() + from.size());
+		to.insert(end(to), begin(from), end(from));
 	}
 
 	// Sorting operations

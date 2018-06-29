@@ -3,6 +3,7 @@
 #include "Event.hpp"
 #include "Error.hpp"
 #include "SDL.hpp"
+#include "assert.hpp"
 
 // Resource management implementation
 

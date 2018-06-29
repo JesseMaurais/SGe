@@ -3,6 +3,7 @@
 #include "Vector.hpp"
 #include "OpenGL.hpp"
 #include "SDL.hpp"
+#include "io.hpp"
 #include <cstdio>
 
 static signed LoadCubeFace(int face, const char *path)
@@ -10,8 +11,8 @@ static signed LoadCubeFace(int face, const char *path)
 	SDL_Surface *image = IMG_Load(path);
 	if (!image)
 	{
-	 SDL_perror("IMG_Load");
-	 return -1;
+		SDL_perror("IMG_Load");
+		return -1;
 	}
 	signed error = LoadCubeMap(image, face, GL_RGB);
 	SDL_FreeSurface(image);
@@ -20,25 +21,25 @@ static signed LoadCubeFace(int face, const char *path)
 
 void LoadCubeMap(const char *dir, const char *ext)
 {
-	char path[FILENAME_MAX];
+	std::string path;
 	CubeTexParameters(GL_TEXTURE_CUBE_MAP);
 
-	std::sprintf(path, "%s/left.%s", dir, ext);
+	io::sprintf(path, "{1}/left.{2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, path);
 
-	std::sprintf(path, "%s/right.%s", dir, ext);
+	io::sprintf(path, "{1}/right.{2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_X, path);
 
-	std::sprintf(path, "%s/bottom.%s", dir, ext);
+	io::sprintf(path, "{1}/bottom.{2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, path);
 
-	std::sprintf(path, "%s/top.%s", dir, ext);
+	io::sprintf(path, "{1}/top.{2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, path);
 
-	std::sprintf(path, "%s/back.%s", dir, ext);
+	io::sprintf(path, "{1}/back.{[2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, path);
 
-	std::sprintf(path, "%s/front.%s", dir, ext);
+	io::sprintf(path, "{1}/front.{2}", dir, ext);
 	LoadCubeFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, path);
 }
 

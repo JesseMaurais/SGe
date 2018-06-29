@@ -4,7 +4,8 @@
 #include "Signal.hpp"
 #include "Event.hpp"
 #include "SDL.hpp"
-#include "stl.hpp"
+#include "io.hpp"
+#include "filesystem.hpp"
 #include <cstdio>
 #include <csignal>
 #include <cerrno>
@@ -69,7 +70,7 @@ namespace
 
 	void PrintCommandLineOptions(std::string const &programName)
 	{
-		stl::printf("%1 a scene graph engine for soft geometry\n", programName);
+		io::printf("{1} a scene graph engine for soft geometry\n", programName);
 
 		for (struct option const &opt : Options)
 		{
@@ -126,21 +127,21 @@ namespace
 			switch (opt.has_arg)
 			{
 			case no_argument:
-				stl::sprintf(style, "-%1 or --%2", (char) opt.val, opt.name);
+				io::sprintf(style, "-{1} or --{2}", (char) opt.val, opt.name);
 				break;
 
 			case optional_argument:
-				stl::sprintf(style, "-%1 [%3] or --%2[=%3]", (char) opt.val, opt.name, arg);
+				io::sprintf(style, "-{1} [{3}] or --{2}[={3}]", (char) opt.val, opt.name, arg);
 				break;
 
 			case required_argument:
-				stl::sprintf(style, "-%1 %3 or --%2=%3", (char) opt.val, opt.name, arg);
+				io::sprintf(style, "-{1} {3} or --{2}={3}", (char) opt.val, opt.name, arg);
 				break;
 			}
 
 			// Print formatted line to stdout
 
-			stl::printf("\n%1\n\t%2\n", style, line);
+			io::printf("\n{1}\n\t{2}\n", style, line);
 		}
 	}
 }
@@ -149,7 +150,7 @@ int main(int argc, char **argv)
 {
 	SDL::ScopedAssertHandler handler;
 	{
-		std::string programName = stl::filesystem::path(argv[0]).filename().string();
+		std::string programName = sys::file::path(argv[0]).filename().string();
 
 		// Defaults for the JavaScript engine
 

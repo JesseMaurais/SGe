@@ -1,9 +1,9 @@
 #include "SDL.hpp"
-#include "stl.hpp"
 #include "Error.hpp"
 #include "Strings.hpp"
 #include <cstring>
 #include <cerrno>
+#include "io.hpp"
 
 
 bool SDL::Init(Uint32 const flags)
@@ -144,9 +144,9 @@ namespace
 		}
 
 		std::string message;
-		stl::sprintf
+		io::sprintf
 		( message
-		, "Assert failed at %1 in %2 on line %3, %4 times\n\t%5\n"
+		, "Assert failed at {1} in {2} on line {3}, {4} times\n\t{5}\n"
 		, data->function
 		, data->filename
 		, data->linenum

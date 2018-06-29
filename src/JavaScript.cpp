@@ -2,7 +2,6 @@
 #include "Stream.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
-#include "stl.hpp"
 #include <memory>
 #include <utility>
 #include <functional>
@@ -299,7 +298,7 @@ namespace
 
 	void Evaluate(SDL_Event const &event)
 	{
-		bool const strict = false != event.user.code;
+		bool const strict = (bool) event.user.code;
 		auto const begin = (jerry_char_ptr_t) event.user.data1;
 		auto const end = (jerry_char_ptr_t) event.user.data2;
 
@@ -313,7 +312,7 @@ namespace
 		} scopedSignal;
 
 		// Parse the input string into an executable function
-		js::Value const function = jerry_parse(begin, end-begin, strict);
+		js::Value const function = jerry_eval(begin, end-begin, strict);
 		if (js::CheckError(function))
 		{
 			SDL::LogError("jerry_parse");
@@ -348,11 +347,11 @@ bool js::Init(jerry_init_flag_t const flags)
 	return true;
 }
 
-bool js::SetError(jerry_value_t value)
+bool js::SetError(jerry_value_t error)
 {
 	if (jerry_is_feature_enabled(JERRY_FEATURE_ERROR_MESSAGES))
 	{
-		jerry_value_clear_error_flag(&value);
+		js::Value value = jerry_get_value_from_error(error, false);
 		return SDL::SetError(GetString(value));
 	}
 	else
@@ -363,5 +362,5 @@ bool js::SetError(jerry_value_t value)
 
 bool js::CheckError(jerry_value_t value)
 {
-	return jerry_value_has_error_flag(value) and js::SetError(value);
+	return jerry_value_is_error(value) and js::SetError(value);
 }

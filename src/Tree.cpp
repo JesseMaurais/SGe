@@ -1,8 +1,10 @@
 #include "Metric.hpp"
 #include "Tree.hpp"
-#include "stl.hpp"
+#include <fstream>
 #include <cstdio>
 #include <cmath>
+#include "io.hpp"
+#include "numeric.hpp"
 
 bool Tree::Traverse(Vector const &eye, Vector const &at)
 {
@@ -71,100 +73,54 @@ int Tree::AddNode(Branch node)
 	return to_int(index);
 }
 
-bool Tree::Save(char const *path)
+bool Tree::Save(std::string const& path)
 {
-	auto file = std::fopen(path, "w");
+	std::ofstream file(path);
 	if (not file)
 	{
-		std::perror(path);
 		return false;
 	}
-
-	std::size_t size = nodes.size();
-	if (std::fprintf(file, "nodes=%d\n", to_int(size)) < 0)
+	if (not io::fprintf(file, "nodes={1}\n", nodes.size()))
 	{
-		std::fputs("Error writing to stream", stderr);
+		return false;
 	}
-
-	for (std::size_t it = 0; it < size; ++it)
+	for (Branch &node : nodes)
 	{
-		Branch const &node = nodes[it];
-		std::fprintf(file, "%d %d %d\n", node.face, node.front, node.back);
-	}
-
-	if (std::fclose(file))
-	{
-		std::perror(path);
+		if (not io::fprintf(file, "{1} {2} {3}\n", node.face, node.front, node.back))
+		{
+			return false;
+		}
 	}
 	return true;
 }
 
-bool Tree::Load(char const *path)
+bool Tree::Load(std::string const& path)
 {
-	auto file = std::fopen(path, "r");
+	std::ifstream file(path);
 	if (not file)
 	{
-		std::perror(path);
 		return false;
 	}
-
-	int size;
-	switch (std::fscanf(file, "nodes=%d\n", &size))
+	std::string line;
+	if (not std::getline(file, line))
 	{
-	case 1:
-		break;
-	case EOF:
-		if (std::ferror(file))
-		{
-			std::perror(path);
-		}
-		else
-		if (std::feof(file))
-		{
-			std::fputs("Unexpected end of file", stderr);
-		}
-		// fallthrough
-	default:
-		if (std::fclose(file))
-		{
-			std::perror(path);
-		}
 		return false;
 	}
-
-	nodes.resize(size);
-
-	for (int it = 0; it < size; ++it)
+	auto const header = fmt::key_value(line);
+	if (header.first != "nodes")
 	{
-		Branch &N = nodes[it];
-
-		switch (std::fscanf(file, "%d %d %d\n", &N.face, &N.front, &N.back))
-		{
-		case 3:
-			break;
-		case EOF:
-			if (std::ferror(file))
-			{
-				std::perror(path);
-			}
-			else
-			if (std::feof(file))
-			{
-				std::fputs("Unexpected end of file", stderr);
-			}
-			// fallthrough
-		default:
-			if (std::fclose(file))
-			{
-				std::perror(path);
-			}
-			return false;
-		}
+		return false;
 	}
-
-	if (std::fclose(file))
+	auto const size = to<std::size_t>(header.second);
+	nodes.reserve(size);
+	while (std::getline(file, line))
 	{
-		std::perror(path);
+		Branch node;
+		std::stringstream stream(line);
+		stream >> node.face;
+		stream >> node.front;
+		stream >> node.back;
+		nodes.push_back(node);
 	}
-	return true;
+	return nodes.size() == size;
 }

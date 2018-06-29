@@ -1,86 +1,101 @@
-#ifndef stl_format_hpp
-#define stl_format_hpp
+#ifndef format_hpp
+#define format_hpp
 
+#include <locale>
 #include <string>
 #include <sstream>
+#include <string_view>
 #include "algorithm.hpp"
 
-namespace stl
+namespace fmt
 {
-	template <class Char> class format
+	template <typename T>
+	inline std::string to_string(T const &value)
+	{
+		return std::to_string(value);
+	}
+
+	template <>
+	inline std::string to_string(std::string const &value)
+	{
+		return value;
+	}
+
+	template <>
+	inline std::string to_string(std::string_view const &value)
+	{
+		return std::string(value.data(), value.size());
+	}
+
+	template <>
+	inline std::string to_string(char const * const &value)
+	{
+		return std::string(value, std::strlen(value));
+	}
+
+	template <>
+	inline std::string to_string(char * const &value)
+	{
+		return std::string(value, std::strlen(value));
+	}
+
+	// Basic string formatting tools
+
+	inline void replace(std::string &buffer, std::string const &search, std::string const &replace)
+	{
+		using size_type = std::string::size_type;
+		constexpr auto npos = std::string::npos;
+		auto const length = search.length();
+		for (size_type pos = buffer.find(search); npos != pos; pos = buffer.find(search, pos+length))
+		{
+			buffer.replace(pos, length, replace);
+		}
+	}
+
+	class format
 	{
 	public:
 
-		using char_type = std::ctype<Char>;
-		using string = std::basic_string<Char>;
-		using view = std::basic_string_view<Char>;
-		using stream = std::basic_stringstream<Char>;
-		using size_type = string::size_type;
-
-		format(string const &s)
-			: buffer(s)
+		format(std::string_view s, std::string_view begin_tag="{", std::string_view end_tag="}")
+			: buffer(to_string(s))
+			, begin(begin_tag)
+			, end(end_tag)
 			, index(0)
-			, ctype()
 		{}
 
-		template <typename Type> format& operator%(Type const &arg)
+		template <typename T> format& operator % (T && arg)
 		{
-			string const search = to_tag(++index);
-			string const replace = to_string(arg);
-			stl::replace(string, search, replace);
+			replace(buffer, next_tag(), to_string(arg));
 			return *this;
 		}
 
-		operator & string() const
+		operator std::string_view() const
+		{
+			return buffer;
+		}
+
+		operator std::string()
 		{
 			return buffer;
 		}
 
 	private:
 
-		char_type ctype;
-		string buffer;
-		size_type index;
+		std::string buffer, begin, end;
+		std::string::size_type index;
 
-		static string to_tag(size_type n)
+		std::string next_tag()
 		{
-			stream tag;
-			constexpr auto delimiter = Char('%');
-			tag << delimiter << n << delimiter;
+			std::stringstream tag;
+			tag << begin << ++index << end;
 			return tag.str();
 		}
 	};
 
-
-	// Basic string formatting tools
-
-	template <typename Char>
-	void replace
-	(
-	 std::basic_string<Char> &string,
-	 std::basic_string<Char> const &search,
-	 std::basic_string<Char> const &replace
-	)
+	inline void split(std::vector<std::string> &tokens, std::string_view string, std::string_view delimiter)
 	{
-		using size_type = std::basic_string<Char>::size_type;
-		constexpr auto npos = std::basic_string<Char>::npos;
-		auto const length = search.length();
-		for (size_type pos = string.find(search); npos != pos; pos = string.find(search, pos+length))
-		{
-			string.replace(pos, length, replace);
-		}
-	}
-
-	template <typename Char, typename Container>
-	void split
-	(
-	 Container &tokens,
-	 std::basic_string<Char> const &string,
-	 std::basic_string<Char> const &delimiter
-	)
-	{
-		using size_type = std::basic_string<Char>::size_type;
-		constexpr auto npos = std::basic_string<Char>::npos;
+		using size_type = std::string::size_type;
+		constexpr auto npos = std::string::npos;
 		auto const length = delimiter.length();
 		for (size_type next = string.find(delimiter), last = 0; npos != last; next = string.find(delimiter, last))
 		{
@@ -89,57 +104,70 @@ namespace stl
 		}
 	}
 
-	template <typename Char, typename Container>
-	std::basic_string<Char> merge
-	(
-	 Container const &tokens,
-	 std::basic_string<Char> const &delimiter
-	)
+	template <typename Container>
+	inline std::string join(Container const &tokens, std::string const &delimiter)
 	{
-		std::basic_stringstream<Char> stream;
-		auto it = std::ostream_iterator<std::basic_string<Char>>(stream, delimiter.c_str());
-		stl::copy(tokens, it);
+		std::ostringstream stream;
+		auto it = std::ostream_iterator<std::string>(stream, delimiter.c_str());
+		std::copy(tokens.begin(), tokens.end(), it);
 		return stream.str();
 	}
 
-	template <typename Char>
-	std::basic_string<Char> to_upper(std::basic_string<Char> string)
+	inline std::string to_upper(std::string string)
 	{
-		stl::transform(string, stl::to_upper);
+		constexpr auto toupper = [](char c) { return std::toupper(c, std::locale()); };
+		algo::transform(string, toupper);
 		return string;
 	}
 
-	template <typename Char>
-	std::basic_string<Char> to_lower(std::basic_string<Char> string)
+	inline std::string to_lower(std::string string)
 	{
-		stl::transform(string, stl::to_lower);
+		constexpr auto tolower = [](char c) { return std::tolower(c, std::locale()); };
+		algo::transform(string, tolower);
 		return string;
 	}
 
-	template <typename Char>
-	std::basic_string<Char>::iterator trim_begin(std::basic_string<Char> &string)
+	inline std::string::iterator trim_begin(std::string &string)
 	{
-		return string.erase(string.begin(), stl::find_if(string, stl::is_blank));
+		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
+		return string.erase(string.begin(), algo::find_if(string, isblank));
 	}
 
-	template <typename Char>
-	std::basic_string<Char>::iterator trim_end(std::basic_string<Char> &string)
+	inline std::string::iterator trim_end(std::string &string)
 	{
-		return string.erase(stl::find_if_not(string, stl::is_blank), string.end());
+		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
+		return string.erase(algo::find_if_not(string, isblank), string.end());
 	}
 
-	template <typename Char>
-	bool trim(std::basic_string<Char> &string)
+	inline bool trim(std::string &string)
 	{
 		return trim_begin(string) != trim_end(string);
 	}
 
-	template <typename Char>
-	std::basic_string<Char> quote(std::basic_string<Char> const &string)
+	inline std::string quote(std::string_view string)
 	{
-		std::string result;
-		sprintf(result, "\"%1%\"", string);
-		return result;
+		return format("\"{1}\"") % string;
+	}
+
+	inline std::string key_value(std::string_view key, std::string_view value)
+	{
+		return format("{1}={2}") % key % value;
+	}
+
+	inline std::pair<std::string_view, std::string_view> key_value(std::string_view string)
+	{
+		std::vector<std::string> pair;
+		split(pair, string, "=");
+		if (pair.size() == 2)
+		{
+			return std::pair(pair.front(), pair.back());
+		}
+		return std::pair("", "");
+	}
+
+	inline bool find(std::string_view string, std::string_view what)
+	{
+		return string.find(what) != std::string::npos;
 	}
 }
 

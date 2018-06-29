@@ -1,7 +1,7 @@
 #ifndef Error_hpp
 #define Error_hpp
 
-#include "stl.hpp"
+#include "io.hpp"
 #include "SDL.hpp"
 #include "Strings.hpp"
 #include <system_error>
@@ -42,7 +42,7 @@ namespace SDL
 	template <typename... Args> bool SetError(std::string const &format, Args&&... args)
 	{
 		std::string message;
-		stl::sprintf(message, format, args...);
+		io::sprintf(message, format, args...);
 		return 0 > SDL_SetError("%s", message.c_str());
 	}
 
@@ -64,7 +64,7 @@ namespace SDL
 	template <typename... Args> void Log(std::string const &format, Args&&... args)
 	{
 		std::string message;
-		stl::sprintf(message, format, args...);
+		io::sprintf(message, format, args...);
 		SDL_Log("%s", message.c_str());
 	}
 

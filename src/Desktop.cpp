@@ -1,14 +1,14 @@
 #include "Desktop.hpp"
 #include "System.hpp"
 #include "Error.hpp"
-#include "stl.hpp"
+#include "filesystem.hpp"
+#include "format.hpp"
+#include "io.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <deque>
 #include <set>
-
-namespace fs = stl::filesystem;
 
 namespace
 {
@@ -26,7 +26,7 @@ namespace
 	std::vector<std::string> SplitDirs(std::string const &string)
 	{
 		std::vector<std::string> dirs;
-		stl::split(dirs, string, DIR_SEPARATOR);
+		fmt::split(dirs, string, DIR_SEPARATOR);
 		return dirs;
 	}
 
@@ -47,13 +47,13 @@ namespace
 		while (std::getline(stream, line))
 		{
 			constexpr auto is_blank = [](char c) { return std::isblank(c); };
-			auto it = stl::find_if_not(line, is_blank);
+			auto it = algo::find_if_not(line, is_blank);
 			if (line.end() != it) // not an empty line
 			{
 				if (*it != '#') // not a comment
 				{
 					line = line.substr(0, line.find('#')); // strip comment
-					stl::trim(line); // strip whitespace
+					fmt::trim(line); // strip whitespace
 					return true;
 				}
 			}
@@ -152,19 +152,19 @@ namespace sys
 	std::string GetProgramPath(std::string const &name)
 	{
 		// Unless extension is given, assume it's a binary
-		fs::path image = name;
+		sys::file::path image = name;
 		if (image.extension().empty())
 		{
 			image += EXE_EXTENSION;
 		}
 		// Search for image in system directories
-		for (fs::path path : sys::env::GetPaths())
+		for (sys::file::path path : sys::env::GetPaths())
 		{
 			path /= image;
-			if (fs::exists(path))
+			if (sys::file::exists(path))
 			{
 				// Check executable status
-				if (stl::is_executable(path))
+				if (sys::file::is_executable(path))
 				{
 					return path.string(); // usable
 				}
@@ -177,16 +177,16 @@ namespace sys
 	{
 		static struct TemporaryDir
 		{
-			fs::path dir;
-			stl::error_code err;
+			sys::file::path dir;
+			sys::file::error_code err;
 			TemporaryDir(std::string const &foldername)
 			{
-				fs::path path = fs::temp_directory_path(err);
+				sys::file::path path = sys::file::temp_directory_path(err);
 				if (not err)
 				{
 					path /= foldername;
-					fs::remove_all(path, err);
-					if (fs::create_directory(path, err))
+					sys::file::remove_all(path, err);
+					if (sys::file::create_directory(path, err))
 					{
 						dir = path;
 					}
@@ -205,7 +205,7 @@ namespace sys
 
 	std::string GetTemporaryPath(std::string const &filename)
 	{
-		static fs::path const path = GetTemporaryDir();
+		static sys::file::path const path = GetTemporaryDir();
 		if (not path.empty())
 		{
 			return (path/filename).string();
@@ -227,9 +227,9 @@ namespace
 		{
 			// Write stdout to a temporary file
 			std::string path = sys::GetTemporaryPath(args.front());
-			args.push_back(">" + stl::quote(path));
+			args.push_back(">" + fmt::quote(path));
 			// Execute and acquire return value
-			std::string const command = stl::merge(args, " ");
+			std::string const command = fmt::join(args, " ");
 			int const status = std::system(command.c_str());
 			// Read output back from temporary file
 			ReadLinesFromFile(path, out);
@@ -298,7 +298,7 @@ namespace xdg
 				return false;
 			}
 
-			auto pair = section->second.emplace(stl::param_value(line));
+			auto pair = section->second.emplace(fmt::key_value(line));
 			if (not replace and not pair.second)
 			{
 				SDL::SetError(IniKeyNotUnique, line);
@@ -312,7 +312,7 @@ namespace xdg
 
 	std::string GetDataHome()
 	{
-		fs::path path = std::getenv("XDG_DATA_HOME");
+		sys::file::path path = std::getenv("XDG_DATA_HOME");
 		if (path.empty())
 		{
 			path = sys::env::GetHomeDir();
@@ -333,7 +333,7 @@ namespace xdg
 
 	std::string GetConfigHome()
 	{
-		fs::path path = std::getenv("XDG_CONFIG_HOME");
+		sys::file::path path = std::getenv("XDG_CONFIG_HOME");
 		if (path.empty())
 		{
 			path = sys::env::GetHomeDir();
@@ -348,7 +348,7 @@ namespace xdg
 		if (dirs.empty())
 		{
 			std::vector<std::string> dirs;
-			for (fs::path path : sys::env::GetConfigDirs())
+			for (sys::file::path path : sys::env::GetConfigDirs())
 			{
 				path /= "xdg";
 				dirs.emplace_back(path.string());
@@ -360,7 +360,7 @@ namespace xdg
 
 	std::string GetCacheHome()
 	{
-		fs::path path = std::getenv("XDG_CACHE_HOME");
+		sys::file::path path = std::getenv("XDG_CACHE_HOME");
 		if (path.empty())
 		{
 			path = sys::env::GetHomeDir();
@@ -375,9 +375,9 @@ namespace xdg
 
 		// Look in HOME/.icons first
 		{
-			fs::path path = sys::env::GetHomeDir();
+			sys::file::path path = sys::env::GetHomeDir();
 			path /= ".icons";
-			if (fs::exists(path))
+			if (sys::file::exists(path))
 			{
 				paths.push_back(path.string());
 			}
@@ -385,10 +385,10 @@ namespace xdg
 
 		// Then in XDG_DATA_DIRS/icons
 	
-		for (fs::path path : xdg::GetDataDirs())
+		for (sys::file::path path : xdg::GetDataDirs())
 		{
 			path /= "icons";
-			if (fs::exists(path))
+			if (sys::file::exists(path))
 			{
 				paths.push_back(path.string());
 			}
@@ -396,10 +396,10 @@ namespace xdg
 
 		// Last in shared pixmaps
 	
-		for (fs::path path : sys::env::GetSharedDirs())
+		for (sys::file::path path : sys::env::GetSharedDirs())
 		{
 			path /= "pixmaps";
-			if (fs::exists(path))
+			if (sys::file::exists(path))
 			{
 				paths.push_back(path.string());
 			}
@@ -412,7 +412,7 @@ namespace xdg
 	{
 		static std::set<std::string> const set = { ".desktop", ".directory" };
 
-		std::string const extension = fs::path(path).extension().string();
+		std::string const extension = sys::file::path(path).extension().string();
 
 		// With no extension use magic
 		if (extension.empty())
@@ -428,11 +428,11 @@ namespace xdg
 		std::vector<std::string> paths;
 		std::string const menu_prefix = std::getenv("XDG_MENU_PREFIX");
 		std::string const applications_menu = menu_prefix + "applications.menu";
-		for (fs::path path : xdg::GetConfigDirs())
+		for (sys::file::path path : xdg::GetConfigDirs())
 		{
 			path /= "menus";
 			path /= applications_menu;
-			if (fs::exists(path))
+			if (sys::file::exists(path))
 			{
 				paths.push_back(path.string());
 			}
@@ -444,13 +444,13 @@ namespace xdg
 	{
 		std::vector<std::string> paths;
 
-		for (fs::path path : xdg::GetConfigDirs())
+		for (sys::file::path path : xdg::GetConfigDirs())
 		{
 			path /= "applications";
 
-			if (fs::exists(path) and fs::is_directory(path))
+			if (sys::file::exists(path) and sys::file::is_directory(path))
 			{
-				fs::directory_iterator it(path), end;
+				sys::file::directory_iterator it(path), end;
 
 				while (it != end)
 				{
@@ -517,15 +517,15 @@ namespace
 	{
 		std::string const desktop = std::getenv("XDG_CURRENT_DESKTOP");
 
-		if (stl::find(desktop, "GNOME"))
+		if (fmt::find(desktop, "GNOME"))
 		{
 			return GTK;
 		}
-		if (stl::find(desktop, "XFCE"))
+		if (fmt::find(desktop, "XFCE"))
 		{
 			return GTK;
 		}
-		if (stl::find(desktop, "KDE"))
+		if (fmt::find(desktop, "KDE"))
 		{
 			return QT;
 		}
@@ -578,12 +578,12 @@ namespace
 		// The message kind
 		args.push_back(kind);
 		// Escaped quotes around the text
-		std::string const quote = stl::quote(text);
-		args.push_back(stl::param_value("--text", quote));
+		std::string const quote = fmt::quote(text);
+		args.push_back(fmt::key_value("--text", quote));
 		// Notification type has icon option
 		if (not icon.empty())
 		{
-			args.push_back(stl::param_value("--window-icon", icon));
+			args.push_back(fmt::key_value("--window-icon", icon));
 		}
 		// We don't expect any output
 		std::vector<std::string> out;
@@ -639,16 +639,16 @@ namespace desktop
 		if (not title.empty())
 		{
 			// Escaped quotes around the title
-			std::string const quote = stl::quote(title);
-			args.push_back(stl::param_value("--title", quote));
+			std::string const quote = fmt::quote(title);
+			args.push_back(fmt::key_value("--title", quote));
 		}
 
 		// Default directory or file
 		if (not path.empty())
 		{
 			// Escaped quotes around the path
-			std::string quote = stl::quote(path);
-			args.push_back(stl::param_value("--filename", quote));
+			std::string quote = fmt::quote(path);
+			args.push_back(fmt::key_value("--filename", quote));
 		}
 
 		// Select multiple files
@@ -656,8 +656,8 @@ namespace desktop
 		{
 			args.push_back("--multiple");
 			// Use the system directory separator
-			std::string quote = stl::quote(DIR_SEPARATOR);
-			args.push_back(stl::param_value("--separator", quote));
+			std::string quote = fmt::quote(DIR_SEPARATOR);
+			args.push_back(fmt::key_value("--separator", quote));
 		}
 
 		// Choose a directory rather than a file

@@ -1,7 +1,7 @@
 CC = g++-8
 RM = rm
 MKDIR = mkdir
-STDFLAGS = -std=c++2a -I/usr/include/freetype2
+STDFLAGS = -std=c++2a -Iinclude -I/usr/include/freetype2
 DBGFLAGS = -Wall -Wextra -Wpedantic -Winvalid-pch -g
 DFLAGS = -MMD -MP
 CFLAGS = $(DBGFLAGS) $(STDFLAGS)

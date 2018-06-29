@@ -1,5 +1,5 @@
-#ifndef stl_filesystem_hpp
-#define stl_filesystem_hpp
+#ifndef filesystem_hpp
+#define filesystem_hpp
 
 // Try to find an file system library, either standard, experimental or boost
 
@@ -7,16 +7,13 @@
 
 #include <filesystem>
 
-namespace stl
+namespace sys::file
 {
-	namespace filesystem = std::filesystem;
+	using namespace std::filesystem;
 	using error_code = std::error_code;
-	inline bool is_executable(filesystem::path const &path)
+	inline bool is_executable(path const &exe)
 	{
-		auto status = filesystem::status(path);
-		auto permissions = status.permissions();
-		permissions &= filesystem::perms::group_exec;
-		return filesystem::perms::none != permissions;
+		return perms::none != (status(exe).permissions() & perms::group_exec);
 	}
 }
 
@@ -24,16 +21,13 @@ namespace stl
 
 #include <experimental/filesystem>
 
-namespace stl
+namespace sys::file
 {
-	namespace filesystem = std::experimental::filesystem;
+	using namespace std::experimental::filesystem;
 	using error_code = std::error_code;
-	inline bool is_executable(filesystem::path const &path)
+	inline bool is_executable(path const &exe)
 	{
-		auto status = filesystem::status(path);
-		auto permissions = status.permissions();
-		permissions &= filesystem::perms::group_exec;
-		return filesystem::perms::none != permissions;
+		return perms::none != (status(exe).permissions() & perms::group_exec);
 	}
 }
 
@@ -46,16 +40,13 @@ namespace stl
 
 #include <boost/filesystem.hpp>
 
-namespace stl
+namespace sys::file
 {
-	namespace filesystem = boost::filesystem;
+	using namespace boost::filesystem;
 	using error_code = boost::system::error_code;
-	inline bool is_executable(filesystem::path const &path)
+	inline bool is_executable(path const &exe)
 	{
-		auto status = filesystem::status(path);
-		auto permissions = status.permissions();
-		permissions &= filesystem::perms::group_exe;
-		return filesystem::perms::no_perms != permissions;
+		return perms::no_perms != (status(exe).permissions() & perms::group_exe);
 	}
 }
 
