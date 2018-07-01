@@ -1,19 +1,15 @@
 #include "Files.hpp"
 #include "System.hpp"
-#include "Desktop.hpp"
 #include "Manager.hpp"
 #include "Error.hpp"
 #include "Event.hpp"
-#include "stl.hpp"
-
-namespace fs = stl::filesystem;
 
 namespace
 {
 	// Folder and file name constants
 
-	constexpr char const *Added = "Add";
-	constexpr char const *Removed = "Remove";
+	constexpr char const *Added = "Added";
+	constexpr char const *Removed = "Removed";
 	constexpr char const *Folder = "Watch";
 
 	// File event types
@@ -26,36 +22,36 @@ namespace
 
 	// Manager to monitor files and send notifications
 
-	class FileManager : public Manager<WatchedFile*, fs::path>
+	class FileMonitor : public Manager<sys::file::path, std::string_view>
 	{
 	public:
 
-		static FileManager &Instance()
+		static FileMonitor &Instance()
 		{
-			static FileManager singleton;
+			static FileMonitor singleton;
 			return singleton;
 		}
 
 	private:
 
-		// File event handler
-		ScopedEventHandler updater;
+		using Watch = Signal<sys::file::Notify*, std::string_view>
 
 		// Thread control data
 		std::future<void> future;
 		bool done = false;
 
 		// Monitored file data
-		std::set<fs::path> watched;
-		std::vector<fs::path> added;
-		std::vector<fs::path> removed;
+		std::vector<sys::file::path> added;
+		std::vector<sys::file::path> removed;
+		std::map<sys::file::path, Watch> watched;
 
-		// Own directory
-		fs::path const self;
+		// Own directory where monitor writes notifications
+		sys::file::path const self = sys::GetTemporaryPath(Folder);
+
+		// The monitoring thread
+		void Thread();
 
 		FileManager()
-		: updater(SDL::UserEvent(UpdateFiles), UpdateHandler)
-		, self(sys::GetTemporaryPath(Folder))
 		{
 			if (self.empty())
 			{
@@ -74,23 +70,21 @@ namespace
 			if (future.valid())
 			{
 				// Remove own directory from watched files
-				fs::path const path = self / Removed;
-				stl::append(path.string(), self.string());
+				sys::file::path const path = self / Removed;
+				sys::file::append(path, self.string());
 				future.wait(); // join thread when done
 			}
 		}
 
 		// The following methods are called in the monitoring thread
 
-		void Thread(); // platform dependent
-
-		using Callback = std::function<void(fs::path const &path)>;
+		using Callback = std::function<void(sys::file::path const &path)>;
 
 		void UpdateWatchedFiles(Callback&& onAdd, Callback&& onRemove)
 		{
 			// Add before remove so that we can replace paths to watch
 
-			for (fs::path const &path : added)
+			for (sys::file::path const &path : added)
 			{
 				// Remove any sub directory of added path
 				auto const upper = watched.upper_bound(path);
@@ -110,7 +104,7 @@ namespace
 
 			// Remove paths from watched files
 
-			for (fs::path const &path : removed)
+			for (sys::file::path const &path : removed)
 			{
 				auto const it = watched.find(path);
 				assert(watched.end() != it);
@@ -122,7 +116,7 @@ namespace
 			}
 		}
 
-		void NotifyFileChanged(fs::path const &path)
+		void NotifyFileChanged(sys::file::path const &path)
 		{
 			if (not (self < path))
 			{
@@ -167,11 +161,50 @@ namespace
 					}
 				}
 				// Clear file contents
-				stl::truncate(path.string());
+				sys::file::truncate(path);
 			}
 		}
 
+		void QueryError(std::exception const &exception)
+		{
+			SDL::SetError(CaughtException, exception.what());
+			// Return from thread if user chooses on exception
+			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
+		}
+
 		// The following methods are called in the main thread
+
+		void Notify(SDL_Event const &event)
+		{
+			sys::file::path path = SDL::GetUserEventData(event);
+			// TODO Notify the source of changed file
+		}
+
+		bool SendUpdate() const override
+		{
+			// Queue event to wake the monitor to update its files
+			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
+		}
+
+		void Generate(std::vector<sys::file::path> &ids) const override
+		{
+			sys::file::path const path = self / Added;
+			std::ofstream stream(path.string());
+			for (sys::file::path const &path : ids)
+			{
+				stream << path;
+			}
+		}
+
+		void Destroy(std::vector<sys::file::path> const &ids) const override
+		{
+			sys::file::path const path = self / Removed;
+			std::ofstream stream(path.string());
+			for (sys::file::path const &path : ids)
+			{
+				stream << path;
+			}
+		}
 
 		static void UpdateHandler(SDL_Event const &event)
 		{
@@ -188,69 +221,24 @@ namespace
 			}
 		}
 
-		void Notify(SDL_Event const &event)
-		{
-			fs::path path = SDL::GetUserEventData(event);
-			// Notify the source of changed file
-			Source *that = Find(path);
-			if (that)
-			{
-				that->UpdateSource();
-			}
-		}
-
-		void QueryError(std::exception const &exception)
-		{
-			SDL::SetError(CaughtException, exception.what());
-			// Return from thread is user chooses on exception
-			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
-		}
-
-		bool SendUpdate() const override
-		{
-			// Queue event to wake the monitor to update its files
-			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
-		}
-
-		void Generate(std::vector<fs::path> &ids) const override
-		{
-			fs::path const path = self / Added;
-			std::ofstream stream(path.string());
-			for (fs::path const &path : ids)
-			{
-				stream << path;
-			}
-		}
-
-		void Destroy(std::vector<fs::path> const &ids) const override
-		{
-			fs::path const path = self / Removed;
-			std::ofstream stream(path.string());
-			for (fs::path const &path : ids)
-			{
-				stream << path;
-			}
-		}
+		unsigned UpdateEvent = SDL::UserEvent(UpdateFiles);
+		ScopedEventHandler updater{ UpdateEvent, UpdateHandler };
 	};
 }
 
-Resources &ManagedFile::Manager()
-{
-	return FileManager::Instance();
-}
+// Slot mechanism
 
-ManagedFile::ManagedFile(std::string const &path)
-{
-	FileManager::Instance().Data(id) = path;
-}
+sys::file::Notify::Notify(std::string_view path, Observer observer)
+: Slot(FileMonitor::Find(path), observer)
+{}
 
-
+// Platform dependent monitoring thread
 
 #if defined(__LINUX__)
 
 #include <sys/inotify.h>
 
-void FileManager::Thread()
+void FileMonitor::Thread()
 {
 	int const fd = inotify_init();
 	if (-1 == fd)
@@ -259,14 +247,15 @@ void FileManager::Thread()
 		return;
 	}
 
-	std::map<fs::path, int> data;
+	std::map<sys::file::path, int> data;
 	char buf[BUFSIZ];
 
 	while (not done) try
 	{
+		// Update our set of watched files
 		UpdateWatchedFiles
 		(
-			[&](fs::path const &path) // on add
+			[&](sys::file::path const &path) // on add
 			{
 				int const wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
 				if (-1 == wd)
@@ -279,7 +268,7 @@ void FileManager::Thread()
 				}
 			}
 			,
-			[&](fs::path const &path) // on remove
+			[&](sys::file::path const &path) // on remove
 			{
 				int const wd = data.at(path);
 				if (-1 == inotify_rm_watch(fd, wd))
@@ -291,7 +280,6 @@ void FileManager::Thread()
 		);
 
 		// Block until there are events to process
-
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
 		{
@@ -312,11 +300,10 @@ void FileManager::Thread()
 		}
 
 		// Process all buffered file events
-
 		union
 		{
-			inotify_event *ev;
-			char *it;
+		 inotify_event *ev;
+		 char *it;
 		};
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{

@@ -114,5 +114,4 @@
 #undef assert
 #define assert(condition) SDL_assert(condition)
 
-
 #endif // file

@@ -4,9 +4,12 @@
 #include "Signal.hpp"
 #include <string>
 
-struct WatchedFile : Slot<std::string>
+namespace sys::file
 {
-	WatchedFile(std::string const &path, Observer);
-};
+	struct Notify : Slot<std::string>
+	{
+		Notify(std::string_view path, Observer);
+	};
+}
 
 #endif // file

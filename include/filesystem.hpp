@@ -52,4 +52,19 @@ namespace sys::file
 
 #endif // file system
 
+namespace sys::file
+{
+	inline bool append(path name, std::string_view text)
+	{
+		std::ofstream stream(name, std::ios::app);
+		return stream and stream << text;
+	}
+
+	inline bool truncate(path name)
+	{
+		std::ofstream stream(name, std::ios::trunc);
+		return stream;
+	}
+}
+
 #endif // file

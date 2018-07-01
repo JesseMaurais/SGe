@@ -70,7 +70,7 @@ namespace
 
 	void PrintCommandLineOptions(std::string const &programName)
 	{
-		io::printf("{1} a scene graph engine for soft geometry\n", programName);
+		io::printf("A scene graph engine for soft geometry\n");
 
 		for (struct option const &opt : Options)
 		{

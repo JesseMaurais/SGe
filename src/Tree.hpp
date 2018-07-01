@@ -24,7 +24,7 @@ struct Tree : virtual Mesh
 	Scalar iris;
 	int root;
 
-	std::vector<int> view;
+	std::vector<int> visible;
 	std::queue<int> visit;
 	
 	bool Traverse(Vector const &eye, Vector const &at);

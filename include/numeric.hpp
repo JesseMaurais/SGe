@@ -67,9 +67,9 @@ namespace
 				constexpr auto signed_max = std::numeric_limits<Signed>::max();
 				constexpr auto target_max = std::numeric_limits<Target>::max();
 
-				if constexpr (target_max < max)
+				if constexpr (target_max < signed_max)
 				{
-					if (target_max < Sign(value)) throw overflow(target_max, value);
+					if (target_max < Signed(value)) throw overflow(target_max, value);
 				}
 			}
 		}

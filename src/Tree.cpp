@@ -31,7 +31,7 @@ bool Tree::Traverse(Vector const &eye, Vector const &at)
 			{
 				visit.push(node.back);
 			}
-			view.push_back(node.face);
+			visible.push_back(node.face);
 		}
 	}
 	else

@@ -39,16 +39,21 @@ namespace fmt
 		return std::string(value, std::strlen(value));
 	}
 
+	template <>
+	inline std::string to_string(char const & value)
+	{
+		return std::string(1, value);
+	}
+
 	// Basic string formatting tools
 
-	inline void replace(std::string &buffer, std::string const &search, std::string const &replace)
+	inline void replace(std::string &buffer, std::string const &s, std::string const &r)
 	{
-		using size_type = std::string::size_type;
-		constexpr auto npos = std::string::npos;
-		auto const length = search.length();
-		for (size_type pos = buffer.find(search); npos != pos; pos = buffer.find(search, pos+length))
+		auto const length = s.length();
+		constexpr auto end = std::string::npos;
+		for (auto at = buffer.find(s); at != end; at = buffer.find(s, at+length))
 		{
-			buffer.replace(pos, length, replace);
+			buffer.replace(at, length, r);
 		}
 	}
 
@@ -63,7 +68,7 @@ namespace fmt
 			, index(0)
 		{}
 
-		template <typename T> format& operator % (T && arg)
+		template <typename T> format& operator % (T&& arg)
 		{
 			replace(buffer, next_tag(), to_string(arg));
 			return *this;
@@ -92,24 +97,24 @@ namespace fmt
 		}
 	};
 
-	inline void split(std::vector<std::string> &tokens, std::string_view string, std::string_view delimiter)
+	inline void split(std::vector<std::string> &tokens, std::string const &string, std::string const &del)
 	{
 		using size_type = std::string::size_type;
-		constexpr auto npos = std::string::npos;
-		auto const length = delimiter.length();
-		for (size_type next = string.find(delimiter), last = 0; npos != last; next = string.find(delimiter, last))
+		constexpr auto end = std::string::npos;
+		auto const length = del.length();
+		for (size_type next = string.find(del), last = 0; last != end; next = string.find(del, last))
 		{
-			tokens.emplace_back(string.substr(last, next - last));
-			last = npos == next ? next : next + length;
+			tokens.emplace_back(string.substr(last, next-last));
+			last = (next == end) ? next : (next + length);
 		}
 	}
 
 	template <typename Container>
 	inline std::string join(Container const &tokens, std::string const &delimiter)
 	{
-		std::ostringstream stream;
+		std::stringstream stream;
 		auto it = std::ostream_iterator<std::string>(stream, delimiter.c_str());
-		std::copy(tokens.begin(), tokens.end(), it);
+		std::copy(std::begin(tokens), std::end(tokens), it);
 		return stream.str();
 	}
 
@@ -149,12 +154,12 @@ namespace fmt
 		return format("\"{1}\"") % string;
 	}
 
-	inline std::string key_value(std::string_view key, std::string_view value)
+	inline std::string key_value(std::string const &key, std::string const &value)
 	{
 		return format("{1}={2}") % key % value;
 	}
 
-	inline std::pair<std::string_view, std::string_view> key_value(std::string_view string)
+	inline std::pair<std::string_view, std::string_view> key_value(std::string const &string)
 	{
 		std::vector<std::string> pair;
 		split(pair, string, "=");
@@ -167,7 +172,7 @@ namespace fmt
 
 	inline bool find(std::string_view string, std::string_view what)
 	{
-		return string.find(what) != std::string::npos;
+		return string.find(what) != std::string_view::npos;
 	}
 }
 

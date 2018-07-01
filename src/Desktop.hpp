@@ -35,11 +35,8 @@ namespace sys
 	/// Get an absolute path to an executable found in the system PATH
 	std::string GetProgramPath(std::string const &program);
 
-	/// Get an absolute path to a folder for temporary files
-	std::string GetTemporaryDir();
-
 	/// Get an absolute path to a temporary file name
-	std::string GetTemporaryPath(std::string const &filename);
+	std::string GetTemporaryDir(std::string_view folder);
 }
 
 namespace xdg

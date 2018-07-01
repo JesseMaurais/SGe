@@ -267,8 +267,7 @@ namespace
 		{
 			auto const message = (jerry_char_ptr_t) exception.what();
 			jerry_value_t value = jerry_create_string(message);
-			jerry_value_set_error_flag(&value);
-			return value;
+			return jerry_create_error_from_value(value, true);
 		}
 	}
 

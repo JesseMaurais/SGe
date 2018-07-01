@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 
-/// Defers a slots acquisition of managed resources to a moment in queue
+/// Defers a slot's acquisition of managed resources to a moment in queue
 template <typename Slot, typename Type> class Manager : public Signal<Slot, Type>
 {
 	using Signal = typename ::Signal<Slot, Type>;

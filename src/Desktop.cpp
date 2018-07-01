@@ -173,44 +173,21 @@ namespace sys
 		return std::string();
 	}
 
-	std::string GetTemporaryDir()
+	std::string GetTemporaryDir(std::string_view folder)
 	{
-		static struct TemporaryDir
+		sys::file::error_code err;
+		sys::file::path temp = sys::file::temp_directory_path(err);
+		if (not err)
 		{
-			sys::file::path dir;
-			sys::file::error_code err;
-			TemporaryDir(std::string const &foldername)
+			path /= folder;
+			sys::file::remove_all(path);
+			if (sys::file::create_directory(path, err))
 			{
-				sys::file::path path = sys::file::temp_directory_path(err);
-				if (not err)
-				{
-					path /= foldername;
-					sys::file::remove_all(path, err);
-					if (sys::file::create_directory(path, err))
-					{
-						dir = path;
-					}
-				}
+				return path;
 			}
-
-		} temp(String(Application));
-
-		if (temp.err)
-		{
-			SDL::SetError(temp.err.message());
 		}
-
-		return temp.dir.string();
-	}
-
-	std::string GetTemporaryPath(std::string const &filename)
-	{
-		static sys::file::path const path = GetTemporaryDir();
-		if (not path.empty())
-		{
-			return (path/filename).string();
-		}
-		return path.string();
+		SDL::SetError(err);
+		return std::string();
 	}
 }
 
