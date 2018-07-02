@@ -78,6 +78,12 @@ protected:
 	virtual void Destroy(std::vector<Type> const &data) const = 0;
 	virtual bool SendUpdate() const = 0;
 
+	/// Find the resource of a slot
+	Type const &Find(Slot id) const
+	{
+		return map.at(id);
+	}
+
 private:
 
 	std::set<Slot> added;

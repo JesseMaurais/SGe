@@ -29,17 +29,22 @@ public:
 		slots.clear();
 	}
 
-	bool Has(Slot id)
+	bool Has(Slot id) const
 	{
 		return slots.find(id) != slots.end();
 	}
 
-	template <typename Filter> void Emit(Filter &&filter)
+	void Emit(Args... args) const
+	{
+		Emit([&](auto pair){ pair.second(args...); });
+	}
+
+	template <typename Filter> void Emit(Filter &&filter) const
 	{
 		std::for_each(slots.begin(), slots.end(), filter);
 	}
 
-	template <typename Filter> void Emit(Slot id, Filter &&filter)
+	template <typename Filter> void Emit(Slot id, Filter &&filter) const
 	{
 		const auto pair = slots.equal_range(id);
 		std::for_each(pair.first, pair.second, filter);
@@ -72,6 +77,22 @@ public:
 private:
 
 	Subject *subject;
+};
+
+template <typename SignalSlot, typename... Args>
+struct Relay : Signal<SignalSlot, Args...>, Slot<Args..>
+{
+	using Slot::Subject;
+	using Slot::Signature;
+	using Slot::Observer;
+
+	Relay(Subject &sub, Observer observer)
+	: Slot(sub, observer)
+	{}
+
+	Relay(Subject &sub)
+	: Relay(sub, [this](Args... args){ Emit(args...); })
+	{}
 };
 
 namespace sys::sig

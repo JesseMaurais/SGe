@@ -6,7 +6,7 @@
 
 namespace sys::file
 {
-	struct Notify : Slot<std::string>
+	struct Notify : Slot<std::string_view>
 	{
 		Notify(std::string_view path, Observer);
 	};

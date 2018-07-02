@@ -10,19 +10,13 @@ namespace
 
 	constexpr char const *Added = "Added";
 	constexpr char const *Removed = "Removed";
-	constexpr char const *Folder = "Watch";
-
-	// File event types
-
-	enum FileEventCode
-	{
-		FileChanged,
-		WatchedFiles,
-	};
+	constexpr char const *Folder = "FileMonitor";
 
 	// Manager to monitor files and send notifications
 
-	class FileMonitor : public Manager<sys::file::path, std::string_view>
+	using Watch = Relay<sys::file::Notify*, std::string_view>;
+
+	class FileMonitor : public Manager<Watch*, sys::file::path>
 	{
 	public:
 
@@ -34,19 +28,14 @@ namespace
 
 	private:
 
-		using Watch = Signal<sys::file::Notify*, std::string_view>
+		// File events that are sent through the main queue
+		enum FileEventCode { UpdateMonitor, UpdateWatcher };
+
+		// Own directory where monitor reads notifications
+		sys::file::path const self = sys::GetTemporaryPath(Folder);
 
 		// Thread control data
 		std::future<void> future;
-		bool done = false;
-
-		// Monitored file data
-		std::vector<sys::file::path> added;
-		std::vector<sys::file::path> removed;
-		std::map<sys::file::path, Watch> watched;
-
-		// Own directory where monitor writes notifications
-		sys::file::path const self = sys::GetTemporaryPath(Folder);
 
 		// The monitoring thread
 		void Thread();
@@ -58,7 +47,6 @@ namespace
 				SDL::LogError(Folder);
 				return;
 			}
-			added.push_back(self);
 			future = std::async([this]()
 			{
 				Thread();
@@ -76,120 +64,11 @@ namespace
 			}
 		}
 
-		// The following methods are called in the monitoring thread
-
-		using Callback = std::function<void(sys::file::path const &path)>;
-
-		void UpdateWatchedFiles(Callback&& onAdd, Callback&& onRemove)
-		{
-			// Add before remove so that we can replace paths to watch
-
-			for (sys::file::path const &path : added)
-			{
-				// Remove any sub directory of added path
-				auto const upper = watched.upper_bound(path);
-				if (watched.end() != upper)
-				{
-					removed.push_back(path);
-				}
-				// Add only if path not a sub directory
-				auto const lower = watched.lower_bound(path);
-				if (watched.end() == lower)
-				{
-					auto pair = watched.insert(path);
-					assert(pair.second);
-					onAdd(*pair.first);
-				}
-			}
-
-			// Remove paths from watched files
-
-			for (sys::file::path const &path : removed)
-			{
-				auto const it = watched.find(path);
-				assert(watched.end() != it);
-				if (watched.end() != it)
-				{
-					watched.erase(it);
-					onRemove(path);
-				}
-			}
-		}
-
-		void NotifyFileChanged(sys::file::path const &path)
-		{
-			if (not (self < path))
-			{
-				// Queue the file event so that it is updated in the main thread
-				if (not SDL::SendUserEvent(UpdateFiles, FileChanged, path.string()))
-				{
-					SDL::LogError(CannotSendEvent);
-				}
-			}
-			else // update self
-			{
-				if (path.filename() == Added)
-				{
-					// Add watched files
-					std::string line;
-					std::ifstream stream(path.string());
-					while (std::getline(stream, line))
-					{
-						if (not (self < line))
-						{
-							added.push_back(line);
-						}
-					}
-				}
-				else
-				if (path.filename() == Removed)
-				{
-					// Remove watched files
-					std::string line;
-					std::ifstream stream(path.string());
-					while (std::getline(stream, line))
-					{
-						if (not (self < line))
-						{
-							removed.push_back(line);
-						}
-						else
-						if (self == line)
-						{
-							done = true;
-						}
-					}
-				}
-				// Clear file contents
-				sys::file::truncate(path);
-			}
-		}
-
-		void QueryError(std::exception const &exception)
-		{
-			SDL::SetError(CaughtException, exception.what());
-			// Return from thread if user chooses on exception
-			done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
-		}
-
 		// The following methods are called in the main thread
-
-		void Notify(SDL_Event const &event)
-		{
-			sys::file::path path = SDL::GetUserEventData(event);
-			// TODO Notify the source of changed file
-		}
-
-		bool SendUpdate() const override
-		{
-			// Queue event to wake the monitor to update its files
-			return SDL::SendUserEvent(UpdateFiles, WatchedFiles);
-		}
-
+		
 		void Generate(std::vector<sys::file::path> &ids) const override
 		{
-			sys::file::path const path = self / Added;
-			std::ofstream stream(path.string());
+			std::ofstream stream(self / Added);
 			for (sys::file::path const &path : ids)
 			{
 				stream << path;
@@ -198,23 +77,33 @@ namespace
 
 		void Destroy(std::vector<sys::file::path> const &ids) const override
 		{
-			sys::file::path const path = self / Removed;
-			std::ofstream stream(path.string());
+			std::ofstream stream(self / Removed);
 			for (sys::file::path const &path : ids)
 			{
 				stream << path;
 			}
 		}
 
+		bool SendUpdate() const override
+		{
+			return SDL::SendUserUpdate(UpdateFiles, UpdateMonitor);
+		}
+
+		void Dispatch(std::string_view path) const
+		{
+			sys::file::path path = SDL::GetUserEventData(event);
+			Find(path).Emit(path);
+		}
+
 		static void UpdateHandler(SDL_Event const &event)
 		{
 			switch (event.user.code)
 			{
-			case FileChanged:
-				Instance().Notify(event);
-				break;
-			case WatchedFiles:
+			case UpdateMonitor:
 				Instance().Update();
+				break;
+			case UpdateWatcher:
+				Instance().Dispatch(event);
 				break;
 			default:
 				assert(not "FileEventCode");
@@ -223,6 +112,59 @@ namespace
 
 		unsigned UpdateEvent = SDL::UserEvent(UpdateFiles);
 		ScopedEventHandler updater{ UpdateEvent, UpdateHandler };
+
+		// The following method is called in the monitoring thread
+
+		using Callback = std::function<void(std::string_view)>;
+
+		bool NotifyChanged(sys::file::path const &path, Callback&& add, Callback&& remove)
+		{
+			bool quit = false;
+			if (not (self < path))
+			{
+				// Queue the file event so that it is updated in the main thread
+				if (not SDL::SendUserEvent(UpdateFiles, UpdateWatcher, path))
+				{
+					SDL::LogError(CannotSendEvent);
+				}
+			}
+			else // update self
+			{
+				if (path.filename() == Added)
+				{
+					std::string line;
+					std::ifstream stream(path);
+					while (std::getline(stream, line))
+					{
+						if (not (self < line))
+						{
+							add(line);
+						}
+					}
+				}
+				else
+				if (path.filename() == Removed)
+				{
+					std::string line;
+					std::ifstream stream(path);
+					while (std::getline(stream, line))
+					{
+						if (not (self < line))
+						{
+							remove(line);
+						}
+						else
+						if (self == line)
+						{
+							quit = true;
+						}
+					}
+				}
+				// Clear file contents
+				sys::file::truncate(path);
+			}
+			return quit;
+		}
 	};
 }
 
@@ -248,37 +190,35 @@ void FileMonitor::Thread()
 	}
 
 	std::map<sys::file::path, int> data;
-	char buf[BUFSIZ];
 
-	while (not done) try
+	auto add = [&](sys::file::path const &path)
 	{
-		// Update our set of watched files
-		UpdateWatchedFiles
-		(
-			[&](sys::file::path const &path) // on add
-			{
-				int const wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
-				if (-1 == wd)
-				{
-					SDL::perror("inotify_add_watch");
-				}
-				else
-				{
-					data[path] = wd;
-				}
-			}
-			,
-			[&](sys::file::path const &path) // on remove
-			{
-				int const wd = data.at(path);
-				if (-1 == inotify_rm_watch(fd, wd))
-				{
-					SDL::perror("inotify_rm_watch");
-				}
-				data.erase(path);
-			}
-		);
+		int const wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY);
+		if (-1 == wd)
+		{
+			SDL::perror("inotify_add_watch");
+		}
+		else
+		{
+			data[path] = wd;
+		}
+	};
+	
+	auto remove = [&](sys::file::path const &path)
+	{
+		int const wd = data.at(path);
+		if (-1 == inotify_rm_watch(fd, wd))
+		{
+			SDL::perror("inotify_rm_watch");
+		}
+		data.erase(path);
+	};
 
+	add(self);
+	bool quit = false;
+	while (not quit) try
+	{
+		char buf[BUFSIZ];
 		// Block until there are events to process
 		ssize_t const sz = read(fd, buf, sizeof(buf));
 		if (-1 == sz)
@@ -307,13 +247,15 @@ void FileMonitor::Thread()
 		};
 		for (it = buf; it < buf+sz; it += sizeof(inotify_event) + ev->len)
 		{
-			std::string const path(ev->name, ev->len);
-			NotifyFileChanged(path);
+			std::string_view path(ev->name, ev->len);
+			quit |= NotifyChanged(path, add, remove);
 		}
 	}
 	catch (std::exception const &exception)
 	{
-		QueryError(exception);
+		SDL::SetError(CaughtException, exception.what());
+		// Return from thread if user chooses on exception
+		done = not SDL::ShowError(SDL_MESSAGEBOX_WARNING);
 	}
 }
 
@@ -321,7 +263,7 @@ void FileMonitor::Thread()
 
 #include <sys/event.h>
 
-void FileManager::Thread()
+void FileMonitor::Thread()
 {
 	int const kq = kqueue();
 	if (-1 == kq)
@@ -337,7 +279,7 @@ void FileManager::Thread()
 	{
 		UpdateWatchedFiles
 		(
-			[&](fs::path const &path) // on add
+			[&](sys::file::path const &path) // on add
 			{
 				int const fd = open(path.c_str(), O_EVTONLY);
 				if (-1 == fd)
@@ -352,7 +294,7 @@ void FileManager::Thread()
 				}
 			}
 			,
-			[&](fs::path const &path) // on remove
+			[&](sys::file::path const &path) // on remove
 			{
 				all.erase(stl::find_if(all, [&](struct kevent &ev))
 				{
@@ -433,9 +375,9 @@ namespace
 	}
 }
 
-void FileManager::Thread()
+void FileMonitor::Thread()
 {
-	std::map<fs::path, HANDLE> data;
+	std::map<sys::file::path, HANDLE> data;
 
 	while (not done) try
 	{
@@ -443,7 +385,7 @@ void FileManager::Thread()
 
 		UpdateWatchedFiles
 		(
-			[&](fs::path const &path) // on add
+			[&](sys::file::path const &path) // on add
 			{
 				constexpr DWORD filter = FILE_NOTIFY_CHANGE_LAST_WRITE;
 				HANDLE const handle = FindFirstChangeNotification(path.c_str(), TRUE, filter);
@@ -457,7 +399,7 @@ void FileManager::Thread()
 				}
 			}
 			,
-			[&](fs::path const &path) // on remove
+			[&](sys::file::path const &path) // on remove
 			{
 				HANDLE const handle = data.at(path);
 				if (FALSE == FindCloseChangeNotification(handle))
@@ -472,7 +414,7 @@ void FileManager::Thread()
 		);
 
 		std::vector<HANDLE> obj(data.size());
-		stl::transform(data, obj, [](auto const &pair) { return pair.second; });
+		algo::transform(data, obj, [](auto const &pair) { return pair.second; });
 
 		// Block until there are events to process
 		DWORD const status = WaitForMultipleObjects(obj.size(), obj.data(), FALSE, INFINITE);
