@@ -63,7 +63,7 @@ namespace sys::file
 	inline bool truncate(path name)
 	{
 		std::ofstream stream(name, std::ios::trunc);
-		return stream;
+		return stream.good();
 	}
 }
 

@@ -168,10 +168,9 @@ namespace sys
 				{
 					return path.string(); // usable
 				}
-				SDL::LogError(path, InvalidProgram);
 			}
 		}
-		SD::SetError(CannotFindProgram);
+		SDL::SetError(CannotFindPath, program);
 		return std::string();
 	}
 
@@ -181,11 +180,11 @@ namespace sys
 		sys::file::path temp = sys::file::temp_directory_path(err);
 		if (not err)
 		{
-			path /= folder;
-			sys::file::remove_all(path);
-			if (sys::file::create_directory(path, err))
+			temp /= folder;
+			sys::file::remove_all(temp);
+			if (sys::file::create_directory(temp, err))
 			{
-				return path;
+				return temp;
 			}
 		}
 		SDL::SetError(err);
@@ -205,7 +204,7 @@ namespace
 		if (HasProcessor) try
 		{
 			// Write stdout to a temporary file
-			std::string path = sys::GetTemporaryPath(args.front());
+			std::string path = sys::GetTemporaryDir(args.front());
 			args.push_back(">" + fmt::quote(path));
 			// Execute and acquire return value
 			std::string const command = fmt::join(args, " ");

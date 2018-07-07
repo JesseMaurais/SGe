@@ -35,10 +35,10 @@ namespace SDL
 {
 	void ProcessEvents();
 	unsigned UserEvent(enum UserEventType type);
-	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char *data = nullptr, std::size_t size = 0);
+	bool SendUserEvent(enum UserEventType type, unsigned code = 0, char const *data = nullptr, std::size_t size = 0);
 	char *GetUserEventData(SDL_Event const &event, std::size_t &size);
 
-	inline bool SendUserEvent(enum UserEventType type, unsigned code = 0, std::string_view string)
+	inline bool SendUserEvent(enum UserEventType type, unsigned code, std::string_view string)
 	{
 		return SendUserEvent(type, code, string.data(), string.size());
 	}

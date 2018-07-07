@@ -4,7 +4,6 @@
 enum Strings
 {
 	 None
-	,Application
 	,CommandPrompt
 	,ColonSeparator
 	,NoError
@@ -26,6 +25,9 @@ enum Strings
 	,InvalidOperation
 	,InvalidDevice
 	,InvalidContext
+	,InvalidProgram
+	,StartProgram
+	,EndProgram
 	,MessageBoxError
 	,MessageBoxWarning
 	,MessageBoxInformation
@@ -41,7 +43,7 @@ enum Strings
 	,CannotSendEvent
 	,CannotStartProcess
 	,CannotFindFormat
-	,CannotFindProgram
+	,CannotFindPath
 	,CannotFindExecutable
 	,CannotShowMessageBox
 	,CannotQueueEvent

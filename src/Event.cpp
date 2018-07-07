@@ -81,7 +81,7 @@ unsigned SDL::UserEvent(enum UserEventType type)
 	return static_cast<unsigned>(type) + base;
 }
 
-bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *data, std::size_t size)
+bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char const *data, std::size_t size)
 {
 	try
 	{

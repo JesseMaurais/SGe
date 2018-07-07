@@ -5,6 +5,7 @@
 #include "SDL.hpp"
 #include "Strings.hpp"
 #include <system_error>
+#include <exception>
 
 namespace SDL
 {
@@ -52,12 +53,25 @@ namespace SDL
 		return SetError(String(format), args...);
 	}
 
+	/// Set error string with given std::exception
+	inline bool SetError(std::exception const except)
+	{
+		std::string const message = except.what();
+		return SetError(message);
+	}
+
+	/// Set error string with given std::error_code
+	inline bool SetError(std::error_code const error_code)
+	{
+		std::string const message = error_code.message();
+		return SetError(message);
+	}
+
 	/// Set error string with given std::errc
 	inline bool SetError(std::errc const errc)
 	{
 		std::error_code const error_code = std::make_error_code(errc);
-		std::string const message = error_code.message();
-		return SetError(message);
+		return SetError(error_code);
 	}
 
 	/// Type-safe and format-safe version of SDL_Log

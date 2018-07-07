@@ -4,6 +4,7 @@
 #include "Desktop.hpp"
 #include "Error.hpp"
 #include "Pipe.hpp"
+#include "filesystem.hpp"
 
 namespace
 {
@@ -15,9 +16,21 @@ namespace
 		static sys::file::path const path = sys::GetProgramPath("fswatch");
 		if (path.empty())
 		{
-			SDL::SetError(CannotFindProgram, program);
+			SDL::SetError(CannotFindPath, program);
 		}
-		return path;
+		return fmt::quote(path);
+	}
+
+	// Create a command for an fswatch process
+
+	sys::file::path GetShellCommand(sys::file::path path)
+	{
+		static sys::file::path const &program = GetProgramPath();
+		if (not program.empty())
+		{
+			return fmt::join(program, path, " ");
+		}
+		return program;
 	}
 
 	// Watch for file changes in another thread
@@ -27,20 +40,29 @@ namespace
 	public:
 
 		FileWatch(sys::file::path path)
+		: command(GetShellCommand(path))
 		{
-			static sys::file::path const program = GetProgramPath();
-			if (not program.empty())
+			if (not command.empty())
 			{
-				sys::file::path const command = fmt::join(program, path, " ");
-				thread = std::thread([command] { Thread(command); });
+				SDL::Log(ProcessStarting, command);
+				thread = std::thread([this] { Thread(command); });
+			}
+		}
+
+		~FileWatch()
+		{
+			if (not command.empty())
+			{
+				SDL::Log(ProcessTerminating, command);
 			}
 		}
 
 	private:
 
+		sys::file::path const command;
 		std::thread thread;
 
- 		static void Thread(sys::file::path command)
+ 		static void Thread(sys::file::path const &command)
 		{
 			// Start a process with the fswatch program
 			sys::io::File process = SDL::Process(command);
@@ -76,17 +98,23 @@ namespace
 			return singleton;
 		}
 
-		FileNotify &Get(sys::file::path path)
+		FileNotify &Notify(std::string_view string)
 		{
-			auto const begin = watchers.lower_bound(path); // not < path
-			auto const end = watchers.upper_bound(path); // > path
-			// Terminate any redundant watcher processes
+			sys::file::path const path = sys::file::canonical(string);
+			// Terminate any redundant processes
+			auto const begin = watchers.upper_bound(path); // not equal
 			if (watchers.end() != begin)
 			{
+				auto const end = std::find_if_not(begin, watchers.end(),
+					[&](sys::file::path const &other)
+					{ 
+						return path < other;
+					}
+				);
 				watchers.erase(begin, end);
 			}
-			// Launch a new process
-			watchers.emplace(path, path);
+			// Start a new process if required
+			watchers.try_emplace(path, path);
 			// Return the signal handler
 			return notifiers[path];
 		}
@@ -102,9 +130,9 @@ namespace
 
 		static void UpdateHandler(SDL_Event const &event)
 		{
+			std::string const path = SDL::GetUserEventData(event);
 			try
 			{
-				std::string const path = SDL::GetUserEventData(event);
 				Instance().notifiers.at(path).Emit(path);
 			}
 			catch (std::exception const &except)
@@ -120,6 +148,6 @@ namespace
 // Slot mechanism
 
 sys::file::Notify::Notify(std::string_view path, Observer observer)
-: Slot(FileMonitor::Instance().Get(path), observer)
+: Slot(FileMonitor::Instance().Notify(path), observer)
 {}
 

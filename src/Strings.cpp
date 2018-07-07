@@ -29,6 +29,8 @@ char const *String(enum Strings id)
 	case InvalidDevice: return "Invalid device";
 	case InvalidContext: return "Invalid context";
 	case InvalidProgram: return "File is not executable";
+	case StartProgram: return "Starting process: {1}";
+	case EndProgram: return "Ending process: {1}";
 	case MessageBoxError: return "Error";
 	case MessageBoxWarning: return "Warning";
 	case MessageBoxInformation: return "Information";
@@ -44,7 +46,7 @@ char const *String(enum Strings id)
 	case CannotSendEvent: return "Cannot queue an event";
 	case CannotStartProcess: return "Cannot start a system process";
 	case CannotFindFormat: return "Cannot find matching format";
-	case CannotFindProgram: return "Cannot find executable program";
+	case CannotFindPath: return "Cannot find a path to {1}";
 	case CannotShowMessageBox: return "Cannot show message box";
 	case CannotQueueEvent: return "Cannot queue event";
 	case CannotCreateContext: return "Cannot create context";
