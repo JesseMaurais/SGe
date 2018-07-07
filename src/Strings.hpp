@@ -41,6 +41,8 @@ enum Strings
 	,CannotSendEvent
 	,CannotStartProcess
 	,CannotFindFormat
+	,CannotFindProgram
+	,CannotFindExecutable
 	,CannotShowMessageBox
 	,CannotQueueEvent
 	,CannotCreateContext

@@ -33,7 +33,7 @@ namespace sys::env
 namespace sys
 {
 	/// Get an absolute path to an executable found in the system PATH
-	std::string GetProgramPath(std::string const &program);
+	std::string GetProgramPath(std::string_view program);
 
 	/// Get an absolute path to a temporary file name
 	std::string GetTemporaryDir(std::string_view folder);

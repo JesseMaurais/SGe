@@ -49,8 +49,8 @@ namespace sys::io
 {
 	struct File : SDL::RWops
 	{
-		std::string get(char delim = '\n');
-		void set(std::string const &string);
+		bool get(std::string &string, char delim = '\n');
+		bool set(std::string const &string);
 	};
 }
 

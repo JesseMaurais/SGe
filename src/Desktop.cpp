@@ -149,10 +149,10 @@ namespace sys
 		return SDL_GetBasePath();
 	}
 
-	std::string GetProgramPath(std::string const &name)
+	std::string GetProgramPath(std::string_view program)
 	{
 		// Unless extension is given, assume it's a binary
-		sys::file::path image = name;
+		sys::file::path image = program;
 		if (image.extension().empty())
 		{
 			image += EXE_EXTENSION;
@@ -168,8 +168,10 @@ namespace sys
 				{
 					return path.string(); // usable
 				}
+				SDL::LogError(path, InvalidProgram);
 			}
 		}
+		SD::SetError(CannotFindProgram);
 		return std::string();
 	}
 

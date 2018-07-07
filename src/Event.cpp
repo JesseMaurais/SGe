@@ -83,12 +83,21 @@ unsigned SDL::UserEvent(enum UserEventType type)
 
 bool SDL::SendUserEvent(enum UserEventType type, unsigned code, char *data, std::size_t size)
 {
-	SDL_Event event;
-	event.user.type = SDL::UserEvent(type);
-	event.user.code = code;
-	event.user.data1 = data;
-	event.user.data2 = data + size;
-	return 0 == SDL_PushEvent(&event);
+	try
+	{
+		auto const buffer = std::strncpy(new char [size], data, size);
+		SDL_Event event;
+		event.user.type = SDL::UserEvent(type);
+		event.user.code = code;
+		event.user.data1 = buffer;
+		event.user.data2 = buffer + size;
+		return 0 == SDL_PushEvent(&event);
+	}
+	catch (std::exception const &except)
+	{
+		SDL::SetError(except);
+		return false;
+	}
 }
 
 char *SDL::GetUserEventData(SDL_Event const &event, std::size_t &size)
@@ -98,19 +107,6 @@ char *SDL::GetUserEventData(SDL_Event const &event, std::size_t &size)
 	assert(begin <= end);
 	size = end - begin;
 	return begin;
-}
-
-bool SDL::SendUserEvent(enum UserEventType type, unsigned code, std::string const &string)
-{
-	// Use portable strdup since its not C
-	char *data = SDL_strdup(string.c_str());
-	if (not data)
-	{
-		// Not all systems will set the error number
-		SDL::SetErrno() or SDL::SetError(OutOfMemory);
-		return false; // not sent
-	}
-	return SDL::SendUserEvent(type, code, data, string.size());
 }
 
 std::string SDL::GetUserEventData(SDL_Event const &event)

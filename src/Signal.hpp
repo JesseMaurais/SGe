@@ -79,22 +79,6 @@ private:
 	Subject *subject;
 };
 
-template <typename SignalSlot, typename... Args>
-struct Relay : Signal<SignalSlot, Args...>, Slot<Args..>
-{
-	using Slot::Subject;
-	using Slot::Signature;
-	using Slot::Observer;
-
-	Relay(Subject &sub, Observer observer)
-	: Slot(sub, observer)
-	{}
-
-	Relay(Subject &sub)
-	: Relay(sub, [this](Args... args){ Emit(args...); })
-	{}
-};
-
 namespace sys::sig
 {
 	using Slot = Slot<int>;

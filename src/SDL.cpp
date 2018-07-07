@@ -27,7 +27,7 @@ bool SDL::LogError(char const *origin, const char *error)
 
 bool SDL::LogError(char const *origin)
 {
-	auto error = SDL_GetError();
+	auto const error = SDL_GetError();
 	if (error)
 	{
 		return SDL::LogError(origin, error);
