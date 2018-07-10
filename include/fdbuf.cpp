@@ -1,57 +1,80 @@
 #include "fdbuf.hpp"
-#include "os.hpp"
+#include <algorithm>
+#include <system_error>
+#include <cerrno>
 
-#ifdef _POSIX_VERSION
+#if __has_include("unistd.h")
 #include <unistd.h>
 #else
-#ifdef _UCRT
+#if __has_include("io.h")
 #include <io.h>
-constexpr auto write = _write
-constexpr auto read _read
-#endif // UCRT
-#endif // POSIX
+constexpr auto write = _write;
+constexpr auto read _read;
+using ssize_t = int;
+#else
+#error Cannot find system header
+#endif
+#endif
 
-namespace io
+namespace sys::io
 {
-	fdbuf::fdbuf(int fdesc) : fd(fdesc)
+	template <class Char, template <class> class Traits>
+	basic_fdbuf<Char, Traits>::basic_fdbuf(int fdesc) : fd(fdesc)
 	{}
 
-	fdbuf::int_type fdbuf::overflow(int_type c)
+	template <class Char, template <class> class Traits>
+	typename basic_fdbuf<Char, Traits>::int_type basic_fdbuf<Char, Traits>::overflow(int_type c)
 	{
-		if (not traits_type::eq_int_type(c, traits_type::eof()))
+		bool const not_eof = traits_type::not_eof(c);
+		if (not_eof)
 		{
-			*pptr() = traits_type::to_char_type(c);
-			pbump(1);
+			*base::pptr() = traits_type::to_char_type(c);
+			base::pbump(1);
 		}
-		return sync() == -1 ? traits_type::eof() : traits_type::not_eof(c);
+		return sync() ? not_eof : traits_type::eof();
 	}
 
-	fdbuf::int_type fdbuf::underflow()
+	template <class Char, template <class> class Traits>
+	typename basic_fdbuf<Char, Traits>::int_type basic_fdbuf<Char, Traits>::underflow()
 	{
-		if (gptr() == egptr())
+		if (base::gptr() == base::egptr())
 		{
-			std::ptrdiff_t const off = gptr() - eback();
-			std::copy(egptr() - off, egptr(), eback());
-			ssize_t const sz = read(fd, eback() + off, egptr() - gptr());
-			setg(eback(), eback() + off, eback() + off + std::max(0, sz));
-		}
-		return gptr() == egptr() ? traits_type::eof() : traits_type::to_int_type(*gptr());
-	}
-
-	fdbuf::int_type fdbuf::sync()
-	{
-		if (pbase() != pptr())
-		{
-			std::ptrdiff_t const off = pptr() - pbase();
-			ssize_t const sz = write(fd, outbuf, off);
-			if (0 < sz)
+			std::ptrdiff_t const off = base::gptr() - base::eback();
+			std::copy(base::egptr() - off, base::egptr(), base::eback());
+			std::ptrdiff_t const diff = base::egptr() - base::gptr();
+			ssize_t const sz = ::read(fd, base::eback() + off, diff * sizeof (char_type));
+			if (-1 == sz)
 			{
-				std::copy(pbase() + sz, pptr(), pbase());
-				setp(pbase(), epptr());
-				pbump(off - sz);
+				throw std::system_error(std::errno, std::generic_category());
+			}
+			base::setg(base::eback(), base::eback() + off, base::eback() + off + sz);
+		}
+		return base::gptr() == base::egptr() ? traits_type::eof() : traits_type::to_int_type(*base::gptr());
+	}
+
+	template <class Char, template <class> class Traits>
+	int basic_fdbuf<Char, Traits>::sync()
+	{
+		if (base::pbase() != base::pptr())
+		{
+			std::ptrdiff_t const off = base::pptr() - base::pbase();
+			ssize_t const sz = ::write(fd, base::pbase(), off * sizeof (char_type));
+			if (-1 == sz)
+			{
+				throw std::system_error(std::errno, std::generic_category());
+			}
+			else if (0 < sz)
+			{
+				std::copy(base::pbase() + sz, base::pptr(), base::pbase());
+				base::setp(base::pbase(), base::epptr());
+				base::pbump(off - sz);
 			}
 		}
-		return pptr() != epptr() ? 0 : -1;
+		return base::pptr() != base::epptr() ? 0 : -1;
 	}
+
+	// Instantiate the templates here
+	template class basic_fdbuf<char>;
+	template class basic_fdbuf<wchar_t>;
 }
 

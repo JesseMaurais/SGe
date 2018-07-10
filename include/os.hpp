@@ -24,12 +24,19 @@ constexpr int XOPEN_VERSION = _XOPEN_VERSION;
 constexpr int XOPEN_VERSION = 0;
 #endif
 
+// Windows Runtime Components
+#if defined(_WINRT_DLL)
+constexpr bool WINRT = true;
+#else
+constexpr bool WINRT = false;
+#endif
+
 //
 // Operating Systems
 //
 
 // Microsoft Windows
-#if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) || defined(__CYGWIN__)
 # undef __WIN32__
 # define __WIN32__ 1
 constexpr bool WIN32 = true;
@@ -37,13 +44,40 @@ constexpr bool WIN32 = true;
 constexpr bool WIN32 = false;
 #endif
 
-// GNU/Linux
+// Microsoft DOS
+#if defined(MSDOS) || defined(_MSDOS) || defined(__MSDOS__) || defined(__DOS__)
+# undef __DOS__
+# define __DOS__ 1
+constexpr bool DOS = true;
+#else
+constexpr bool DOS = false;
+#endif
+
+// GNU
+#if defined(__GNU__) || defined(__gnu_hurd__) || defined(__gnu_linux__)
+# undef __GNU__
+# define __GNU__
+constexpr bool GNU = true;
+#else
+constexpr bool GNU = false;
+#endif
+
+// Linux
 #if defined(linux) || defined(__linux) || defined(__linux__)
 # undef __LINUX__
 # define __LINUX__ 1
 constexpr bool LINUX = true;
 #else
 constexpr bool LINUX = false;
+#endif
+
+// Google Android
+#if defined(__ANDROID__)
+# undef __ANDROID__
+# define __ANDROID__
+constexpr bool ANDROID = true;
+#else
+constexpr bool ANDROID = false;
 #endif
 
 // Apple Mac OS
@@ -80,6 +114,42 @@ constexpr bool NETBSD = false;
 constexpr bool OPENBSD = true;
 #else
 constexpr bool OPENBSD = false;
+#endif
+
+// DragonFly
+#if defined(__DragonFly__)
+# undef __DRAGONFLY__
+# define __DRAGONFLY__ 1
+constexpr bool DRAGONFLY = true;
+#else
+constexpr bool DRAGONFLY = false;
+#endif
+
+// OpenVMS
+#if defined(VMS) || defined(__VMS)
+# undef __VMS__
+# define __VMS__
+constexpr bool VMS = true;
+#else
+constexpr bool VMS = false;
+#endif
+
+// SCO OpenServer
+#if defined(M_I386) || defined(M_XENIX) || defined(_SCO_DS)
+# undef __OPENSERVER__
+# define __OPENSERVER__ 1
+constexpr bool OPENSERVER = true;
+#else
+constexpr bool OPENSERVER = false;
+#endif
+
+// UnixWare
+#if defined(sco) || defined(_UNIXWARE7)
+# undef __UNIXWARE__
+# define __UNIXWARE__
+constexpr bool UNIXWARE = true;
+#else
+constexpr bool UNIXWARE = false;
 #endif
 
 // System V
@@ -140,7 +210,7 @@ constexpr bool AIX = false;
 # define __BSD__ 1
 constexpr bool BSD = true;
 #else
-constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD;
+constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD or DRAGONFLY;
 #endif
 
 // Legacy UNIX
@@ -149,7 +219,7 @@ constexpr bool BSD = MACOS or FREEBSD or NETBSD or OPENBSD;
 # define __UNIX__ 1
 constexpr bool UNIX = true;
 #else
-constexpr bool UNIX = SYSV or BSD or AIX or HPUX or IRIX; // not linux
+constexpr bool UNIX = SYSV or BSD or AIX or HPUX or IRIX;
 #endif
 
 constexpr bool XSI = XOPEN_VERSION > 0;
