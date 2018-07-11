@@ -15,7 +15,11 @@ namespace io
 
 	public:
 
-		void execute(string_view command, ios_base::openmode mode = ios_base::in);
+		basic_iipcstream();
+
+	protected:
+
+		pid_t pid;
 	};
 
 	template <class Char, template <class> Traits = std::char_traits>
@@ -26,7 +30,11 @@ namespace io
 
 	public:
 
-		void execute(view command, ios_base::openmode mode = ios_base::in);
+		basic_oipcstream();
+
+	protected:
+
+		pid_t pid;
 	};
 
 	template <class Char, template <class> Traits = std::char_traits>
@@ -37,7 +45,11 @@ namespace io
 
 	public:
 
-		void execute(string_view command, ios_base::openmode mode = ios_base::in);
+		basic_ipcstream();
+
+	protected:
+
+		pid_t pid;
 	};
 
 	// Hide implementation details

@@ -7,18 +7,18 @@
 namespace io
 {
 	template <class Char, template <class> class Traits = std::char_traits>
-	class basic_ifdstream : public std::basic_istream<Char, Traits<Char>>, sys::io::fdbuf<Char, Traits>
+	class basic_ifdstream : public std::basic_istream<Char, Traits<Char>>, sys::io::basic_fdbuf<Char, Traits>
 	{
 	public:
-		basic_ifdstream(int fd) : fdbuf(fd), basic_istream(this)
+		basic_ifdstream(int fd) : basic_fdbuf(fd), basic_istream(this)
 		{}
 	};
 
 	template <class Char, template <class> class Traits = std::char_traits>
-	class basic_ofdstream : public std::basic_ostream<Char, Traits<Char>>, sys::io::fdbuf<Char, Traits>
+	class basic_ofdstream : public std::basic_ostream<Char, Traits<Char>>, sys::io::basic_fdbuf<Char, Traits>
 	{
 	public:
-		basic_ofdstream(int fd) : fdbuf(fd), basic_ostream(this)
+		basic_ofdstream(int fd) : basic_fdbuf(fd), basic_ostream(this)
 		{}
 	};
 
@@ -27,6 +27,8 @@ namespace io
 	{
 	public:
 		basic_fdstream(int in, int out) : basic_ifdstream(in), basic_ofdstream(out)
+		{}
+		basic_fdstream(int fd[2]) : basic_fdstream(fd[0], fd[1])
 		{}
 	};
 

@@ -1,20 +1,8 @@
 #include "fdbuf.hpp"
+#include "unisys.hpp"
 #include <algorithm>
 #include <system_error>
 #include <cerrno>
-
-#if __has_include("unistd.h")
-#include <unistd.h>
-#else
-#if __has_include("io.h")
-#include <io.h>
-constexpr auto write = _write;
-constexpr auto read _read;
-using ssize_t = int;
-#else
-#error Cannot find system header
-#endif
-#endif
 
 namespace sys::io
 {

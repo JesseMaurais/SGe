@@ -1,24 +1,55 @@
 #include "ipcstream.hpp"
+#include "unisys.hpp"
 
-#if __has_include("unistd.h")
-#include <unistd.h>
-#else
-#if __has_include("io.h")
-#include <io.h>
-constexpr auto write = _write;
-constexpr auto read _read;
-using ssize_t = int;
-#else
-#error Cannot find system header
-#endif
-#endif
+namespace
+{
+	pid_t spork(int fd[2])
+	{
+		if (-1 == pipe(fd))
+		{
+			return -1;
+		}
+		pid_t pid = fork();
+		if (-1 == pid)
+		{
+			close(fd[0]);
+			close(fd[1]);
+		}
+		return pid;
+	}
+}
 
 namespace io
 {
 	template <class Char, template <class> class Traits>
-	void basic_iipcstream<Char, Traits>::execute(std::basic_string_view<Char> command, ios_base::openmode mode)
+	basic_iipcstream<Char, Traits>::basic_iipcstream()
 	{
-
+		int fd[2];
+		pid = spork(fd);
+		if (-1 == pid)
+		{
+			// error
+		}
+		else
+		if (0 == pid)
+		{
+			if (-1 == dup2(fd[1], STDOUT_FILENO))
+			{
+				// error
+			}
+			if (-1 == close(fd[0]))
+			{
+				// error
+			}
+		}
+		else
+		{
+			if (-1 == close(fd[1]))
+			{
+				// error
+			}
+			base::setfd(fd[0]);
+		}
 	}
 
 	// Instantiate the templates here
