@@ -2,6 +2,7 @@
 #define fdbuf_hpp
 
 #include <streambuf>
+#include <sstream>
 
 namespace sys::io
 {
@@ -12,6 +13,7 @@ namespace sys::io
 
 	public:
 
+		using size_type = typename base::streamsize;
 		using char_type = typename base::char_type;
 		using traits_type = typename base::traits_type;
 		using int_type = typename base::int_type;
@@ -27,8 +29,18 @@ namespace sys::io
 
 	protected:
 
+		// Put area
+
+		size_type xsputn(char_type const *s, size_type n) override;
 		int_type overflow(int_type c) override;
+
+		// Get area
+
+		size_type xsgetn(char_type const *s, size_type n) override;
 		int_type underflow() override;
+
+		// Position
+
 		int sync() override;
 	};
 
