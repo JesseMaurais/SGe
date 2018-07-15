@@ -20,15 +20,15 @@ namespace sys::io
 	}
 
 	//
-	// Put area
+	// Put
 	//
 
 	template <class Char, template <class> class Traits>
 	typename basic_fdbuf<Char, Traits>::size_type
 	xsputn(char_type const *s, size_type n)
 	{
-		ssize_t const sz = ::write(fd, s, n*sizeof (char_type));
-		if (sz < 0) std::perror(__FUNCTION__);
+		ssize_t const sz = ::write(fd, s, n*sizeof char_type);
+		if (-1 == sz) std::perror(__FUNCTION__);
 		return sz;
 	}
 
@@ -36,25 +36,28 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::int_type
 	basic_fdbuf<Char, Traits>::overflow(int_type c)
 	{
-		bool const not_eof = traits_type::not_eof(c);
-		if (not_eof)
+		int nsync = -1;
+		if (not traits::eq_int_type(traits::eof(), c))
 		{
-			*base::pptr() = traits_type::to_char_type(c);
+			bool const space = base::pptr() != base::epptr();
+			if (not space) nsync = sync();
+			*base::pptr() = traits::to_char_type(c);
 			base::pbump(1);
+			if (space) nsync = sync();
 		}
-		return sync() ? not_eof : traits_type::eof();
+		return nsync ? traits::eof() : traits::not_eof(c);
 	}
 
 	//
-	// Get area
+	// Get
 	//
 
 	template <class Char, template <class> class Traits>
 	typename basic_fdbuf<Char, Traits>::size_type
-	basic_fdbuf<Char, Traits>::xsgetn(char_type const *s, size_type n)
+	basic_fdbuf<Char, Traits>::xsgetn(char_type *s, size_type n)
 	{
-		ssize_t sz = ::read(fd, s, n*sizeof (char_type));
-		if (sz < 0) std::perror(__FUNCTION__);
+		ssize_t sz = ::read(fd, s, n*sizeof char_type);
+		if (-1 == sz) std::perror(__FUNCTION__);
 		return sz;
 	}
 
@@ -62,23 +65,25 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::int_type
 	basic_fdbuf<Char, Traits>::underflow()
 	{
+		int_type res = traits::eof();
 		if (base::gptr() == base::egptr())
 		{
-			std::ptrdiff_t const off = base::gptr() - base::eback();
-			std::copy(base::egptr() - off, base::egptr(), base::eback());
+			std::ptrdiff_t const sz = base::gptr() - base::eback();
+			std::copy(base::egptr() - sz, base::egptr(), base::eback());
 			std::ptrdiff_t const diff = base::egptr() - base::gptr();
 			size_type const sz = sgetn(base::eback() + off, diff);
-			if (-1 == sz)
+			if (0 < sz)
 			{
-				throw std::system_error(std::errno, std::generic_category());
+				base::setg(base::eback(), base::eback() + off, base::eback() + off + sz);
 			}
-			base::setg(base::eback(), base::eback() + off, base::eback() + off + sz);
+			char_type const c = *base::gptr();
+			res = traits::to_int_type(c);
 		}
-		return base::gptr() == base::egptr() ? traits_type::eof() : traits_type::to_int_type(*base::gptr());
+		return res
 	}
 
 	//
-	// Position
+	// Pos
 	//
 
 	template <class Char, template <class> class Traits>
@@ -87,22 +92,20 @@ namespace sys::io
 		if (base::pbase() != base::pptr())
 		{
 			std::ptrdiff_t const off = base::pptr() - base::pbase();
-			size_type const sz = sgetn(base::pbase(), off * sizeof (char_type));
-			if (-1 == sz)
-			{
-				throw std::system_error(std::errno, std::generic_category());
-			}
-			else if (0 < sz)
+			size_type const sz = sputn(base::pbase(), off);
+			if (0 < sz)
 			{
 				std::copy(base::pbase() + sz, base::pptr(), base::pbase());
 				base::setp(base::pbase(), base::epptr());
 				base::pbump(off - sz);
 			}
+			return sz < 0 ? -1 : 0;
 		}
 		return base::pptr() != base::epptr() ? 0 : -1;
 	}
 
-	// Instantiate the templates here
+	// Impl
+	
 	template class basic_fdbuf<char>;
 	template class basic_fdbuf<wchar_t>;
 }

@@ -9,7 +9,8 @@ namespace sys::io
 	template <class Char, template <class> class Traits = std::char_traits>
 	class basic_fdbuf : public std::basic_streambuf<Char, Traits<Char>>
 	{
-		using base = typename std::basic_streambuf<Char, Traits<Char>>;
+		using traits = typename Traits<Char>:
+		using base = typename std::basic_streambuf<Char, traits>;
 
 	public:
 

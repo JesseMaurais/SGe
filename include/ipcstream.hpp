@@ -7,7 +7,7 @@
 
 namespace io
 {
-	template <class Char, template <class> Traits = std::char_traits>
+	template <class Char, template <class> class Traits = std::char_traits>
 	class basic_iipcstream : public basic_ifdstream<Char, Traits>
 	{
 		using base = typename basic_ifdstream<Char, Traits>;
