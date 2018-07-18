@@ -19,13 +19,24 @@ namespace sys::io
 		this->fd = fd;
 	}
 
+	template <class Char, template <class> class Traits>
+	typename basic_fdbuf<Char, Traits>::base*
+	basic_fdbuf<Char, Traits>::setbuf(char_type *s, size_type n)
+	{
+		auto m = n / 2;
+		auto t = s + m;
+		setg(s, t, t);
+		setp(t, s + n);
+		return this;
+	}
+
 	//
 	// Put
 	//
 
 	template <class Char, template <class> class Traits>
 	typename basic_fdbuf<Char, Traits>::size_type
-	xsputn(char_type const *s, size_type n)
+	basic_fdbuf<Char, Traits>::xsputn(char_type const *s, size_type n)
 	{
 		ssize_t const sz = ::write(fd, s, n*sizeof char_type);
 		if (-1 == sz) std::perror(__FUNCTION__);
@@ -68,10 +79,8 @@ namespace sys::io
 		int_type res = traits::eof();
 		if (base::gptr() == base::egptr())
 		{
-			std::ptrdiff_t const sz = base::gptr() - base::eback();
-			std::copy(base::egptr() - sz, base::egptr(), base::eback());
-			std::ptrdiff_t const diff = base::egptr() - base::gptr();
-			size_type const sz = sgetn(base::eback() + off, diff);
+			std::ptrdiff_t const off = efore() - base::eback();
+			size_type const sz = sgetn(base::eback(), off);
 			if (0 < sz)
 			{
 				base::setg(base::eback(), base::eback() + off, base::eback() + off + sz);
