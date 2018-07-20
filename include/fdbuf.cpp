@@ -1,9 +1,9 @@
 #include "fdbuf.hpp"
 #include "unisys.hpp"
-#include <algorithm>
 #include <system_error>
 #include <cstdio>
 #include <cerrno>
+#include <cstring>
 
 namespace sys::io
 {
@@ -53,7 +53,6 @@ namespace sys::io
 			bool const space = base::pptr() != base::epptr();
 			if (not space) nsync = sync();
 			*base::pptr() = traits::to_char_type(c);
-			base::pbump(1);
 			if (space) nsync = sync();
 		}
 		return nsync ? traits::eof() : traits::not_eof(c);
@@ -79,14 +78,17 @@ namespace sys::io
 		int_type res = traits::eof();
 		if (base::gptr() == base::egptr())
 		{
-			std::ptrdiff_t const off = efore() - base::eback();
-			size_type const sz = sgetn(base::eback(), off);
+			std::ptrdiff_t const max = base::egptr() - base::eback();
+			size_type const sz = sgetn(base::eback(), max);
 			if (0 < sz)
 			{
-				base::setg(base::eback(), base::eback() + off, base::eback() + off + sz);
+				std::ptrdiff_t diff =  max - sz;
+				std::memmove(base::eback() + sz, base::eback(), diff*sizeof char_type);
+				base::setg(base::eback(), base::eback(), base::egptr());
+				base::gbump(sz);
+				char_type const c = *base::gptr();
+				res = traits::to_int_type(c);
 			}
-			char_type const c = *base::gptr();
-			res = traits::to_int_type(c);
 		}
 		return res
 	}
@@ -104,9 +106,10 @@ namespace sys::io
 			size_type const sz = sputn(base::pbase(), off);
 			if (0 < sz)
 			{
-				std::copy(base::pbase() + sz, base::pptr(), base::pbase());
+				std::ptrdiff_t const diff = off - sz;
+				std::memmove(base::pbase(), base::pbase() + sz, diff*sizeof char_type);
 				base::setp(base::pbase(), base::epptr());
-				base::pbump(off - sz);
+				base::pbump(diff);
 			}
 			return sz < 0 ? -1 : 0;
 		}
