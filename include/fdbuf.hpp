@@ -23,7 +23,7 @@ namespace sys::io
 		basic_fdbuf(int fd);
 		void setfd(int fd);
 		base *setbuf(char_type* s, size_type n) override;
-		char_type *efore() const { return pbase(); }
+		base *setbuf(char_type* s, size_type n, size_type m);
 
 	private:
 

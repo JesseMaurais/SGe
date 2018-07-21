@@ -23,10 +23,17 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::base*
 	basic_fdbuf<Char, Traits>::setbuf(char_type *s, size_type n)
 	{
-		auto m = n / 2;
-		auto t = s + m;
-		setg(s, t, t);
-		setp(t, s + n);
+		size_type const m = n / 2;
+		return setbuf(s, n - m, m);
+	}
+
+	template <class Char, template <class> class Traits>
+	typename basic_fdbuf<Char, Traits>::base*
+	basic_fdbuf<Char, Traits>::setbuf(char_type *s, size_type n, size_type m)
+	{
+		auto t = s + n;
+		setg(s, t, n);
+		setp(t, m);
 		return this;
 	}
 
@@ -47,15 +54,23 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::int_type
 	basic_fdbuf<Char, Traits>::overflow(int_type c)
 	{
-		int nsync = -1;
-		if (not traits::eq_int_type(traits::eof(), c))
+		constexpr int_type eof = traits::eof();
+		if (base::pptr() == base::epptr())
 		{
-			bool const space = base::pptr() != base::epptr();
-			if (not space) nsync = sync();
-			*base::pptr() = traits::to_char_type(c);
-			if (space) nsync = sync();
+			if (-1 == sync())
+			{
+				c = eof;
+			}
 		}
-		return nsync ? traits::eof() : traits::not_eof(c);
+		if (not traits::eq_int_type(eof, c))
+		{
+			*base::pptr() = traits::to_char_type(c);
+		}
+		else
+		{
+			base::setp(nullptr, nullptr);
+		}
+		return traits::not_eof(c);
 	}
 
 	//
@@ -66,7 +81,7 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::size_type
 	basic_fdbuf<Char, Traits>::xsgetn(char_type *s, size_type n)
 	{
-		ssize_t sz = ::read(fd, s, n*sizeof char_type);
+		::ssize_t sz = ::read(fd, s, n*sizeof char_type);
 		if (-1 == sz) std::perror(__FUNCTION__);
 		return sz;
 	}
@@ -83,9 +98,8 @@ namespace sys::io
 			if (0 < sz)
 			{
 				std::ptrdiff_t diff =  max - sz;
-				std::memmove(base::eback() + sz, base::eback(), diff*sizeof char_type);
-				base::setg(base::eback(), base::eback(), base::egptr());
-				base::gbump(sz);
+				std::memmove(base::eback() + diff, base::eback(), diff*sizeof char_type);
+				gbump(-max);
 				char_type const c = *base::gptr();
 				res = traits::to_int_type(c);
 			}
@@ -108,8 +122,7 @@ namespace sys::io
 			{
 				std::ptrdiff_t const diff = off - sz;
 				std::memmove(base::pbase(), base::pbase() + sz, diff*sizeof char_type);
-				base::setp(base::pbase(), base::epptr());
-				base::pbump(diff);
+				base::pbump(-sz);
 			}
 			return sz < 0 ? -1 : 0;
 		}
