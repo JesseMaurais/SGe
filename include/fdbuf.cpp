@@ -31,7 +31,7 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::base*
 	basic_fdbuf<Char, Traits>::setbuf(char_type *s, size_type n, size_type m)
 	{
-		auto t = s + n;
+		chat_type const *t = s + n;
 		setg(s, t, n);
 		setp(t, m);
 		return this;
@@ -45,7 +45,7 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::size_type
 	basic_fdbuf<Char, Traits>::xsputn(char_type const *s, size_type n)
 	{
-		ssize_t const sz = ::write(fd, s, n*sizeof char_type);
+		::ssize_t const sz = ::write(fd, s, n*sizeof char_type);
 		if (-1 == sz) std::perror(__FUNCTION__);
 		return sz;
 	}
@@ -57,18 +57,15 @@ namespace sys::io
 		constexpr int_type eof = traits::eof();
 		if (base::pptr() == base::epptr())
 		{
-			if (-1 == sync())
-			{
-				c = eof;
-			}
+			if (-1 == sync()) c = eof;
 		}
-		if (not traits::eq_int_type(eof, c))
+		if (traits::eq_int_type(eof, c))
 		{
-			*base::pptr() = traits::to_char_type(c);
+			base::setp(nullptr, nullptr);
 		}
 		else
 		{
-			base::setp(nullptr, nullptr);
+			*base::pptr() = traits::to_char_type(c);
 		}
 		return traits::not_eof(c);
 	}
@@ -90,7 +87,6 @@ namespace sys::io
 	typename basic_fdbuf<Char, Traits>::int_type
 	basic_fdbuf<Char, Traits>::underflow()
 	{
-		int_type res = traits::eof();
 		if (base::gptr() == base::egptr())
 		{
 			std::ptrdiff_t const max = base::egptr() - base::eback();
@@ -98,13 +94,16 @@ namespace sys::io
 			if (0 < sz)
 			{
 				std::ptrdiff_t diff =  max - sz;
-				std::memmove(base::eback() + diff, base::eback(), diff*sizeof char_type);
-				gbump(-max);
-				char_type const c = *base::gptr();
-				res = traits::to_int_type(c);
+				std::memmove(base::eback() + diff, base::eback(), sz*sizeof char_type);
+				base::gbump(-sz);
+			}
+			else
+			{
+				setg(nullptr, nullptr, nullptr);
+				return traits::eof();
 			}
 		}
-		return res
+		return traits::to_int_type(*base::gptr());
 	}
 
 	//

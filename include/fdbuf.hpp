@@ -5,7 +5,11 @@
 
 namespace sys::io
 {
-	template <class Char, template <class> class Traits = std::char_traits>
+	template
+	<
+	 class Char,
+	 template <class> class Traits = std::char_traits
+	>
 	class basic_fdbuf : public std::basic_streambuf<Char, Traits<Char>>
 	{
 		using traits = typename Traits<Char>:
@@ -31,26 +35,23 @@ namespace sys::io
 
 	protected:
 
-		// Put area
-
+		// put area
 		size_type xsputn(char_type const *s, size_type n) override;
 		int_type overflow(int_type c) override;
 
-		// Get area
-
+		// get area
 		size_type xsgetn(char_type const *s, size_type n) override;
 		int_type underflow() override;
 
-		// Position
-
+		// position
 		int sync() override;
 	};
 
-	// Hide implementation details
+	// implementations
 	extern template class basic_fdbuf<char>;
 	extern template class basic_fdbuf<wchar_t>;
 
-	// Type aliases for ease of use
+	// aliases
 	using fdbuf = basic_fdbuf<char>;
 	using wfdbuf = basic_fdbuf<wchar_t>;
 }

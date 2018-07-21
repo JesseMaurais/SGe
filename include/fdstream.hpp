@@ -3,15 +3,24 @@
 
 #include <iostream>
 #include "fdbuf.hpp"
+#include "membuf.hpp"
 
 namespace sys::io
 {
-	template <class Char, template <class> class Traits = std::char_traits>
-	class basic_ifdstream : public std::basic_istream<Char, Traits<Char>>, basic_fdbuf<Char, Traits>
+	template
+	<
+	 class Char,
+	 template <class> class Traits = std::char_traits,
+	 template <class> class Alloc = std::allocator
+	>
+	class basic_ifdstream
+       	: public std::basic_istream<Char, Traits<Char>>
+	, public basic_membuf<Char, Traits, Alloc>
+	, public basic_fdbuf<Char, Traits>
 	{
 	public:
 		basic_ifdstream(int fd) : basic_fdbuf(fd), basic_istream(this)
-		{}
+		{ }
 	};
 
 	template <class Char, template <class> class Traits = std::char_traits>
