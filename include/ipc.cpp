@@ -1,4 +1,4 @@
-#include "ipcstream.hpp"
+#include "ipc.hpp"
 #include "unisys.hpp"
 
 namespace
@@ -51,16 +51,14 @@ namespace io
 			base::setfd(fd[0]);
 		}
 	}
-
-	// Instantiate the templates here
 	
-	template class basic_iipcstream<char>;
-	template class basic_iipcstream<wchar_t>;
+	template class basic_iipstream<char>;
+	template class basic_iipstream<wchar_t>;
 
-	template class basic_oipcstream<char>;
-	template class basic_oipcstream<wchar_t>;
+	template class basic_oipstream<char>;
+	template class basic_oipstream<wchar_t>;
 
-	template class basic_ipcstream<char>;
-	template class basic_ipcstream<wchar_t>;
+	template class basic_ipstream<char>;
+	template class basic_ipstream<wchar_t>;
 }
 

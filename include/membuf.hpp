@@ -4,47 +4,71 @@
 #include <streambuf>
 #include <string>
 
-template
-<
- class Char,
- template <class> class Traits = std::char_traits,
- template <class> class Alloc = std::allocator
->
-class basic_membuf : public std::basic_streambuf<Char, Traits<Char>>
+namespace sys::io
 {
-	using traits = typename Traits<Char>;
-	using alloc = typename Alloc<Char>;
-	using base = typename std::basic_streambuf<Char, traits>;
-	using string = typename std::basic_string<Char, traits, alloc>;
-	using string_view = typename std::basic_string_view<Char, traits>;
-
-public:
-
-	basic_membuf(size_type n)
+	template
+	<
+	 class Char,
+	 template <class> class Traits = std::char_traits,
+	 template <class> class Alloc = std::allocator
+	>
+	class basic_membuf : public virtual std::basic_streambuf<Char, Traits<Char>>
 	{
-		setbufsiz(n);
-	}
+		using traits = typename Traits<Char>;
+		using alloc = typename Alloc<Char>;
+		using base = typename std::basic_streambuf<Char, traits>;
+		using string = typename std::basic_string<Char, traits, alloc>;
+		using string_view = typename std::basic_string_view<Char, traits>;
 
-	virtual base *setbufsz(size_type n)
-	{
-		buf.resize(n);
-		return setbuf(buf.data(), buf.size());
-	}
+	public:
 
-	string_view pbuf() const
-	{
-		return string_view(pptr(), epptr() - pptr());
-	}
+		basic_membuf(size_type n)
+		{
+			setbufsiz(n);
+		}
 
-	string_view gbuf() const
-	{
-		return strint_view(gptr(), egptr() - gptr());
-	}
+		basic_streambuf *setbuf(char_type *s, size_type n) override
+		{
+			size_type const m = n / 2;
+			return setbuf(s, n - m, m);
+		}
 
-private:
+		basic_streambuf *setbuf(char_type *s, size_type n, size_type m)
+		{
+			auto t = s + n;
+			auto u = t + m;
+			setg(s, t, t);
+		       	setp(t, u);
+			return this;
+		}
 
-	string buf;
-};
+		basic_streambuf *setbufsz(size_type n)
+		{
+			buf.resize(n);
+			return setbuf(buf.data(), n);
+		}
+
+		basic_streambuf *setbufsz(size_type n, size_type m)
+		{
+			buf.resize(n + m);
+			return setbuf(buf.data(), n, m);
+		}
+
+		string_view pview() const
+		{
+			return string_view(pbase(), pptr() - pbase());
+		}
+
+		string_view gview() const
+		{
+			return string_view(pptr(), egptr() - pptr());
+		}
+
+	private:
+
+		string buf;
+	};
+}
 
 #endif // file
 
