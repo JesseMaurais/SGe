@@ -40,7 +40,7 @@ namespace fmt
 	}
 
 	template <>
-	inline std::string to_string(char const & value)
+	inline std::string to_string(char const &value)
 	{
 		return std::string(1, value);
 	}

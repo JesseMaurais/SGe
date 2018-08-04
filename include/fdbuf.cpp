@@ -5,12 +5,6 @@
 namespace sys::io
 {
 	template <class Char, template <class> class Traits>
-	basic_fdbuf<Char, Traits, Alloc>::basic_fdbuf(int fd)
-	{
-		this->fd = fd;
-	}
-
-	template <class Char, template <class> class Traits>
 	typename basic_fdbuf<Char, Traits>::size_type
 	basic_fdbuf<Char, Traits>::xsputn(char_type const *s, size_type n)
 	{
@@ -27,7 +21,7 @@ namespace sys::io
 		if (-1 == sz) std::perror(__FUNCTION__);
 		return sz;
 	}
-	
+
 	template class basic_fdbuf<char>;
 	template class basic_fdbuf<wchar_t>;
 }

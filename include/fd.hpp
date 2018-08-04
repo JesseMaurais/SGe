@@ -18,11 +18,28 @@ namespace sys::io
 	, public basic_membuf<Char, Traits, Alloc>
 	, public basic_fdbuf<Char, Traits>
 	{
+		using traits = typename Traits<Char>;
+		using alloc = typename Alloc<Char>;
+		using string = std::basic_string<Char, traits, alloc>;
+		using string_view = std::basic_string_view<Char, traits>;
+		using namespace std::ios_base;
+
 	public:
-		basic_ifdstream(int fd)
-		: basic_fdbuf(fd)
-		, basic_istream(this)
-		{ }
+
+		basic_ifdstream(int fd = NFD);
+		basic_ifdstream(string_view filename, openmode mode = in)
+		: basic_ifdstream()
+		{
+			open(filename, mode|in);
+		}
+
+		void close() { fd = NFD; }
+		bool is_open() const { return fd; }
+		void open(string_view filename, openmode mode = in);
+
+	private:
+
+		auto_fd fd;
 	};
 
 	template

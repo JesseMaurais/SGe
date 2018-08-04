@@ -14,6 +14,7 @@ namespace sys::io
 	{
 		using traits = typename Traits<Char>:
 		using base = typename basic_iobuf<Char, Traits>;
+		using namespace std::ios_base;
 
 	public:
 
@@ -24,7 +25,15 @@ namespace sys::io
 		using pos_type = typename base::pos_type;
 		using off_type = typename base::off_type;
 
-		basic_fdbuf(int fd);
+		basic_fdbuf(int fd)
+		{
+			setfd(fd);
+		}
+
+		void setfd(int fd)
+		{
+			this->fd = fd;
+		}
 
 	private:
 
