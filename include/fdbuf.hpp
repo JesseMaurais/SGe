@@ -12,18 +12,15 @@ namespace sys::io
 	>
 	class basic_fdbuf : public basic_iobuf<Char, Traits>
 	{
-		using traits = typename Traits<Char>:
-		using base = typename basic_iobuf<Char, Traits>;
-		using namespace std::ios_base;
-
-	public:
-
+		using base = basic_iobuf<Char, Traits>;
 		using size_type = typename base::streamsize;
 		using char_type = typename base::char_type;
 		using traits_type = typename base::traits_type;
 		using int_type = typename base::int_type;
 		using pos_type = typename base::pos_type;
 		using off_type = typename base::off_type;
+
+	public:
 
 		basic_fdbuf(int fd)
 		{

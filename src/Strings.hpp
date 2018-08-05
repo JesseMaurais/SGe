@@ -26,8 +26,8 @@ enum Strings
 	,InvalidDevice
 	,InvalidContext
 	,InvalidProgram
-	,StartProgram
-	,EndProgram
+	,ProcessStart
+	,ProcessTerminate
 	,MessageBoxError
 	,MessageBoxWarning
 	,MessageBoxInformation

@@ -1,59 +1,68 @@
-#ifndef format_hpp
-#define format_hpp
+#ifndef fmt_hpp
+#define fmt_hpp
 
 #include <locale>
 #include <string>
 #include <sstream>
 #include <string_view>
-#include "algorithm.hpp"
+#include "algo.hpp"
+#include "fs.hpp"
 
 namespace fmt
 {
+	// String converters for generic programming
+
 	template <typename T>
-	inline std::string to_string(T const &value)
+	inline std::string to_string(T const &x)
 	{
-		return std::to_string(value);
+		return std::to_string(x);
 	}
 
 	template <>
-	inline std::string to_string(std::string const &value)
+	inline std::string to_string(std::string const &s)
 	{
-		return value;
+		return s;
 	}
 
 	template <>
-	inline std::string to_string(std::string_view const &value)
+	inline std::string to_string(std::string_view const &s)
 	{
-		return std::string(value.data(), value.size());
+		return std::string(s.data(), s.size());
 	}
 
 	template <>
-	inline std::string to_string(char const * const &value)
+	inline std::string to_string(sys::file::path const &p)
 	{
-		return std::string(value, std::strlen(value));
+		return p.string();
 	}
 
 	template <>
-	inline std::string to_string(char * const &value)
+	inline std::string to_string(char const * const &s)
 	{
-		return std::string(value, std::strlen(value));
+		return std::string(s, std::strlen(s));
 	}
 
 	template <>
-	inline std::string to_string(char const &value)
+	inline std::string to_string(char * const &s)
 	{
-		return std::string(1, value);
+		return std::string(s, std::strlen(s));
+	}
+
+	template <>
+	inline std::string to_string(char const &c)
+	{
+		return std::string(1, c);
 	}
 
 	// Basic string formatting tools
 
-	inline void replace(std::string &buffer, std::string const &s, std::string const &r)
+	inline void replace(std::string &buf, std::string const &s, std::string const &r)
 	{
-		auto const length = s.length();
+		auto const sz = s.size();
 		constexpr auto end = std::string::npos;
-		for (auto at = buffer.find(s); at != end; at = buffer.find(s, at+length))
+		for (auto at = buf.find(s); at != end; at = buf.find(s, at + sz))
 		{
-			buffer.replace(at, length, r);
+			buf.replace(at, sz, r);
 		}
 	}
 
@@ -97,24 +106,24 @@ namespace fmt
 		}
 	};
 
-	inline void split(std::vector<std::string> &tokens, std::string const &string, std::string const &del)
+	inline void split(std::vector<std::string> &tok, std::string const &s, std::string const &del)
 	{
 		using size_type = std::string::size_type;
 		constexpr auto end = std::string::npos;
-		auto const length = del.length();
-		for (size_type next = string.find(del), last = 0; last != end; next = string.find(del, last))
+		auto const sz = del.size();
+		for (size_type next = s.find(del), last = 0; last != end; next = s.find(del, last))
 		{
-			tokens.emplace_back(string.substr(last, next-last));
-			last = (next == end) ? next : (next + length);
+			tok.emplace_back(s.substr(last, next - last));
+			last = (next == end) ? next : (next + sz);
 		}
 	}
 
 	template <typename Container>
-	inline std::string join(Container const &tokens, std::string const &delimiter)
+	inline std::string join(Container const &tok, std::string const &del)
 	{
 		std::stringstream stream;
-		auto it = std::ostream_iterator<std::string>(stream, delimiter.c_str());
-		std::copy(std::begin(tokens), std::end(tokens), it);
+		auto it = std::ostream_iterator<std::string>(stream, del.c_str());
+		std::copy(std::begin(tok), std::end(tok), it);
 		return stream.str();
 	}
 

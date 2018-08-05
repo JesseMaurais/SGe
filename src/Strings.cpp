@@ -29,8 +29,8 @@ char const *String(enum Strings id)
 	case InvalidDevice: return "Invalid device";
 	case InvalidContext: return "Invalid context";
 	case InvalidProgram: return "File is not executable";
-	case StartProgram: return "Starting process: {1}";
-	case EndProgram: return "Ending process: {1}";
+	case ProcessStart: return "Starting process: {1}";
+	case ProcessTerminate: return "Terminating process: {1}";
 	case MessageBoxError: return "Error";
 	case MessageBoxWarning: return "Warning";
 	case MessageBoxInformation: return "Information";

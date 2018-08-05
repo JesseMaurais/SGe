@@ -1,5 +1,5 @@
-#ifndef numeric_hpp
-#define numeric_hpp
+#ifndef num_hpp
+#define num_hpp
 
 #include <stdexcept>
 #include <charconv>

@@ -3,32 +3,34 @@
 #include "Signal.hpp"
 #include "Desktop.hpp"
 #include "Error.hpp"
-#include "Pipe.hpp"
-#include "filesystem.hpp"
+#include "fmt.hpp"
+#include "fs.hpp"
+#include "ipc.hpp"
 
 namespace
 {
 	// Look for the fswatch program
 
-	sys::file::path const &GetProgramPath()
+	sys::file::path GetProgramPath()
 	{
 		constexpr auto const program = "fswatch";
-		static sys::file::path const path = sys::GetProgramPath("fswatch");
+		static sys::file::path const path = sys::GetProgramPath(program);
 		if (path.empty())
 		{
 			SDL::SetError(CannotFindPath, program);
 		}
-		return fmt::quote(path);
+		return fmt::quote(fmt::to_string(path));
 	}
 
 	// Create a command for an fswatch process
 
 	sys::file::path GetShellCommand(sys::file::path path)
 	{
-		static sys::file::path const &program = GetProgramPath();
+		static sys::file::path const program = GetProgramPath();
 		if (not program.empty())
 		{
-			return fmt::join(program, path, " ");
+			std::vector args { fmt::to_string(program), fmt::to_string(path) };
+			return fmt::join(args, " ");
 		}
 		return program;
 	}
@@ -44,7 +46,7 @@ namespace
 		{
 			if (not command.empty())
 			{
-				SDL::Log(ProcessStarting, command);
+				SDL::Log(ProcessStart, command);
 				thread = std::thread([this] { Thread(command); });
 			}
 		}
@@ -53,7 +55,7 @@ namespace
 		{
 			if (not command.empty())
 			{
-				SDL::Log(ProcessTerminating, command);
+				SDL::Log(ProcessTerminate, command);
 			}
 		}
 
@@ -65,7 +67,7 @@ namespace
  		static void Thread(sys::file::path const &command)
 		{
 			// Start a process with the fswatch program
-			sys::io::File process = SDL::Process(command);
+			sys::io::pstream process(command);
 			if (not process)
 			{
 				SDL::LogError(command);
@@ -73,7 +75,7 @@ namespace
 			}
 			// Block for input
 			std::string line;
-			while (process.get(line))
+			while (std::getline(pstream, line))
 			{
 				// Push onto the main event queue
 				if (not SDL::SendUserEvent(UpdateFile, 0, line))

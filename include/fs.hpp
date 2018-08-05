@@ -1,5 +1,5 @@
-#ifndef filesystem_hpp
-#define filesystem_hpp
+#ifndef fs_hpp
+#define fs_hpp
 
 // Try to find an file system library, either standard, experimental or boost
 

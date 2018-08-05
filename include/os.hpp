@@ -159,7 +159,7 @@ constexpr bool UNIXWARE = false;
 constexpr bool SYSV = true;
 #else
 constexpr bool SYSV = false;
-#undef
+#endif
 
 // Oracle Solaris
 #if defined(sun) || defined(__sun)
@@ -187,7 +187,7 @@ constexpr bool HPUX = false;
 #endif
 
 // SGI IRIX
-#if defined(sgi) || defind(__sgi)
+#if defined(sgi) || defined(__sgi)
 # undef __IRIX__
 # define __IRIX__ 1
 constexpr bool IRIX = true;
