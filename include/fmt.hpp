@@ -31,6 +31,22 @@ namespace fmt
 	}
 
 	template <>
+	inline std::string to_string(std::wstring const &w)
+	{
+		using utf8 = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<utf8> convert;
+		return convert.to_bytes(w);
+	}
+
+	template <>
+	inline std::string to_string(std::wstring_view const &w)
+	{
+		using utf8 = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<utf8> convert;
+		return convert.to_bytes(w.data(), w.data() + w.size());
+	}
+
+	template <>
 	inline std::string to_string(sys::file::path const &p)
 	{
 		return p.string();

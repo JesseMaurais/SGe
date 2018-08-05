@@ -15,8 +15,7 @@ namespace sys::io
 	>
 	class basic_pstream : public basic_fdstream<Char, Traits, Alloc>
 	{
-		using traits = typename Traits<Alloc>;
-		using string_view = typename basic_string_view<Char, traits>;
+		using string_view = typename basic_string_view<Char, Traits<Char>>;
 		using namespace std::ios_base;
 
 	public:

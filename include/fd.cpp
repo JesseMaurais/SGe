@@ -1,5 +1,5 @@
 #include "fd.hpp"
-#include "os.hpp"
+#include "fmt.hpp"
 #include "unisys.hpp"
 #include <cstdio>
 
@@ -38,45 +38,39 @@ namespace
 
 namespace sys::io
 {
-	template
-	<
-	 class Char,
-	 template <class> class Traits,
-	 template <class> class Alloc
-	>
-	basic_ifdstream(int fd)
-	: basic_fdbuf(fd)
-	, basic_membuf(BUFSIZ)
-	, basic_istream(this)
-	{ }
-
-	template
+	auto_fd::auto_fd(std::string_view view, std::ios_base::openmode mode)
 	{
-	 class Char,
-	 template <class> class Traits,
-	 template <class> class Alloc
-	>
-	void open(string_view filename_view, openmode mode)
-	{
-		string const filename = filename_view; // should convert UTF-8
-		fd = ::open(filename.c_str(), convert(mode));
+		std::string const path = fmt::to_string(view);
+		fd = ::open(path.c_str(), convert(mode));
 		if (NFD == fd)
 		{
-			std::perror(__FUNCTION__);
+			std::perror("open");
 			return;
 		}
-		if (mode & out and mode & in)
+	}
+
+	auto_fd::~auto_fd()
+	{
+		if (NFD == fd)
 		{
-			setbufsz(BUFSIZ, BUFSIZ);
+			return;
 		}
-		else if (mode & out)
+		if (::close(fd))
 		{
-			setbufsz(0, BUFSIZ);
+			std::perror("close");
 		}
-		else if (mode & in)
+	}
+
+	auto_pipe::auto_pipe()
+	{
+		int fds[2];
+		if (::pipe(fds))
 		{
-			setbufsz(BUFSIZ, 0);
+			std::perror("pipe");
+			return;
 		}
+		this->fds[0] = fds[0];
+		this->fds[1] = fds[1];
 	}
 }
 

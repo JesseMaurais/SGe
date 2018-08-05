@@ -11,7 +11,7 @@ namespace sys::io
 	 class Char,
 	 template <class> class Traits = std::char_traits
 	>
-	class basic_iobuf : public std::basic_streambuf<Char, Traits<Char>>
+	class basic_iobuf : public virtual std::basic_streambuf<Char, Traits<Char>>
 	{
 		using base = std::basic_streambuf<Char, Traits<Char>>;
 		using char_type = typename base::char_type;

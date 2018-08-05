@@ -1,87 +1,72 @@
 #ifndef fd_hpp
 #define fd_hpp
 
-#include <iostream>
-#include "pipe.hpp"
-#include "fdbuf.hpp"
-#include "membuf.hpp"
+#include <string>
+#include <ios>
 
 namespace sys::io
 {
-	template
-	<
-	 class Char,
-	 template <class> class Traits = std::char_traits,
-	 template <class> class Alloc = std::allocator
-	>
-	class basic_ifdstream
-	: public std::basic_istream<Char, Traits<Char>>
-	, public basic_membuf<Char, Traits, Alloc>
-	, public basic_fdbuf<Char, Traits>
-	{
-		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
-		using string_view = std::basic_string_view<Char, Traits<Char>>;
-		using namespace std::ios_base;
+	constexpr int NFD = -1;
 
+	class auto_fd
+	{
 	public:
 
-		basic_ifdstream(int fd = NFD);
-		basic_ifdstream(string_view filename, openmode mode = in)
-		: basic_ifdstream()
+		~auto_fd();
+		auto_fd(std::string_view path, std::ios_base::openmode mode);
+
+		auto_fd(int fd = NFD)
 		{
-			open(filename, mode|in);
+			this->fd = fd;
 		}
 
-		void close() { fd = NFD; }
-		bool is_open() const { return fd; }
-		void open(string_view filename, openmode mode = in);
+		operator int() const
+		{
+			return fd;
+		}
+
+		operator bool() const
+		{
+			return NFD != fd;
+		}
+
+		int release()
+		{
+			int fd = this->fd;
+			this->fd = NFD;
+			return fd;
+		}
 
 	private:
 
-		auto_fd fd;
+		int fd;
 	};
 
-	template
-	<
-	 class Char,
-	 template <class> class Traits = std::char_traits,
-	 template <class> class Alloc = std::allocator
-	>
-	class basic_ofdstream
-	: public std::basic_ostream<Char, Traits<Char>>
-	, public basic_membuf<Char, Traits, Alloc>
-	, public basic_fdbuf<Char, Traits>
+	class auto_pipe
 	{
 	public:
-		basic_ofdstream(int fd)
-		: basic_fdbuf(fd)
-		, basic_ostream(this)
-		{ }
-	};
 
-	template
-	<
-	 class Char,
-	 template <class> class Traits = std::char_traits,
-	 template <class> class Alloc = std::allocator
-	>
-	class basic_fdstream
-	: public basic_ifdstream<Char, Traits, Alloc>
-	, public basic_ofdstream<Char, Traits, Alloc>
-	{
-	public:
-		basic_fdstream(int in, int out)
-		: basic_ifdstream(in)
-		, basic_ofdstream(out)
-		{ }
-		basic_fdstream(int fd[2])
-		: basic_fdstream(fd[0], fd[1])
-		{ }
-	};
+		auto_pipe();
 
-	using fdstream = basic_fdstream<char>;
-	using wfdstream = basic_fdstream<wchar_t>;
+		int operator[](std::size_t id) const
+		{
+			return id < 2 ? (int) fds[id] : NFD;
+		}
+
+		operator bool() const
+		{
+			return fds[0] or fds[1];
+		}
+
+		int release(std::size_t id)
+		{
+			return id < 2 ? fds[id].release() : NFD;
+		}
+
+	private:
+
+		auto_fd fds[2];
+	};
 }
 
 #endif // file
-

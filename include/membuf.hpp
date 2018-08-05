@@ -12,15 +12,17 @@ namespace sys::io
 	 template <class> class Traits = std::char_traits,
 	 template <class> class Alloc = std::allocator
 	>
-	class basic_membuf : public std::basic_streambuf<Char, Traits<Char>>
+	class basic_membuf : public virtual std::basic_streambuf<Char, Traits<Char>>
 	{
-		using base = std::basic_streambuf<Char, Traits<Char>>;
+		using base = basic_iobuf<Char, Traits>;
 		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
 		using string_view = std::basic_string_view<Char, Traits<Char>>;
 		using size_type = typename base::streamsize;
 		using char_type = typename base::char_type;
 
 	public:
+
+		basic_membuf() = default;
 
 		basic_membuf(size_type n)
 		{
@@ -56,12 +58,14 @@ namespace sys::io
 
 		string_view pview() const
 		{
-			return string_view(pbase(), pptr() - pbase());
+			auto const sz = base::pptr() - base::pbase();
+			return string_view(pbase(), sz);
 		}
 
 		string_view gview() const
 		{
-			return string_view(pptr(), egptr() - pptr());
+			auto const sz = base::egptr() - gptr();
+			return string_view(gptr(), sz);
 		}
 
 	private:
