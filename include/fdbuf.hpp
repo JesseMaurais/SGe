@@ -15,10 +15,6 @@ namespace sys::io
 		using base = basic_iobuf<Char, Traits>;
 		using size_type = typename base::streamsize;
 		using char_type = typename base::char_type;
-		using traits_type = typename base::traits_type;
-		using int_type = typename base::int_type;
-		using pos_type = typename base::pos_type;
-		using off_type = typename base::off_type;
 
 	public:
 

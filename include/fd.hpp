@@ -2,6 +2,7 @@
 #define fd_hpp
 
 #include <iostream>
+#include "pipe.hpp"
 #include "fdbuf.hpp"
 #include "membuf.hpp"
 
@@ -14,14 +15,12 @@ namespace sys::io
 	 template <class> class Alloc = std::allocator
 	>
 	class basic_ifdstream
-       	: public std::basic_istream<Char, Traits<Char>>
+	: public std::basic_istream<Char, Traits<Char>>
 	, public basic_membuf<Char, Traits, Alloc>
 	, public basic_fdbuf<Char, Traits>
 	{
-		using traits = typename Traits<Char>;
-		using alloc = typename Alloc<Char>;
-		using string = std::basic_string<Char, traits, alloc>;
-		using string_view = std::basic_string_view<Char, traits>;
+		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
+		using string_view = std::basic_string_view<Char, Traits<Char>>;
 		using namespace std::ios_base;
 
 	public:
@@ -49,7 +48,7 @@ namespace sys::io
 	 template <class> class Alloc = std::allocator
 	>
 	class basic_ofdstream
-       	: public std::basic_ostream<Char, Traits<Char>>
+	: public std::basic_ostream<Char, Traits<Char>>
 	, public basic_membuf<Char, Traits, Alloc>
 	, public basic_fdbuf<Char, Traits>
 	{
@@ -67,7 +66,7 @@ namespace sys::io
 	 template <class> class Alloc = std::allocator
 	>
 	class basic_fdstream
-       	: public basic_ifdstream<Char, Traits, Alloc>
+	: public basic_ifdstream<Char, Traits, Alloc>
 	, public basic_ofdstream<Char, Traits, Alloc>
 	{
 	public:

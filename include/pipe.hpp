@@ -1,5 +1,5 @@
-#ifndef pipe_hpp
-#define pipe_hpp
+#ifndef auto_fd_hpp
+#define auto_fd_hpp
 
 namespace sys::io
 {
@@ -46,7 +46,7 @@ namespace sys::io
 
 		int operator[](std::size_t id) const
 		{
-			return id < 2 ? fds[id] : NFD;
+			return id < 2 ? (int) fds[id] : NFD;
 		}
 
 		operator bool() const
