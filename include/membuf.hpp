@@ -64,8 +64,8 @@ namespace sys::io
 
 		string_view gview() const
 		{
-			auto const sz = base::egptr() - gptr();
-			return string_view(gptr(), sz);
+			auto const sz = base::egptr() - base::gptr();
+			return string_view(base::gptr(), sz);
 		}
 
 	private:
