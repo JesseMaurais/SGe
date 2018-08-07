@@ -2,9 +2,10 @@
 #define fmt_hpp
 
 #include <locale>
+#include <cstring>
 #include <string>
 #include <sstream>
-#include <string_view>
+#include <iterator>
 #include "algo.hpp"
 #include "fs.hpp"
 

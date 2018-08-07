@@ -1,6 +1,8 @@
 #ifndef io_hpp
 #define io_hpp
 
+#include <string>
+#include <iostream>
 #include "fmt.hpp"
 
 namespace io

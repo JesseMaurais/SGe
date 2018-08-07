@@ -7,31 +7,6 @@ namespace sys
 {
 
 //
-// System Interfaces
-//
-
-// Portable Operating System Interface
-#if defined(_POSIX_VERSION)
-constexpr long POSIX_VERISON = _POSIX_VERSION;
-#else
-constexpr long POSIX_VERSION = 0L;
-#endif
-
-// Single UNIX Specification
-#if defined(_XOPEN_VERSION)
-constexpr int XOPEN_VERSION = _XOPEN_VERSION;
-#else
-constexpr int XOPEN_VERSION = 0;
-#endif
-
-// Windows Runtime Components
-#if defined(_WINRT_DLL)
-constexpr bool WINRT = true;
-#else
-constexpr bool WINRT = false;
-#endif
-
-//
 // Operating Systems
 //
 
@@ -221,11 +196,27 @@ constexpr bool UNIX = true;
 #else
 constexpr bool UNIX = SYSV or BSD or AIX or HPUX or IRIX;
 #endif
+}
 
-constexpr bool XSI = XOPEN_VERSION > 0;
-constexpr bool POSIX = XSI or POSIX_VERSION > 0;
+// _POSIX_VERSION and _XOPEN_VERSION macros
+#if __has_include(<unistd.h>)
+#include <unistd.h>
+#endif
 
-static_assert(POSIX or WIN32, "Cannot determine which operating system API to use");
+namespace sys
+{
+
+//
+// System Interfaces
+//
+
+// Windows Runtime Components
+#if defined(_WINRT_DLL)
+constexpr bool WINRT = true;
+#else
+constexpr bool WINRT = false;
+#endif
+
 
 }
 

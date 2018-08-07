@@ -1,13 +1,16 @@
 #include "fd.hpp"
+#include "os.hpp"
 #include "fmt.hpp"
 #include "sys.hpp"
+#include "err.hpp"
+#include "ios.hpp"
 #include <cstdio>
 
 namespace
 {
-	using namespace std::ios_base;
-	int convert(openmode mode)
+	int convert(io::openmode mode)
 	{
+		using namespace io;
 		int flags = 0;
 		if (mode & in and mode & out)
 		{
@@ -21,6 +24,10 @@ namespace
 		{
 			flags |= O_RDONLY;
 		}
+		if (mode & bin)
+		{
+			flags |= O_BINARY;
+		}
 		if (mode & app)
 		{
 			flags |= O_APPEND;
@@ -29,22 +36,23 @@ namespace
 		{
 			flags |= O_TRUNC;
 		}
-		if constexpr (sys::linux)
+		if constexpr (sys::LINUX)
 		{
 			flags |= O_DIRECT;
 		}
+		return flags;
 	}
 }
 
 namespace sys::io
 {
-	auto_fd::auto_fd(std::string_view view, std::ios_base::openmode mode)
+	auto_fd::auto_fd(std::string_view view, ::io::openmode mode)
 	{
 		std::string const path = fmt::to_string(view);
 		fd = ::open(path.c_str(), convert(mode));
 		if (NFD == fd)
 		{
-			std::perror("open");
+			sys::ferror("open", path, mode);
 			return;
 		}
 	}
@@ -57,7 +65,7 @@ namespace sys::io
 		}
 		if (::close(fd))
 		{
-			std::perror("close");
+			sys::ferror("close", fd);
 		}
 	}
 
@@ -66,7 +74,7 @@ namespace sys::io
 		int fds[2];
 		if (::pipe(fds))
 		{
-			std::perror("pipe");
+			sys::ferror("pipe");
 			return;
 		}
 		this->fds[0] = fds[0];

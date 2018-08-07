@@ -1,12 +1,7 @@
 #include "ipc.hpp"
 #include "sys.hpp"
+#include "err.hpp"
 #include "os.hpp"
-
-#ifdef __WIN32__
-#include <processthreadsapi.h>
-#else
-#include <unistd.h>
-#endif
 
 namespace sys::io
 {

@@ -1,5 +1,6 @@
 #include "fdbuf.hpp"
 #include "sys.hpp"
+#include "err.hpp"
 #include <cstdio>
 
 namespace sys::io
@@ -10,7 +11,10 @@ namespace sys::io
 	{
 		auto const sz = m * sizeof (char_type);
 		::ssize_t const n = ::write(fd, s, sz);
-		if (-1 == n) std::perror(__FUNCTION__);
+		if (-1 == n)
+		{
+			sys::ferror("write", fd, s, sz);
+		}
 		return n;
 	}
 
@@ -20,7 +24,10 @@ namespace sys::io
 	{
 		auto const sz = m * sizeof (char_type);
 		::ssize_t const n = ::read(fd, s, sz);
-		if (-1 == n) std::perror(__FUNCTION__);
+		if (-1 == n)
+		{
+			sys::ferror("read", fd, s, sz);
+		}
 		return n;
 	}
 

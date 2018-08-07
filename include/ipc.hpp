@@ -3,12 +3,7 @@
 
 #include <string>
 #include <iostream>
-<<<<<<< Updated upstream
 #include "fdstream.hpp"
-=======
-#include "pipe.hpp"
-#include "fd.hpp"
->>>>>>> Stashed changes
 
 namespace sys::io
 {

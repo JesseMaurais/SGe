@@ -52,6 +52,8 @@ namespace sys::file
 
 #endif // file system
 
+#include <fstream>
+
 namespace sys::file
 {
 	inline bool append(path name, std::string_view text)
