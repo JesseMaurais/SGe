@@ -1,26 +1,17 @@
-// Test for an internal compiler error in GCC 8.2.0
-#if 0
 #include "fdbuf.cpp"
 #include "fd.cpp"
 #include "ipc.cpp"
-#include "auto.cpp"
+#include "fdstream.cpp"
 
 int main(char **argv, int argc)
 {
 	sys::io::pstream ls("ls");
 	std::string line;
+	unsigned count = 0;
 	while (std::getline(ls, line))
 	{
-		std::cout << line << std::endl;
+		std::cout << ++count << ": " << line << std::endl;
 	}
 	return 0;
 }
-#else
 
-#include "fdbuf.hpp"
-
-int main(int argc, char **argv)
-{
-	return 0;
-}
-#endif

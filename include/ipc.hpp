@@ -3,7 +3,12 @@
 
 #include <string>
 #include <iostream>
+<<<<<<< Updated upstream
 #include "fdstream.hpp"
+=======
+#include "pipe.hpp"
+#include "fd.hpp"
+>>>>>>> Stashed changes
 
 namespace sys::io
 {
@@ -13,7 +18,7 @@ namespace sys::io
 	 template <class> class Traits = std::char_traits,
 	 template <class> class Alloc = std::allocator
 	>
-	class basic_pstream : public basic_fdstream<Char, Traits, Alloc>
+	class basic_pstream : public basic_fdstream<Char, Traits, Alloc>, auto_pipe
 	{
 		using string_view = typename basic_string_view<Char, Traits<Char>>;
 		using namespace std::ios_base;
@@ -22,6 +27,7 @@ namespace sys::io
 
 		basic_pstream();
 		basic_pstream(string_view program, openmode mode = in|out)
+		: basic_pstream()
 		{
 			open(program, mode);
 		}
