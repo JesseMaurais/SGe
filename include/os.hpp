@@ -6,10 +6,6 @@
 namespace sys
 {
 
-//
-// Operating Systems
-//
-
 // Microsoft Windows
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) || defined(__CYGWIN__)
 # undef __WIN32__
@@ -196,28 +192,6 @@ constexpr bool UNIX = true;
 #else
 constexpr bool UNIX = SYSV or BSD or AIX or HPUX or IRIX;
 #endif
-}
-
-// _POSIX_VERSION and _XOPEN_VERSION macros
-#if __has_include(<unistd.h>)
-#include <unistd.h>
-#endif
-
-namespace sys
-{
-
-//
-// System Interfaces
-//
-
-// Windows Runtime Components
-#if defined(_WINRT_DLL)
-constexpr bool WINRT = true;
-#else
-constexpr bool WINRT = false;
-#endif
-
-
 }
 
 #endif // file

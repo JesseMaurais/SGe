@@ -26,11 +26,6 @@ namespace sys::io
 	>
 	void basic_fdstream::open(string_view path, openmode mode)
 	{
-		if (NFD == fd)
-		{
-			std::perror(__FUNCTION__);
-			return;
-		}
 		if (mode & out and mode & in)
 		{
 			setbufsz(BUFSIZ, BUFSIZ);

@@ -14,7 +14,8 @@
 
 namespace sys
 {
-// Portable Operating System Interface
+
+// Portable Operating System Interface X
 #if defined(_POSIX_VERSION)
 constexpr long POSIX_VERSION = _POSIX_VERSION;
 #else
@@ -30,7 +31,6 @@ constexpr int XOPEN_VERSION = 0;
 
 constexpr bool XSI = XOPEN_VERSION > 0;
 constexpr bool POSIX = XSI or POSIX_VERSION > 0;
-}
 
 // Linux does not define/require these
 #ifndef O_BINARY
@@ -40,6 +40,20 @@ constexpr bool POSIX = XSI or POSIX_VERSION > 0;
 #define O_TEXT 0L
 #endif
 
+constexpr auto dup2 = ::dup2;
+constexpr auto open = ::open;
+using ssize_t = ::ssize_t;
+constexpr auto write = ::write;
+constexpr auto read = ::read;
+constexpr auto close = ::close;
+using pid_t = ::pid_t;
+constexpr auto fork = ::fork;
+constexpr auto popen = ::popen;
+constexpr auto pclose = ::pclose;
+constexpr auto pipe = ::pipe;
+
+} // namespace sys
+
 //
 // MSVCRT
 //
@@ -47,6 +61,16 @@ constexpr bool POSIX = XSI or POSIX_VERSION > 0;
 #else
 #if __has_include(<io.h>)
 #include <io.h>
+
+namespace sys
+{
+
+// Microsoft Visual C
+#if defined(_MSC_VER)
+constexpr long MSC_VER = _MSC_VER
+#else
+constexpr long MSC_VER = 0L;
+#endif
 
 #define O_APPEND _O_APPEND
 #define O_BINARY _O_BINARY
@@ -57,12 +81,12 @@ constexpr bool POSIX = XSI or POSIX_VERSION > 0;
 #define O_TRUNC  _O_TRUNC
 #define O_WRONLY _O_WRONLY
 
-constexpr auto dup2 = _dup2;
-constexpr auto open = _open;
+constexpr auto dup2 = ::_dup2;
+constexpr auto open = ::_open;
 using ssize_t = int;
-constexpr auto write = _write;
-constexpr auto read = _read;
-constexpr auto close = _close;
+constexpr auto write = ::_write;
+constexpr auto read = ::_read;
+constexpr auto close = ::_close;
 
 using pid_t = int;
 // WIN32 does not have a fork
@@ -70,14 +94,16 @@ constexpr auto fork = [] { return -1; };
 
 // UWP does not support the console
 #ifndef _WINRT_DLL
-constexpr auto popen = _popen;
-constexpr auto pclose = _pclose;
-constexpr auto pipe = [](int fd[2]) { return _pipe(fd, BUFSIZ, 0); };
+constexpr auto popen = ::_popen;
+constexpr auto pclose = ::_pclose;
+constexpr auto pipe = [](int fd[2]) { return ::_pipe(fd, BUFSIZ, 0); };
 #else
 constexpr auto popen = [](char const *path, int mode) { return -1; };
 constexpr auto pclose = [](int fd) { return -1; };
 constexpr auto pipe = [](int fd[2]) { return -1; };
 #endif // _WINRT_DLL
+
+} // namespace sys
 
 //
 // Unknown
@@ -87,12 +113,4 @@ constexpr auto pipe = [](int fd[2]) { return -1; };
 #error Cannot find system header
 #endif // io.h
 #endif // unistd.h
-
-//
-// Testing
-//
-
-#include "os.hpp"
-static_assert(sys::POSIX or sys::WIN32, "Cannot determine which operating system API to use");
-
 #endif // file

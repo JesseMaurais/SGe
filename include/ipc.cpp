@@ -30,7 +30,7 @@ namespace sys::io
 		}
 		if constexpr (sys::POSIX)
 		{
-			::pid_t pid = ::fork();
+			sys::pid_t const pid = sys::fork();
 			if (-1 == pid)
 			{
 			}

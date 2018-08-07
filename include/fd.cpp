@@ -49,7 +49,7 @@ namespace sys::io
 	auto_fd::auto_fd(std::string_view view, ::io::openmode mode)
 	{
 		std::string const path = fmt::to_string(view);
-		fd = ::open(path.c_str(), convert(mode));
+		fd = sys::open(path.c_str(), convert(mode));
 		if (NFD == fd)
 		{
 			sys::ferror("open", path, mode);
@@ -63,7 +63,7 @@ namespace sys::io
 		{
 			return;
 		}
-		if (::close(fd))
+		if (sys::close(fd))
 		{
 			sys::ferror("close", fd);
 		}
@@ -72,7 +72,7 @@ namespace sys::io
 	auto_pipe::auto_pipe()
 	{
 		int fds[2];
-		if (::pipe(fds))
+		if (sys::pipe(fds))
 		{
 			sys::ferror("pipe");
 			return;

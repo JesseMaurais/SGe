@@ -10,7 +10,7 @@ namespace sys::io
 	basic_fdbuf<Char, Traits>::xsputn(char_type const *s, size_type m)
 	{
 		auto const sz = m * sizeof (char_type);
-		::ssize_t const n = ::write(fd, s, sz);
+		::ssize_t const n = sys::write(fd, s, sz);
 		if (-1 == n)
 		{
 			sys::ferror("write", fd, s, sz);
@@ -23,7 +23,7 @@ namespace sys::io
 	basic_fdbuf<Char, Traits>::xsgetn(char_type *s, size_type m)
 	{
 		auto const sz = m * sizeof (char_type);
-		::ssize_t const n = ::read(fd, s, sz);
+		::ssize_t const n = sys::read(fd, s, sz);
 		if (-1 == n)
 		{
 			sys::ferror("read", fd, s, sz);
