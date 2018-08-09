@@ -1,16 +1,13 @@
 #include "fd.hpp"
-#include "os.hpp"
-#include "fmt.hpp"
 #include "sys.hpp"
-#include "err.hpp"
-#include "ios.hpp"
+#include "os.hpp"
 #include <cstdio>
 
 namespace
 {
-	int convert(io::openmode mode)
+	using namespace sys::file;
+	int convert(openmode mode)
 	{
-		using namespace io;
 		int flags = 0;
 		if (mode & in and mode & out)
 		{
@@ -46,39 +43,54 @@ namespace
 
 namespace sys::io
 {
-	auto_fd::auto_fd(std::string_view view, ::io::openmode mode)
+	template
+	<
+	 class Char,
+	 template <class> class Traits,
+	 template <class> class Alloc,
+	 template <class, class> class basic_stream,
+	 sys::file::openmode default_mode
+	>
+	impl_fdstream(int fd)
+	: basic_fdbuf(fd)
+	, basic_membuf()
+	, basic_stream(this)
+	{ }
+
+	template
 	{
-		std::string const path = fmt::to_string(view);
+	 class Char,
+	 template <class> class Traits,
+	 template <class> class Alloc,
+	 template <class, class> class basic_stream,
+	 sys::file::openmode default_mode
+	>
+	void impl_fdstream::open(string_view view, openmode mode)
+	{
+		if (mode & out and mode & in)
+		{
+			setbufsz(BUFSIZ, BUFSIZ);
+		}
+		else if (mode & out)
+		{
+			setbufsz(0, BUFSIZ);
+		}
+		else if (mode & in)
+		{
+			setbufsz(BUFSIZ, 0);
+		}
+		else
+		{
+			// error?
+			return;
+		}
+		std::string const path = sys::file::absolute(view).string();
 		fd = sys::open(path.c_str(), convert(mode));
-		if (NFD == fd)
+		if (not fd)
 		{
-			sys::ferror("open", path, mode);
+			sys::perror("open", path, mode);
 			return;
 		}
-	}
-
-	auto_fd::~auto_fd()
-	{
-		if (NFD == fd)
-		{
-			return;
-		}
-		if (sys::close(fd))
-		{
-			sys::ferror("close", fd);
-		}
-	}
-
-	auto_pipe::auto_pipe()
-	{
-		int fds[2];
-		if (sys::pipe(fds))
-		{
-			sys::ferror("pipe");
-			return;
-		}
-		this->fds[0] = fds[0];
-		this->fds[1] = fds[1];
 	}
 }
 

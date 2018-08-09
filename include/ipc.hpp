@@ -3,7 +3,9 @@
 
 #include <string>
 #include <iostream>
-#include "fdstream.hpp"
+#include "file.hpp"
+#include "fdbuf.hpp"
+#include "membuf.hpp"
 
 namespace sys::io
 {
@@ -11,36 +13,39 @@ namespace sys::io
 	<
 	 class Char,
 	 template <class> class Traits = std::char_traits,
-	 template <class> class Alloc = std::allocator
+	 template <class> class Alloc = std::allocator,
+	 template <class, class> class basic_stream,
+	 sys::file::openmode default_mode
 	>
-	class basic_pstream : public basic_fdstream<Char, Traits, Alloc>, auto_pipe
+	class impl_pstream
+	: basic_stream<Char, Traits<Char>>
+	, basic_membuf<Char, Traits, Alloc>
+	, basic_fdbuf<Char, Traits>
 	{
-		using string_view = typename basic_string_view<Char, Traits<Char>>;
-		using namespace std::ios_base;
+		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
+		using string_view = std::basic_string_view<Char, Traits<Char>>;
+		using openmode = sys::file::openmode;
 
 	public:
 
 		basic_pstream();
-		basic_pstream(string_view program, openmode mode = in|out)
+		basic_pstream(string_view path, openmode mode = default_mode)
 		: basic_pstream()
 		{
-			open(program, mode);
-		}
-		~basic_pstream()
-		{
-			close();
+			open(path, mode | default_mode);
 		}
 		
 		bool is_open() const;
-		virtual void open(string_view program, openmode mode = in|out);
+		virtual void open(string_view program, openmode mode = default_mode);
 		void close();
+
+	private:
+
+		sys::file::pipe pipe;
 	};
 
-	using pstream = basic_pstream<char>;
-	using wpstream = basic_pstream<wchar_t>;
-
-	extern template basic_pstream<char>;
-	extern template basic_pstream<wchar_t>;
+	extern template impl_pstream<char>;
+	extern template impl_pstream<wchar_t>;
 
 	template
 	<
@@ -48,26 +53,31 @@ namespace sys::io
 	 template <class> class Traits = std::char_traits,
 	 template <class> class Alloc = std::allocator
 	>
-	class basic_ipstream : public basic_pstream<Char, Traits, Alloc>
+	class basic_pstream
+	: public impl_pstream<Char, Traits, Alloc, std::basic_iostream, sys::file::in|sys::file::out>
 	{
 	public:
-
-		basic_ipstream();
-		basic_ipstream(string_view program, openmode mode = in)
-		: basic_pstream(program mode)
-		{ }
-
-		void open(string_view program, openmode mode = in) override
-		{
-			basic_pstream::open(program, mode);
-		}
+		using impl_pstream::impl_pstream;
 	};
 	
+	using pstream = basic_pstream<char>;
+	using wpstream = basic_pstream<wchar_t>;
+
+	template
+	<
+	 class Char,
+	 template <class> class Traits = std::char_traits,
+	 template <class> class Alloc = std::allocator
+	>
+	class basic_ipstream
+	: public impl_pstream<Char, Traits, Alloc, std::basic_istream, sys::file::in>
+	{
+	public:
+		using impl_pstream::impl_pstream;
+	};
+
 	using ipstream = basic_ipstream<char>;
 	using wipstream = basic_ipstream<wchar_t>;
-
-	extern template basic_ipstream<char>;
-	extern template basic_ipstream<wchar_t>;
 
 	template 
 	<
@@ -75,26 +85,15 @@ namespace sys::io
 	 template <class> class Traits = std::char_traits,
 	 template <class> class Alloc = std::allocator
 	>
-	class basic_opstream : public basic_pstream<Char, Traits, Alloc>
+	class basic_opstream
+	: public impl_pstream<Char, Traits, Alloc, std::basic_ostream, sys::file::out>
 	{
 	public:
-
-		basic_opstream();
-		basic_opstream(string_view program, openmode mode = out)
-		: basic_pstream(program, mode)
-		{ }
-
-		void open(string_view program, openmode mode = out) override
-		{
-			basic_pstream::open(program, mode);
-		}
+		using impl_pstream::impl_pstream;
 	};
 
 	using opstream = basic_opstream<char>;
 	using wopstream = basic_opstream<wchar_t>;
-
-	extern template basic_opstream<char>;
-	extern template basic_opstream<wchar_t>;
 }
 
 #endif // file

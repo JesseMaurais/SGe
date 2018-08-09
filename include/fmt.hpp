@@ -123,16 +123,19 @@ namespace fmt
 		}
 	};
 
-	inline void split(std::vector<std::string> &tok, std::string const &s, std::string const &del)
+	inline std::vector<std::string_view> split(std::string_view s, std::string_view del)
 	{
-		using size_type = std::string::size_type;
-		constexpr auto end = std::string::npos;
-		auto const sz = del.size();
-		for (size_type next = s.find(del), last = 0; last != end; next = s.find(del, last))
+		std::vector<std::string_view> tok;
+		constexpr size_type end = std::string_view::npos;
+		for (size_type last = 0, next = s.find_first_of(del); last != end; next = s.find_first_of(del, last))
 		{
-			tok.emplace_back(s.substr(last, next - last));
-			last = (next == end) ? next : (next + sz);
+			if (next != last)
+			{
+				tok.emplace_back(s.substr(last, next - last));
+			}
+			last = s.find_first_not_of(del, last);
 		}
+		return tok;
 	}
 
 	template <typename Container>
@@ -187,9 +190,8 @@ namespace fmt
 
 	inline std::pair<std::string_view, std::string_view> key_value(std::string const &string)
 	{
-		std::vector<std::string> pair;
-		split(pair, string, "=");
-		if (pair.size() == 2)
+		auto const pair = split(string, "=");
+		if (not pair.empty())
 		{
 			return std::pair(pair.front(), pair.back());
 		}

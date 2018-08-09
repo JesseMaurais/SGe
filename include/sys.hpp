@@ -31,6 +31,7 @@ constexpr int XOPEN_VERSION = 0;
 
 constexpr bool XSI = XOPEN_VERSION > 0;
 constexpr bool POSIX = XSI or POSIX_VERSION > 0;
+constexpr bool WINRT = false;
 
 // Linux does not define/require these
 #ifndef O_BINARY
@@ -51,6 +52,7 @@ constexpr auto fork = ::fork;
 constexpr auto popen = ::popen;
 constexpr auto pclose = ::pclose;
 constexpr auto pipe = ::pipe;
+constexpr auto execv = ::execv;
 
 } // namespace sys
 
@@ -65,12 +67,12 @@ constexpr auto pipe = ::pipe;
 namespace sys
 {
 
-// Microsoft Visual C
-#if defined(_MSC_VER)
-constexpr long MSC_VER = _MSC_VER
-#else
-constexpr long MSC_VER = 0L;
-#endif
+constexpr bool XSI = false;
+constexpr bool POSIX = false;
+
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
 
 #define O_APPEND _O_APPEND
 #define O_BINARY _O_BINARY
@@ -94,10 +96,12 @@ constexpr auto fork = [] { return -1; };
 
 // UWP does not support the console
 #ifndef _WINRT_DLL
+constexpr bool WINRT = false;
 constexpr auto popen = ::_popen;
 constexpr auto pclose = ::_pclose;
 constexpr auto pipe = [](int fd[2]) { return ::_pipe(fd, BUFSIZ, 0); };
 #else
+constexpr bool WINRT = true;
 constexpr auto popen = [](char const *path, int mode) { return -1; };
 constexpr auto pclose = [](int fd) { return -1; };
 constexpr auto pipe = [](int fd[2]) { return -1; };
