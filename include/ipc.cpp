@@ -27,6 +27,11 @@ namespace sys::io
 	>
 	void basic_pstream::open(string_view path, openmode mode)
 	{
+		if constexpr (sys::WIN32)
+		{
+			// do first because of Cygwin's slow fork
+		}
+		else
 		if constexpr (sys::POSIX)
 		{
 			sys::file::pipe in, out;
@@ -58,10 +63,6 @@ namespace sys::io
 			{
 
 			}
-		}
-		else
-		{
-			static_cast(false, "Need to implemented this");
 		}
 	}
 	

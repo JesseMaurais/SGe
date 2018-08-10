@@ -106,13 +106,13 @@ namespace fmt
 		std::vector<std::string_view> tok;
 		using size_type = std::string_view::size_type;
 		constexpr size_type end = std::string_view::npos;
-		for (size_type last = 0, next = s.find_first_of(del); last != end; next = s.find_first_of(del, last))
+		for (size_type at = 0, to = s.find_first_of(del); at != end; to = s.find_first_of(del, at))
 		{
-			if (next != last)
+			if (to != at)
 			{
-				tok.emplace_back(s.substr(last, next - last));
+				tok.emplace_back(s.substr(at, to - at));
 			}
-			last = s.find_first_not_of(del, next);
+			at = s.find_first_not_of(del, to);
 		}
 		return tok;
 	}
@@ -128,26 +128,26 @@ namespace fmt
 
 	inline std::string to_upper(std::string s)
 	{
-		alg::transform(s, [](char c) { return std::toupper(c, std::locale()); });
+		stl::transform(s, [](char c) { return std::toupper(c, std::locale()); });
 		return s;
 	}
 
 	inline std::string to_lower(std::string s)
 	{
-		alg::transform(s, [](char c) { return std::tolower(c, std::locale()); });
+		stl::transform(s, [](char c) { return std::tolower(c, std::locale()); });
 		return s;
 	}
 
 	inline std::string::iterator trim_begin(std::string &s)
 	{
 		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
-		return s.erase(begin(s), alg::find_if(s, isblank));
+		return s.erase(begin(s), stl::find_if(s, isblank));
 	}
 
 	inline std::string::iterator trim_end(std::string &s)
 	{
 		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
-		return s.erase(alg::find_if_not(s, isblank), end(s));
+		return s.erase(stl::find_if_not(s, isblank), end(s));
 	}
 
 	inline bool trim(std::string &s)
@@ -212,14 +212,11 @@ namespace fmt
 		auto const pair = split(s, "=");
 		if (not pair.empty())
 		{
-			return std::pair(pair.front(), pair.back());
+			auto &key = pair.front();
+			auto &value = pair.back();
+			return std::pair(trim(key), trim(value));
 		}
 		return std::pair("", "");
-	}
-
-	inline bool find(std::string_view string, std::string_view what)
-	{
-		return string.find(what) != std::string_view::npos;
 	}
 }
 

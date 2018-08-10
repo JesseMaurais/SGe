@@ -9,7 +9,7 @@
 namespace sys
 {
 	template <typename... Args>
-	void perror(std::string_view format, Args... args)
+	void ferror(std::string_view format, Args... args)
 	{
 		std::string string;
 		if (::io::sprintf(string, format, args...) > 0)
@@ -19,7 +19,7 @@ namespace sys
 	}
 
 	template <typename... Args>
-	void ferror(Args... args)
+	void perror(Args... args)
 	{
 		std::stringstream stream;
 		((stream << args << " "), ...);

@@ -13,7 +13,7 @@ namespace sig
 
 		using signature = void(Args...);
 		using observer = std::function<signature>;
-		using container = std::multimap<Slot, observer>;
+		using container = std::map<Slot, observer>;
 		using count = typename container::size_type;
 
 		void connect(Slot id, observer fn)
@@ -44,7 +44,7 @@ namespace sig
 		template <typename Filter>
 		void send(Filter &&filter) const
 		{
-			std::for_each(slots.begin(), slots.end(), filter);
+			std::for_each(begin(slots), end(slots), filter);
 		}
 
 		template <typename Filter>

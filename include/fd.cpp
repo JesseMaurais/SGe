@@ -81,8 +81,7 @@ namespace sys::io
 		}
 		else
 		{
-			// error?
-			return;
+			return; // error?
 		}
 		std::string const path = sys::file::absolute(view).string();
 		fd = sys::open(path.c_str(), convert(mode));

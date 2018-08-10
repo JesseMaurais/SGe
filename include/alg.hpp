@@ -3,32 +3,32 @@
 
 #include <algorithm>
 
-namespace alg
+namespace stl
 {
 	// Non-modifying sequence operations
 
 	template <typename Container, typename Operation>
 	inline void for_each(Container &&c, Operation &&op)
 	{
-		std::for_each(c.begin(), c.end(), op);
+		std::for_each(begin(c), end(c), op);
 	}
 
 	template <typename Value, typename Alloc, template <typename, typename> class Container>
 	inline auto find(Container<Value, Alloc> const &c, Value const &value) -> decltype(c.end())
 	{
-		return std::find(c.begin(), c.end(), value);
+		return std::find(begin(c), end(c), value);
 	}
 
 	template <typename Container, typename Predicate>
 	inline auto find_if(Container &&c, Predicate &&p) -> decltype(c.end())
 	{
-		return std::find_if(c.begin(), c.end(), p);
+		return std::find_if(begin(c), end(c), p);
 	}
 
 	template <typename Container, typename Predicate>
 	inline auto find_if_not(Container &&c, Predicate &&p) -> decltype(c.end())
 	{
-		return std::find_if_not(std::begin(c), std::end(c), p);
+		return std::find_if_not(begin(c), end(c), p);
 	}
 
 	// Modifying sequence operations
@@ -75,7 +75,7 @@ namespace alg
 	template <typename Container, typename Compare>
 	inline void sort(Container &&c, Compare &&cmp)
 	{
-		std::sort(c.begin(), c.end(), cmp);
+		std::sort(begin(c), end(c), cmp);
 	}
 }
 
