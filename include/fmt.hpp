@@ -112,7 +112,7 @@ namespace fmt
 			{
 				tok.emplace_back(s.substr(last, next - last));
 			}
-			last = s.find_first_not_of(del, last);
+			last = s.find_first_not_of(del, next);
 		}
 		return tok;
 	}
