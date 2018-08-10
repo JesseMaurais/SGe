@@ -3,7 +3,6 @@
 #include "err.hpp"
 #include "os.hpp"
 #include "fmt.hpp"
-#include "algo.hpp"
 
 namespace sys::io
 {

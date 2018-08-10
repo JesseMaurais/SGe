@@ -1,9 +1,9 @@
-#ifndef algo_hpp
-#define algo_hpp
+#ifndef alg_hpp
+#define alg_hpp
 
 #include <algorithm>
 
-namespace algo
+namespace alg
 {
 	// Non-modifying sequence operations
 

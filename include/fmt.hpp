@@ -2,11 +2,11 @@
 #define fmt_hpp
 
 #include <locale>
-#include <cstring>
+#include <codecvt>
 #include <string>
 #include <sstream>
 #include <iterator>
-#include "algo.hpp"
+#include "alg.hpp"
 #include "fs.hpp"
 
 namespace fmt
@@ -32,6 +32,24 @@ namespace fmt
 	}
 
 	template <>
+	inline std::string to_string(char const * const &s)
+	{
+		return to_string(std::string_view(s));
+	}
+
+	template <>
+	inline std::string to_string(char * const &s)
+	{
+		return to_string(std::string_view(s));
+	}
+
+	template <>
+	inline std::string to_string(char const &c)
+	{
+		return std::string(1, c);
+	}
+
+	template <>
 	inline std::string to_string(std::wstring const &w)
 	{
 		using utf8 = std::codecvt_utf8<wchar_t>;
@@ -48,40 +66,96 @@ namespace fmt
 	}
 
 	template <>
+	inline std::string to_string(wchar_t const * const &s)
+	{
+		return to_string(std::wstring_view(s));
+	}
+
+	template <>
+	inline std::string to_string(wchar_t * const &s)
+	{
+		return to_string(std::wstring_view(s));
+	}
+
+	template <>
+	inline std::string to_string(wchar_t const &c)
+	{
+		return to_string(std::wstring(1, c));
+	}
+
+	template <>
 	inline std::string to_string(sys::file::path const &p)
 	{
 		return p.string();
 	}
 
-	template <>
-	inline std::string to_string(char const * const &s)
-	{
-		return std::string(s, std::strlen(s));
-	}
-
-	template <>
-	inline std::string to_string(char * const &s)
-	{
-		return std::string(s, std::strlen(s));
-	}
-
-	template <>
-	inline std::string to_string(char const &c)
-	{
-		return std::string(1, c);
-	}
-
 	// Basic string formatting tools
 
-	inline void replace(std::string &buf, std::string const &s, std::string const &r)
+	inline void replace(std::string &buf, std::string_view s, std::string_view r)
 	{
-		auto const sz = s.size();
-		constexpr auto end = std::string::npos;
-		for (auto at = buf.find(s); at != end; at = buf.find(s, at + sz))
+		using size_type = std::string_view::size_type;
+		constexpr size_type end = std::string::npos;
+		for (auto at = buf.find(s.data(), 0, s.size()); at != end; at = buf.find(s.data(), at + r.size(), s.size())
 		{
-			buf.replace(at, sz, r);
+			buf.replace(at, s.size(), r.data(), r.size());
 		}
 	}
+
+	inline std::vector<std::string_view> split(std::string_view s, std::string_view del)
+	{
+		std::vector<std::string_view> tok;
+		using size_type = std::string_view::size_type;
+		constexpr size_type end = std::string_view::npos;
+		for (size_type last = 0, next = s.find_first_of(del); last != end; next = s.find_first_of(del, last))
+		{
+			if (next != last)
+			{
+				tok.emplace_back(s.substr(last, next - last));
+			}
+			last = s.find_first_not_of(del, last);
+		}
+		return tok;
+	}
+
+	template <typename Container>
+	inline std::string join(Container const &tok, std::string const &del)
+	{
+		std::stringstream stream;
+		auto it = std::ostream_iterator<std::string>(stream, del.c_str());
+		std::copy(std::begin(tok), std::end(tok), it);
+		return stream.str();
+	}
+
+	inline std::string to_upper(std::string s)
+	{
+		alg::transform(s, [](char c) { return std::toupper(c, std::locale()); });
+		return s;
+	}
+
+	inline std::string to_lower(std::string s)
+	{
+		alg::transform(s, [](char c) { return std::tolower(c, std::locale()); });
+		return s;
+	}
+
+	inline std::string::iterator trim_begin(std::string &s)
+	{
+		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
+		return s.erase(begin(s), alg::find_if(s, isblank));
+	}
+
+	inline std::string::iterator trim_end(std::string &s)
+	{
+		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
+		return s.erase(alg::find_if_not(s, isblank), end(s));
+	}
+
+	inline bool trim(std::string &s)
+	{
+		return trim_begin(s) != trim_end(s);
+	}
+
+	// String formatting with inline tags
 
 	class format
 	{
@@ -123,74 +197,19 @@ namespace fmt
 		}
 	};
 
-	inline std::vector<std::string_view> split(std::string_view s, std::string_view del)
-	{
-		std::vector<std::string_view> tok;
-		constexpr size_type end = std::string_view::npos;
-		for (size_type last = 0, next = s.find_first_of(del); last != end; next = s.find_first_of(del, last))
-		{
-			if (next != last)
-			{
-				tok.emplace_back(s.substr(last, next - last));
-			}
-			last = s.find_first_not_of(del, last);
-		}
-		return tok;
-	}
-
-	template <typename Container>
-	inline std::string join(Container const &tok, std::string const &del)
-	{
-		std::stringstream stream;
-		auto it = std::ostream_iterator<std::string>(stream, del.c_str());
-		std::copy(std::begin(tok), std::end(tok), it);
-		return stream.str();
-	}
-
-	inline std::string to_upper(std::string string)
-	{
-		constexpr auto toupper = [](char c) { return std::toupper(c, std::locale()); };
-		algo::transform(string, toupper);
-		return string;
-	}
-
-	inline std::string to_lower(std::string string)
-	{
-		constexpr auto tolower = [](char c) { return std::tolower(c, std::locale()); };
-		algo::transform(string, tolower);
-		return string;
-	}
-
-	inline std::string::iterator trim_begin(std::string &string)
-	{
-		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
-		return string.erase(string.begin(), algo::find_if(string, isblank));
-	}
-
-	inline std::string::iterator trim_end(std::string &string)
-	{
-		constexpr auto isblank = [](char c) { return std::isblank(c, std::locale()); };
-		return string.erase(algo::find_if_not(string, isblank), string.end());
-	}
-
-	inline bool trim(std::string &string)
-	{
-		return trim_begin(string) != trim_end(string);
-	}
-
 	inline std::string quote(std::string_view string)
 	{
 		return format("\"{1}\"") % string;
 	}
 
-	inline std::string key_value(std::string const &key, std::string const &value)
+	inline std::string key_value(std::string_view key, std::string_view value)
 	{
 		return format("{1}={2}") % key % value;
 	}
 
-	inline std::pair<std::string_view, std::string_view> key_value(std::string const &string)
+	inline std::pair<std::string_view, std::string_view> key_value(std::string_view s)
 	{
-		auto const pair = split(string, "=");
+		auto const pair = split(s, "=");
 		if (not pair.empty())
 		{
 			return std::pair(pair.front(), pair.back());
