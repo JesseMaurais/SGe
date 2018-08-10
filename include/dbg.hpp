@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 #define verify(x) (x)
 constexpr bool DEBUG = false;
 #else
