@@ -4,8 +4,8 @@
 #include <string>
 #include <iostream>
 #include "file.hpp"
-#include "fdbuf.hpp"
 #include "membuf.hpp"
+#include "pipebuf.hpp"
 
 namespace sys::io
 {
@@ -20,7 +20,7 @@ namespace sys::io
 	class impl_pstream
 	: basic_stream<Char, Traits<Char>>
 	, basic_membuf<Char, Traits, Alloc>
-	, basic_fdbuf<Char, Traits>
+	, basic_pipebuf<Char, Traits>
 	{
 		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
 		using string_view = std::basic_string_view<Char, Traits<Char>>;
