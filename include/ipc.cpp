@@ -13,7 +13,7 @@ namespace sys::io
 	 template <class> class Alloc,
 	 template <class, class> class basic_stream,
 	 sys::file::openmode default_mode
-	>
+	>cmd
 	impl_pstream::impl_pstream()
 	{ }
 
@@ -25,7 +25,7 @@ namespace sys::io
 	 template <class, class> class basic_stream,
 	 sys::file::openmode default_mode
 	>
-	void basic_pstream::open(string_view path, openmode mode)
+	void basic_pstream::open(initializer_list args, openmode mode)
 	{
 		if constexpr (sys::WIN32)
 		{
@@ -57,11 +57,20 @@ namespace sys::io
 					sys::perror("dup2", out[STDOUT_FILENO], STDOUT_FILENO);
 					return;
 				}
-				
+
+				std::vector<Char*> cmds(args);
+				cmds.push_back(nullptr);
+
+				if (-1 == sys::execv(cmds.front(), cmds.data()))
+				{
+					sys::perror("execv");
+				}
+				std::exit(EXIT_FAILURE);
 			}
 			else
 			{
-
+				pipe[STDIN_FILENO] = out.release(STDOUT_FILENO);
+				pipe[STDOUT_FILENO] = in.release(STDIN_FILENO);
 			}
 		}
 	}

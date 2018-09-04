@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <initializer_list>
 #include "file.hpp"
 #include "membuf.hpp"
 #include "pipebuf.hpp"
@@ -24,19 +25,20 @@ namespace sys::io
 	{
 		using string = std::basic_string<Char, Traits<Char>, Alloc<Char>>;
 		using string_view = std::basic_string_view<Char, Traits<Char>>;
+		using initializer_list = std::initializer_list<Char*>;
 		using openmode = sys::file::openmode;
 
 	public:
 
 		basic_pstream();
-		basic_pstream(string_view path, openmode mode = default_mode)
+		basic_pstream(initializer_list args, openmode mode = default_mode)
 		: basic_pstream()
 		{
-			open(path, mode | default_mode);
+			open(args, mode | default_mode);
 		}
 		
 		bool is_open() const;
-		virtual void open(string_view program, openmode mode = default_mode);
+		virtual void open(initializer_list args, openmode mode = default_mode);
 		void close();
 
 	private:

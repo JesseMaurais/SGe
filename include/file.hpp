@@ -56,7 +56,7 @@ namespace sys::file
 
 		int operator[](std::size_t id) const
 		{
-			return id < 2 ? (int) fds[id] : NFD;
+			return id < 2 ? (int) fds[id] : -1;
 		}
 
 		operator bool() const
